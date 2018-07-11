@@ -2,7 +2,7 @@ package com.fnt.ui;
 
 import javax.servlet.annotation.WebServlet;
 
-import com.fnt.user.UserList;
+import com.fnt.customer.CustomerList;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
@@ -20,12 +20,12 @@ public class VaadinUI extends UI {
 
 		tabSheet.setSizeFull();
 		setContent(tabSheet);
-		addTab(new UserList());
+		addTab(new CustomerList());
 
 	}
 
 	private void addTab(Component content) {
-		tabSheet.addTab(content, "User");
+		tabSheet.addTab(content, "Customer");
 	}
 
 	@WebServlet(urlPatterns = "/*", name = "VaadinUIServlet", asyncSupported = true)

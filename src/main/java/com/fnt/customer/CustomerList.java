@@ -1,8 +1,9 @@
-package com.fnt.user;
+package com.fnt.customer;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.fnt.role.RoleRepository;
+
+import com.fnt.entity.Customer;
 import com.fnt.sys.RestResponse;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Button;
@@ -12,14 +13,13 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.SingleSelect;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.components.grid.HeaderRow;
 import com.vaadin.ui.themes.ValoTheme;
 
-public class UserList extends Composite {
+public class CustomerList extends Composite {
 
 	private static final long serialVersionUID = 4797579884478708862L;
 
@@ -27,8 +27,7 @@ public class UserList extends Composite {
 	public static final int CRUD_EDIT = 2;
 	public static final int CRUD_DELETE = 4;
 
-	UserRepository userRepository = new UserRepository();
-	RoleRepository roleRepository = new RoleRepository();
+	CustomerRepository customerRepository = new CustomerRepository();
 
 	// crud
 	private Button refresh = new Button("", VaadinIcons.SEARCH);
@@ -46,9 +45,9 @@ public class UserList extends Composite {
 	private CheckBox sortLastname = new CheckBox();
 	private CheckBox sortEmail = new CheckBox();
 
-	private Grid<User> grid = new Grid<>(User.class);
+	private Grid<Customer> grid = new Grid<>(Customer.class);
 
-	public UserList() {
+	public CustomerList() {
 		initLayout();
 		initBehavior();
 		search();
@@ -79,7 +78,8 @@ public class UserList extends Composite {
 
 		grid.setSizeFull();
 
-		for (@SuppressWarnings("rawtypes") Grid.Column column : grid.getColumns()) {
+		for (@SuppressWarnings("rawtypes")
+		Grid.Column column : grid.getColumns()) {
 			column.setSortable(false);
 		}
 		VerticalLayout layout = new VerticalLayout(header, grid);
@@ -112,7 +112,6 @@ public class UserList extends Composite {
 		return null;
 	}
 
-
 	private Object evaluateLastnameSort() {
 		Boolean val = sortLastname.getValue();
 		if (val) {
@@ -134,13 +133,13 @@ public class UserList extends Composite {
 		showSort();
 		return null;
 	}
-	
+
 	private void showSort() {
-		
-		if(selectedSort.size() < 1) {
+
+		if (selectedSort.size() < 1) {
 			sortFirstname.setValue(true);
 		}
-		
+
 		String theSort = "";
 		for (String dta : selectedSort) {
 			theSort += dta;
@@ -152,7 +151,6 @@ public class UserList extends Composite {
 		filterSortOrder.setValue(theSort);
 	}
 
-
 	public void search() {
 
 		String firstNameStr = filterFirstName.getValue() == null ? "" : filterFirstName.getValue().trim();
@@ -160,7 +158,7 @@ public class UserList extends Composite {
 		String emailStr = filterEmail.getValue() == null ? "" : filterEmail.getValue().trim();
 		String sortOrder = filterSortOrder.getValue();
 
-		RestResponse<List<User>> rs = userRepository.search(firstNameStr, lastNameStr, emailStr, sortOrder);
+		RestResponse<List<Customer>> rs = customerRepository.search(firstNameStr, lastNameStr, emailStr, sortOrder);
 		grid.setItems(rs.getEntity());
 		updateHeader();
 	}
@@ -172,27 +170,29 @@ public class UserList extends Composite {
 	}
 
 	private void showAddWindow() {
-		UserForm window = new UserForm(this, userRepository, roleRepository, "Add", new User(), CRUD_CREATE);
+		CustomerForm window = new CustomerForm(this, customerRepository, "Add", new Customer(), CRUD_CREATE);
 		getUI().addWindow(window);
 	}
 
 	private void showEditWindow() {
 		// get from the server, it could have been removed
-		SingleSelect<User> selected = grid.asSingleSelect();
-		Long id = selected.getValue().getId();
-		RestResponse<User> fetched = userRepository.getById(id);
+		SingleSelect<Customer> selected = grid.asSingleSelect();
+		// Long id = selected.getValue().getId();
+		// RestResponse<Customer> fetched = userRepository.getById(id);
 
-		if (fetched.getStatus().equals(200)) {
-			User fetchedUser = fetched.getEntity();
-			UserForm window = new UserForm(this, userRepository, roleRepository, "Edit", fetchedUser, CRUD_EDIT);
-			getUI().addWindow(window);
-		} else {
-			Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
-		}
+		// if (fetched.getStatus().equals(200)) {
+		// Customer fetchedCustomer = fetched.getEntity();
+		// UserForm window = new UserForm(this, fetchedCustomer,  "Edit",
+		// fetchedUser, CRUD_EDIT);
+		// getUI().addWindow(window);
+		// } else {
+		// Notification.show("ERROR", fetched.getMsg(),
+		// Notification.Type.ERROR_MESSAGE);
+		// }
 	}
 
 	private void showRemoveWindow() {
-		UserForm window = new UserForm(this, userRepository, roleRepository, "Delete", grid.asSingleSelect().getValue(),
+		CustomerForm window = new CustomerForm(this, customerRepository, "Delete", grid.asSingleSelect().getValue(),
 				CRUD_DELETE);
 		getUI().addWindow(window);
 	}

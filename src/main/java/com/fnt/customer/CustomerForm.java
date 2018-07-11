@@ -1,16 +1,16 @@
-package com.fnt.user;
+package com.fnt.customer;
 
-import com.fnt.role.Role;
-import com.fnt.role.RoleRepository;
+import java.util.List;
+
+import com.fnt.entity.Customer;
 import com.fnt.sys.RestResponse;
 import com.vaadin.data.BeanValidationBinder;
+import com.vaadin.data.BindingValidationStatus;
 import com.vaadin.data.ValidationException;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.CheckBoxGroup;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
@@ -20,40 +20,33 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-public class UserForm extends Window {
+public class CustomerForm extends Window {
 
 	private static final long serialVersionUID = -1559073890684080775L;
 
 	int crudFunction = 1;
-	UserRepository userRepository;
-	RoleRepository roleRepository;
-	UserList owner;
+	CustomerRepository customerRepository;
+	CustomerList owner;
 
 	private TextField firstName = new TextField("First name");
 	private TextField lastName = new TextField("Last name");
 	private TextField email = new TextField("Email");
 	private PasswordField password = new PasswordField("Password");
-	private CheckBoxGroup<Role> roles;
-	private ComboBox<Role> mainRole;
 	private CheckBox blocked = new CheckBox("Blocked");
 
 	private Button cancel = new Button("Cancel");
 	private Button save = new Button("Ok", VaadinIcons.CHECK);
-	//private Button refresh = new Button("Refresh");  // does not work as expected
+	// private Button refresh = new Button("Refresh"); // does not work as expected
 
-	public UserForm(UserList owner, UserRepository userRepository, RoleRepository roleRepository, String caption,
-			User user, int crudFunction) {
+	public CustomerForm(CustomerList owner, CustomerRepository customerRepository, String caption, Customer user,
+			int crudFunction) {
 		this.owner = owner;
-		this.userRepository = new UserRepository();
-		this.roleRepository = new RoleRepository();
-
-		roles = new CheckBoxGroup<>("Roles", roleRepository.findAll());
-		mainRole = new ComboBox<>("Main Role", roleRepository.findAll());
+		this.customerRepository = customerRepository;
 
 		this.crudFunction = crudFunction;
 
 		switch (crudFunction) {
-		case UserList.CRUD_DELETE:
+		case CustomerList.CRUD_DELETE:
 			save.setCaption("Confirm delete");
 			break;
 		}
@@ -62,11 +55,11 @@ public class UserForm extends Window {
 		initBehavior(user);
 	}
 
-	private void fetchUser(Long id) {
+	private void fetchCustomer(Long id) {
 
-		RestResponse<User> fetched = userRepository.getById(id);
+		RestResponse<Customer> fetched = customerRepository.getById(id);
 		if (fetched.getStatus().equals(200)) {
-			User fetchedUser = fetched.getEntity();
+			Customer fetchedUser = fetched.getEntity();
 			initBehavior(fetchedUser);
 		} else {
 			Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
@@ -81,7 +74,7 @@ public class UserForm extends Window {
 		// HorizontalLayout buttons = new HorizontalLayout(refresh, cancel, save);
 		buttons.setSpacing(true);
 
-		GridLayout formLayout = new GridLayout(3, 3, firstName, lastName, email, password, roles, mainRole, blocked);
+		GridLayout formLayout = new GridLayout(3, 3, firstName, lastName, email, password, blocked);
 		formLayout.setMargin(true);
 		formLayout.setSpacing(true);
 
@@ -92,10 +85,10 @@ public class UserForm extends Window {
 		center();
 	}
 
-	private void initBehavior(User user) {
-		BeanValidationBinder<User> binder = new BeanValidationBinder<>(User.class);
+	private void initBehavior(Customer customer) {
+		BeanValidationBinder<Customer> binder = new BeanValidationBinder<>(Customer.class);
 		binder.bindInstanceFields(this);
-		binder.readBean(user);
+		binder.readBean(customer);
 
 		// refresh.addClickListener(e -> fetchUser(user.getId()));
 
@@ -103,17 +96,17 @@ public class UserForm extends Window {
 		save.addClickListener(e -> {
 			try {
 				binder.validate();
-				binder.writeBean(user);
-				RestResponse<User> rs = null;
+				binder.writeBean(customer);
+				RestResponse<Customer> rs = null;
 				switch (crudFunction) {
-				case UserList.CRUD_CREATE:
-					rs = userRepository.create(user);
+				case CustomerList.CRUD_CREATE:
+					rs = customerRepository.create(customer);
 					break;
-				case UserList.CRUD_EDIT:
-					rs = userRepository.update(user);
+				case CustomerList.CRUD_EDIT:
+					rs = customerRepository.update(customer);
 					break;
-				case UserList.CRUD_DELETE:
-					rs = userRepository.delete(user);
+				case CustomerList.CRUD_DELETE:
+					rs = customerRepository.delete(customer);
 					break;
 				default: {
 					return;
@@ -126,7 +119,14 @@ public class UserForm extends Window {
 					owner.search();
 				}
 			} catch (ValidationException ex) {
-				Notification.show("Please fix the errors and try again");
+				List<BindingValidationStatus<?>> errors = ex.getFieldValidationErrors();
+				String msg = "";
+				for (BindingValidationStatus<?> error : errors) {
+					msg += error.getResult().get().getErrorMessage();
+					// TODO close but no cigar where are the field names ???
+					msg += "\n";
+				}
+				Notification.show("ERROR", msg, Notification.Type.ERROR_MESSAGE);
 			}
 		});
 	}
