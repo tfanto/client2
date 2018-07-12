@@ -13,6 +13,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.SingleSelect;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -30,20 +31,18 @@ public class CustomerList extends Composite {
 	CustomerRepository customerRepository = new CustomerRepository();
 
 	// crud
-	private Button refresh = new Button("", VaadinIcons.SEARCH);
-	private Button add = new Button("", VaadinIcons.PLUS);
-	private Button edit = new Button("", VaadinIcons.PENCIL);
-	private Button delete = new Button("", VaadinIcons.TRASH);
+	private Button btn_refresh = new Button("", VaadinIcons.SEARCH);
+	private Button btn_add = new Button("", VaadinIcons.PLUS);
+	private Button btn_edit = new Button("", VaadinIcons.PENCIL);
+	private Button btn_delete = new Button("", VaadinIcons.TRASH);
 	// filter
-	private TextField filterFirstName = new TextField();
-	private TextField filterLastName = new TextField();
-	private TextField filterEmail = new TextField();
+	private TextField filterCustomerNumber = new TextField();
+	private TextField filterName = new TextField();
 	// sorting
 	private Label filterSortOrder = new Label();
 	private List<String> selectedSort = new ArrayList<>();
-	private CheckBox sortFirstname = new CheckBox();
-	private CheckBox sortLastname = new CheckBox();
-	private CheckBox sortEmail = new CheckBox();
+	private CheckBox sortCustomerNumber = new CheckBox();
+	private CheckBox sortName = new CheckBox();
 
 	private Grid<Customer> grid = new Grid<>(Customer.class);
 
@@ -64,17 +63,17 @@ public class CustomerList extends Composite {
 
 	private void initLayout() {
 
-		CssLayout buttons = new CssLayout(add, edit, delete, refresh);
+		CssLayout buttons = new CssLayout(btn_add, btn_edit, btn_delete, btn_refresh);
 		HorizontalLayout header = new HorizontalLayout(buttons, filterSortOrder);
 		header.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		header.setSpacing(true);
 
-		grid.setColumns("firstname", "lastname", "email", "mainrole");
+		grid.setColumns("customernumber", "name");
 
 		HeaderRow headerRow = grid.getDefaultHeaderRow();
-		headerRow.getCell("firstname").setComponent(createFilterField("Firstname", filterFirstName, sortFirstname));
-		headerRow.getCell("lastname").setComponent(createFilterField("Lastname", filterLastName, sortLastname));
-		headerRow.getCell("email").setComponent(createFilterField("Email", filterEmail, sortEmail));
+		headerRow.getCell("customernumber")
+				.setComponent(createFilterField("Customer number", filterCustomerNumber, sortCustomerNumber));
+		headerRow.getCell("name").setComponent(createFilterField("Name", filterName, sortName));
 
 		grid.setSizeFull();
 
@@ -90,45 +89,33 @@ public class CustomerList extends Composite {
 
 	private void initBehavior() {
 		grid.asSingleSelect().addValueChangeListener(e -> updateHeader());
-		refresh.addClickListener(e -> search());
-		add.addClickListener(e -> showAddWindow());
-		edit.addClickListener(e -> showEditWindow());
-		delete.addClickListener(e -> showRemoveWindow());
+		btn_refresh.addClickListener(e -> search());
+		btn_add.addClickListener(e -> showAddWindow());
+		btn_edit.addClickListener(e -> showEditWindow());
+		btn_delete.addClickListener(e -> showRemoveWindow());
 
-		sortFirstname.addValueChangeListener(e -> evaluateFirstnameSort());
-		sortLastname.addValueChangeListener(e -> evaluateLastnameSort());
-		sortEmail.addValueChangeListener(e -> evaluateEmailSort());
+		sortCustomerNumber.addValueChangeListener(e -> evaluateCustomerNumberSort());
+		sortName.addValueChangeListener(e -> evaluateNameSort());
 		showSort();
 	}
 
-	private Object evaluateFirstnameSort() {
-		Boolean val = sortFirstname.getValue();
+	private Object evaluateNameSort() {
+		Boolean val = sortName.getValue();
 		if (val) {
-			selectedSort.add("Firstname");
+			selectedSort.add("Name");
 		} else {
-			selectedSort.remove("Firstname");
+			selectedSort.remove("Name");
 		}
 		showSort();
 		return null;
 	}
 
-	private Object evaluateLastnameSort() {
-		Boolean val = sortLastname.getValue();
+	private Object evaluateCustomerNumberSort() {
+		Boolean val = sortCustomerNumber.getValue();
 		if (val) {
-			selectedSort.add("Lastname");
+			selectedSort.add("CustomerNumber");
 		} else {
-			selectedSort.remove("Lastname");
-		}
-		showSort();
-		return null;
-	}
-
-	private Object evaluateEmailSort() {
-		Boolean val = sortEmail.getValue();
-		if (val) {
-			selectedSort.add("Email");
-		} else {
-			selectedSort.remove("Email");
+			selectedSort.remove("CustomerNumber");
 		}
 		showSort();
 		return null;
@@ -137,7 +124,7 @@ public class CustomerList extends Composite {
 	private void showSort() {
 
 		if (selectedSort.size() < 1) {
-			sortFirstname.setValue(true);
+			sortCustomerNumber.setValue(true);
 		}
 
 		String theSort = "";
@@ -153,20 +140,20 @@ public class CustomerList extends Composite {
 
 	public void search() {
 
-		String firstNameStr = filterFirstName.getValue() == null ? "" : filterFirstName.getValue().trim();
-		String lastNameStr = filterLastName.getValue() == null ? "" : filterLastName.getValue().trim();
-		String emailStr = filterEmail.getValue() == null ? "" : filterEmail.getValue().trim();
+		String customerNumberStr = filterCustomerNumber.getValue() == null ? ""
+				: filterCustomerNumber.getValue().trim();
+		String nameStr = filterName.getValue() == null ? "" : filterName.getValue().trim();
 		String sortOrder = filterSortOrder.getValue();
 
-		RestResponse<List<Customer>> rs = customerRepository.search(firstNameStr, lastNameStr, emailStr, sortOrder);
+		RestResponse<List<Customer>> rs = customerRepository.search(customerNumberStr, nameStr, sortOrder);
 		grid.setItems(rs.getEntity());
 		updateHeader();
 	}
 
 	private void updateHeader() {
 		boolean selected = !grid.asSingleSelect().isEmpty();
-		edit.setEnabled(selected);
-		delete.setEnabled(selected);
+		btn_edit.setEnabled(selected);
+		btn_delete.setEnabled(selected);
 	}
 
 	private void showAddWindow() {
@@ -177,18 +164,16 @@ public class CustomerList extends Composite {
 	private void showEditWindow() {
 		// get from the server, it could have been removed
 		SingleSelect<Customer> selected = grid.asSingleSelect();
-		// Long id = selected.getValue().getId();
-		// RestResponse<Customer> fetched = userRepository.getById(id);
+		Long id = selected.getValue().getId();
+		RestResponse<Customer> fetched = customerRepository.getById(id);
 
-		// if (fetched.getStatus().equals(200)) {
-		// Customer fetchedCustomer = fetched.getEntity();
-		// UserForm window = new UserForm(this, fetchedCustomer,  "Edit",
-		// fetchedUser, CRUD_EDIT);
-		// getUI().addWindow(window);
-		// } else {
-		// Notification.show("ERROR", fetched.getMsg(),
-		// Notification.Type.ERROR_MESSAGE);
-		// }
+		if (fetched.getStatus().equals(200)) {
+			Customer obj = fetched.getEntity();
+			CustomerForm window = new CustomerForm(this, customerRepository, "Edit", obj, CRUD_EDIT);
+			getUI().addWindow(window);
+		} else {
+			Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
+		}
 	}
 
 	private void showRemoveWindow() {
