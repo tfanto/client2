@@ -1,4 +1,4 @@
-package com.fnt.user;
+package com.fnt.customer;
 
 import java.util.ArrayList;
 import java.util.Base64;
@@ -17,11 +17,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fnt.entity.Customer;
 import com.fnt.sys.RestResponse;
 
-public class UserRepository {
+public class CustomerRepository {
 
-	private static final String REST_USER_END_POINT = "http://localhost:8080/server/rest/user";
+	private static final String REST_CUSTOMER_END_POINT = "http://localhost:8080/server2/rest/customer";
 
 	public Client createClient() {
 
@@ -38,18 +39,48 @@ public class UserRepository {
 		return client;
 	}
 
-	public RestResponse<User> getById(Long id) {
+	public RestResponse<List<Customer>> search(String customernumber, String name, String sortorder) {
+		
+		Encoder encoder = Base64.getEncoder();
+
+		String cn = encoder.encodeToString(customernumber.getBytes());
+		String n = encoder.encodeToString(name.getBytes());
+
+		String so = encoder.encodeToString(sortorder.getBytes());
+
+		Client client = null;
+		try {
+			client = createClient();
+			Response response = client.target(REST_CUSTOMER_END_POINT).path("search").queryParam("customernumber", cn)
+					.queryParam("name", n).queryParam("sortorder", so).request(MediaType.APPLICATION_JSON)
+					.get(Response.class);
+			int status = response.getStatus();
+			if (status == 200) {
+				List<Customer> theList = response.readEntity(new GenericType<List<Customer>>() {
+				});
+				return new RestResponse<>(status, theList);
+			} else {
+				return new RestResponse<>(200, new ArrayList<>());
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
+	}
+
+	public RestResponse<Customer> getById(Long id) {
 
 		String idStr = String.valueOf(id);
 
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_USER_END_POINT).path(idStr).request(MediaType.APPLICATION_JSON)
+			Response response = client.target(REST_CUSTOMER_END_POINT).path(idStr).request(MediaType.APPLICATION_JSON)
 					.get(Response.class);
 			int status = response.getStatus();
 			if (status == 200) {
-				User data = response.readEntity(new GenericType<User>() {
+				Customer data = response.readEntity(new GenericType<Customer>() {
 				});
 				return new RestResponse<>(status, data);
 			} else {
@@ -64,15 +95,15 @@ public class UserRepository {
 		}
 	}
 
-	public RestResponse<User> create(User user) {
+	public RestResponse<Customer> create(Customer customer) {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_USER_END_POINT).request(MediaType.APPLICATION_JSON)
-					.post(Entity.entity(user, MediaType.APPLICATION_JSON), Response.class);
+			Response response = client.target(REST_CUSTOMER_END_POINT).request(MediaType.APPLICATION_JSON)
+					.post(Entity.entity(customer, MediaType.APPLICATION_JSON), Response.class);
 			int status = response.getStatus();
 			if (status == 200) {
-				User data = response.readEntity(new GenericType<User>() {
+				Customer data = response.readEntity(new GenericType<Customer>() {
 				});
 				return new RestResponse<>(status, data);
 			} else {
@@ -87,15 +118,15 @@ public class UserRepository {
 		}
 	}
 
-	public RestResponse<User> update(User user) {
+	public RestResponse<Customer> update(Customer customer) {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_USER_END_POINT).request(MediaType.APPLICATION_JSON)
-					.put(Entity.entity(user, MediaType.APPLICATION_JSON), Response.class);
+			Response response = client.target(REST_CUSTOMER_END_POINT).request(MediaType.APPLICATION_JSON)
+					.put(Entity.entity(customer, MediaType.APPLICATION_JSON), Response.class);
 			int status = response.getStatus();
 			if (status == 200) {
-				User data = response.readEntity(new GenericType<User>() {
+				Customer data = response.readEntity(new GenericType<Customer>() {
 				});
 				return new RestResponse<>(status, data);
 			} else {
@@ -110,14 +141,13 @@ public class UserRepository {
 		}
 	}
 
-	public RestResponse<User> delete(User user) {
-
-		String idStr = String.valueOf(user.getId());
+	public RestResponse<Customer> delete(Customer customer) {
+		String idStr = String.valueOf(customer.getId());
 
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_USER_END_POINT).path(idStr).request(MediaType.APPLICATION_JSON)
+			Response response = client.target(REST_CUSTOMER_END_POINT).path(idStr).request(MediaType.APPLICATION_JSON)
 					.delete();
 			int status = response.getStatus();
 			if (status != 200) {
@@ -132,7 +162,6 @@ public class UserRepository {
 				client.close();
 			}
 		}
-
 	}
 
 	private String formatAppMsg(String appMsg) {
@@ -149,37 +178,6 @@ public class UserRepository {
 			ret += "\n";
 		}
 		return ret;
-	}
-
-	public RestResponse<List<User>> search(String firstName, String lastName, String email, String sortorder) {
-
-		Encoder encoder = Base64.getEncoder();
-
-		String fName = encoder.encodeToString(firstName.getBytes());
-		String lName = encoder.encodeToString(lastName.getBytes());
-		String em = encoder.encodeToString(email.getBytes());
-
-		String so = encoder.encodeToString(sortorder.getBytes());
-
-		Client client = null;
-		try {
-			client = createClient();
-			Response response = client.target(REST_USER_END_POINT).path("search").queryParam("firstname", fName)
-					.queryParam("lastname", lName).queryParam("email", em).queryParam("sortorder", so)
-					.request(MediaType.APPLICATION_JSON).get(Response.class);
-			int status = response.getStatus();
-			if (status == 200) {
-				List<User> theList = response.readEntity(new GenericType<List<User>>() {
-				});
-				return new RestResponse<>(status, theList);
-			} else {
-				return new RestResponse<>(200, new ArrayList<>());
-			}
-		} finally {
-			if (client != null) {
-				client.close();
-			}
-		}
 	}
 
 }
