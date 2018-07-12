@@ -7,12 +7,14 @@ import java.util.List;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fnt.entity.Customer;
@@ -67,23 +69,98 @@ public class CustomerRepository {
 	}
 
 	public RestResponse<Customer> getById(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+
+		String idStr = String.valueOf(id);
+
+		Client client = null;
+		try {
+			client = createClient();
+			Response response = client.target(REST_CUSTOMER_END_POINT).path(idStr).request(MediaType.APPLICATION_JSON)
+					.get(Response.class);
+			int status = response.getStatus();
+			if (status == 200) {
+				Customer data = response.readEntity(new GenericType<Customer>() {
+				});
+				return new RestResponse<>(status, data);
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(404, formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
 	}
 
 	public RestResponse<Customer> create(Customer customer) {
-		// TODO Auto-generated method stub
-		return null;
+		Client client = null;
+		try {
+			client = createClient();
+			Response response = client.target(REST_CUSTOMER_END_POINT).request(MediaType.APPLICATION_JSON)
+					.post(Entity.entity(customer, MediaType.APPLICATION_JSON), Response.class);
+			int status = response.getStatus();
+			if (status == 200) {
+				Customer data = response.readEntity(new GenericType<Customer>() {
+				});
+				return new RestResponse<>(status, data);
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(status, formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
 	}
 
 	public RestResponse<Customer> update(Customer customer) {
-		// TODO Auto-generated method stub
-		return null;
+		Client client = null;
+		try {
+			client = createClient();
+			Response response = client.target(REST_CUSTOMER_END_POINT).request(MediaType.APPLICATION_JSON)
+					.put(Entity.entity(customer, MediaType.APPLICATION_JSON), Response.class);
+			int status = response.getStatus();
+			if (status == 200) {
+				Customer data = response.readEntity(new GenericType<Customer>() {
+				});
+				return new RestResponse<>(status, data);
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(status, formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
 	}
 
 	public RestResponse<Customer> delete(Customer customer) {
-		// TODO Auto-generated method stub
-		return null;
+		String idStr = String.valueOf(customer.getId());
+
+		Client client = null;
+		try {
+			client = createClient();
+			Response response = client.target(REST_CUSTOMER_END_POINT).path(idStr).request(MediaType.APPLICATION_JSON)
+					.delete();
+			int status = response.getStatus();
+			if (status != 200) {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(status, formatAppMsg(appMsg));
+			} else {
+				return new RestResponse<>(status);
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
 	}
 
 	private String formatAppMsg(String appMsg) {
