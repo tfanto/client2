@@ -40,6 +40,7 @@ public class CustomerRepository {
 	}
 
 	public RestResponse<List<Customer>> search(String customernumber, String name, String sortorder) {
+		
 		Encoder encoder = Base64.getEncoder();
 
 		String cn = encoder.encodeToString(customernumber.getBytes());

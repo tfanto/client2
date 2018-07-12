@@ -57,7 +57,7 @@ public class ItemList extends Composite {
 	public ItemList() {
 		initLayout();
 		initBehavior();
-		search();
+		// search();
 	}
 
 	private HorizontalLayout createFilterField(String caption, TextField field, CheckBox chk) {
@@ -66,6 +66,13 @@ public class ItemList extends Composite {
 		hl.addComponent(field);
 		hl.addComponent(chk);
 		field.setHeight("95%");
+		return hl;
+	}
+
+	private HorizontalLayout createSortField(String caption, CheckBox chk) {
+		HorizontalLayout hl = new HorizontalLayout();
+		hl.addComponent(new Label(caption));
+		hl.addComponent(chk);
 		return hl;
 	}
 
@@ -85,12 +92,10 @@ public class ItemList extends Composite {
 		headerRow.getCell("description")
 				.setComponent(createFilterField("Description", filterDescription, sortDescription));
 
-		headerRow.getCell("orderingPoint")
-				.setComponent(createFilterField("OrderingPoint", filterOrderingPoint, sortOrderingPoint));
-		headerRow.getCell("inStock").setComponent(createFilterField("In Stock", filterInStock, sortInStock));
-		headerRow.getCell("price").setComponent(createFilterField("Price", filterPrice, sortPrice));
-		headerRow.getCell("purchasePrice")
-				.setComponent(createFilterField("Purchase price", filterPurchasePrice, sortPurchasePrice));
+		headerRow.getCell("orderingpoint").setComponent(createSortField("OrderingPoint", sortOrderingPoint));
+		headerRow.getCell("instock").setComponent(createSortField("In Stock", sortInStock));
+		headerRow.getCell("price").setComponent(createSortField("Price", sortPrice));
+		headerRow.getCell("purchaseprice").setComponent(createSortField("Purchase price", sortPurchasePrice));
 
 		grid.setSizeFull();
 
@@ -154,18 +159,25 @@ public class ItemList extends Composite {
 		String itemNumberStr = filterItemNumber.getValue() == null ? "" : filterItemNumber.getValue().trim();
 		String descriptionStr = filterDescription.getValue() == null ? "" : filterDescription.getValue().trim();
 
-		String orderingPointStr = filterOrderingPoint.getValue() == null ? "" : filterOrderingPoint.getValue().trim();
-		String inStockStr = filterInStock.getValue() == null ? "" : filterInStock.getValue().trim();
+		// String orderingPointStr = filterOrderingPoint.getValue() == null ? "" :
+		// filterOrderingPoint.getValue().trim();
+		// String inStockStr = filterInStock.getValue() == null ? "" :
+		// filterInStock.getValue().trim();
 
-		String priceStr = filterPrice.getValue() == null ? "" : filterPrice.getValue().trim();
-		String purchasePriceStr = filterPurchasePrice.getValue() == null ? "" : filterPurchasePrice.getValue().trim();
+		// String priceStr = filterPrice.getValue() == null ? "" :
+		// filterPrice.getValue().trim();
+		// String purchasePriceStr = filterPurchasePrice.getValue() == null ? "" :
+		// filterPurchasePrice.getValue().trim();
 
 		String sortOrder = filterSortOrder.getValue();
 
-		RestResponse<List<Item>> rs = itemRepository.search(itemNumberStr, descriptionStr, orderingPointStr, inStockStr,
-				priceStr, purchasePriceStr, sortOrder);
-		grid.setItems(rs.getEntity());
-		updateHeader();
+		RestResponse<List<Item>> fetched = itemRepository.search(itemNumberStr, descriptionStr, sortOrder);
+		if (fetched.getStatus().equals(200)) {
+			grid.setItems(fetched.getEntity());
+			updateHeader();
+		} else {
+			Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
+		}
 	}
 
 	private void updateHeader() {
