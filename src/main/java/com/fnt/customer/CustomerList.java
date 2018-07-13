@@ -9,7 +9,6 @@ import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Composite;
-import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -63,7 +62,8 @@ public class CustomerList extends Composite {
 
 	private void initLayout() {
 
-		CssLayout buttons = new CssLayout(btn_add, btn_edit, btn_delete, btn_refresh);
+		HorizontalLayout buttons = new HorizontalLayout(btn_add, btn_edit, btn_delete, btn_refresh);
+		buttons.setSpacing(false);
 		HorizontalLayout header = new HorizontalLayout(buttons, filterSortOrder);
 		header.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		header.setSpacing(true);

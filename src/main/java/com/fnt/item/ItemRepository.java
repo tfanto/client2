@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -69,8 +70,98 @@ public class ItemRepository {
 	}
 
 	public RestResponse<Item> getById(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+
+		String idStr = String.valueOf(id);
+
+		Client client = null;
+		try {
+			client = createClient();
+			Response response = client.target(REST_ITEM_END_POINT).path(idStr).request(MediaType.APPLICATION_JSON)
+					.get(Response.class);
+			int status = response.getStatus();
+			if (status == 200) {
+				Item data = response.readEntity(new GenericType<Item>() {
+				});
+				return new RestResponse<>(status, data);
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(404, formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
+	}
+
+	public RestResponse<Item> create(Item obj) {
+		Client client = null;
+		try {
+			client = createClient();
+			Response response = client.target(REST_ITEM_END_POINT).request(MediaType.APPLICATION_JSON)
+					.post(Entity.entity(obj, MediaType.APPLICATION_JSON), Response.class);
+			int status = response.getStatus();
+			if (status == 200) {
+				Item data = response.readEntity(new GenericType<Item>() {
+				});
+				return new RestResponse<>(status, data);
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(status, formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
+	}
+
+	public RestResponse<Item> update(Item obj) {
+		Client client = null;
+		try {
+			client = createClient();
+			Response response = client.target(REST_ITEM_END_POINT).request(MediaType.APPLICATION_JSON)
+					.put(Entity.entity(obj, MediaType.APPLICATION_JSON), Response.class);
+			int status = response.getStatus();
+			if (status == 200) {
+				Item data = response.readEntity(new GenericType<Item>() {
+				});
+				return new RestResponse<>(status, data);
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(status, formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
+	}
+
+	public RestResponse<Item> delete(Item obj) {
+		String idStr = String.valueOf(obj.getId());
+
+		Client client = null;
+		try {
+			client = createClient();
+			Response response = client.target(REST_ITEM_END_POINT).path(idStr).request(MediaType.APPLICATION_JSON)
+					.delete();
+			int status = response.getStatus();
+			if (status != 200) {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(status, formatAppMsg(appMsg));
+			} else {
+				return new RestResponse<>(status);
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
 	}
 
 	private String formatAppMsg(String appMsg) {

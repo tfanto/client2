@@ -32,7 +32,7 @@ public class CustomerForm extends Window {
 
 	private Button btn_cancel = new Button("Cancel");
 	private Button btn_save = new Button("Ok", VaadinIcons.CHECK);
-	// private Button refresh = new Button("Refresh"); // does not work as expected
+//	private Button btn_refresh = new Button("Refresh"); // does not work as expected
 
 	public CustomerForm(CustomerList owner, CustomerRepository customerRepository, String caption, Customer user,
 			int crudFunction) {
@@ -68,8 +68,7 @@ public class CustomerForm extends Window {
 		btn_save.addStyleName(ValoTheme.BUTTON_PRIMARY);
 
 		HorizontalLayout buttons = new HorizontalLayout(btn_cancel, btn_save);
-		// HorizontalLayout buttons = new HorizontalLayout(btn_refresh, btn_cancel,
-		// btn_save);
+		 //HorizontalLayout buttons = new HorizontalLayout(btn_refresh, btn_cancel, btn_save);
 		buttons.setSpacing(true);
 
 		GridLayout formLayout = new GridLayout(3, 3, customerNumber, name, description);
@@ -88,7 +87,7 @@ public class CustomerForm extends Window {
 		binder.bindInstanceFields(this);
 		binder.readBean(customer);
 
-		// refresh.addClickListener(e -> fetchUser(user.getId()));
+	//	 btn_refresh.addClickListener(e -> fetchCustomer(customer.getId()));
 
 		btn_cancel.addClickListener(e -> close());
 		btn_save.addClickListener(e -> {
