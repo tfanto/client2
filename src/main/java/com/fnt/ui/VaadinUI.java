@@ -3,6 +3,7 @@ package com.fnt.ui;
 import javax.servlet.annotation.WebServlet;
 
 import com.fnt.customer.CustomerList;
+import com.fnt.customerorder.CustomerOrderList;
 import com.fnt.item.ItemList;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinRequest;
@@ -23,6 +24,7 @@ public class VaadinUI extends UI {
 		setContent(tabSheet);
 		addTab(new CustomerList(), "Customer");
 		addTab(new ItemList(), "Item");
+		addTab(new CustomerOrderList(), "Customer Order");
 
 	}
 
