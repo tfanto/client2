@@ -3,7 +3,8 @@ package com.fnt.customerorder;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fnt.entity.CustomerOrderHead;
+import com.fnt.dto.CustomerOrderHeadListView;
+import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Button;
@@ -22,6 +23,7 @@ import com.vaadin.ui.themes.ValoTheme;
 public class CustomerOrderList extends Composite {
 
 	private static final long serialVersionUID = 4797579884478708862L;
+	private Fnc fnc = new Fnc();
 
 	public static final int CRUD_CREATE = 1;
 	public static final int CRUD_EDIT = 2;
@@ -35,44 +37,30 @@ public class CustomerOrderList extends Composite {
 	private Button btn_edit = new Button("", VaadinIcons.PENCIL);
 	private Button btn_delete = new Button("", VaadinIcons.TRASH);
 	// filter
-	private TextField filterItemNumber = new TextField();
-	private TextField filterDescription = new TextField();
-	private TextField filterOrderingPoint = new TextField();
-	private TextField filterInStock = new TextField();
-	private TextField filterPrice = new TextField();
-	private TextField filterPurchasePrice = new TextField();
+	private TextField filterOrderNumber = new TextField();
+	private TextField filterCustomerNumber = new TextField();
+	private TextField filterName = new TextField();
+	private TextField filterDate = new TextField();
+	private TextField filterStatus = new TextField();
+	private TextField filterChangedBy = new TextField();
+
 	// sorting
 	private Label filterSortOrder = new Label();
 	private List<String> selectedSort = new ArrayList<>();
-	private CheckBox sortItemNumber = new CheckBox();
-	private CheckBox sortDescription = new CheckBox();
-	private CheckBox sortOrderingPoint = new CheckBox();
-	private CheckBox sortInStock = new CheckBox();
-	private CheckBox sortPrice = new CheckBox();
-	private CheckBox sortPurchasePrice = new CheckBox();
 
-	private Grid<CustomerOrderHead> grid = new Grid<>(CustomerOrderHead.class);
+	private CheckBox sortOrderNumber = new CheckBox();
+	private CheckBox sortCustomerNumber = new CheckBox();
+	private CheckBox sortName = new CheckBox();
+	private CheckBox sortDate = new CheckBox();
+	private CheckBox sortStatus = new CheckBox();
+	private CheckBox sortChangedBy = new CheckBox();
+
+	private Grid<CustomerOrderHeadListView> grid = new Grid<>(CustomerOrderHeadListView.class);
 
 	public CustomerOrderList() {
 		initLayout();
 		initBehavior();
 		// search();
-	}
-
-	private HorizontalLayout createFilterField(String caption, TextField field, CheckBox chk) {
-		HorizontalLayout hl = new HorizontalLayout();
-		hl.addComponent(new Label(caption));
-		hl.addComponent(field);
-		hl.addComponent(chk);
-		field.setHeight("95%");
-		return hl;
-	}
-
-	private HorizontalLayout createSortField(String caption, CheckBox chk) {
-		HorizontalLayout hl = new HorizontalLayout();
-		hl.addComponent(new Label(caption));
-		hl.addComponent(chk);
-		return hl;
 	}
 
 	private void initLayout() {
@@ -83,26 +71,16 @@ public class CustomerOrderList extends Composite {
 		header.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		header.setSpacing(true);
 
-		grid.setColumns("orderNumber", "customerId", "date", "status");
+		grid.setColumns("customernumber", "name", "date", "changedby", "status");
 
 		HeaderRow headerRow = grid.getDefaultHeaderRow();
-		/*
-		 * headerRow.getCell("orderNumber")
-		 * .setComponent(createFilterField("Item number", filterItemNumber,
-		 * sortItemNumber));
-		 * 
-		 * headerRow.getCell("description")
-		 * .setComponent(createFilterField("Description", filterDescription,
-		 * sortDescription));
-		 * 
-		 * headerRow.getCell("orderingpoint").setComponent(createSortField(
-		 * "OrderingPoint", sortOrderingPoint));
-		 * headerRow.getCell("instock").setComponent(createSortField("In Stock",
-		 * sortInStock));
-		 * headerRow.getCell("price").setComponent(createSortField("Price", sortPrice));
-		 * headerRow.getCell("purchaseprice").setComponent(
-		 * createSortField("Purchase price", sortPurchasePrice));
-		 */
+
+		headerRow.getCell("customernumber").setComponent(fnc.createFilterField("Customernumber", filterCustomerNumber, sortCustomerNumber));
+		headerRow.getCell("name").setComponent(fnc.createFilterField("Name", filterName, sortName));
+		headerRow.getCell("date").setComponent(fnc.createFilterField("Date", filterDate, sortDate));
+		headerRow.getCell("status").setComponent(fnc.createFilterField("Status", filterStatus, sortStatus));
+		headerRow.getCell("changedby").setComponent(fnc.createFilterField("Changedby", filterChangedBy, sortChangedBy));
+
 		grid.setSizeFull();
 
 		for (@SuppressWarnings("rawtypes")
@@ -116,18 +94,20 @@ public class CustomerOrderList extends Composite {
 	}
 
 	private void initBehavior() {
+
+
 		grid.asSingleSelect().addValueChangeListener(e -> updateHeader());
 		btn_refresh.addClickListener(e -> search());
 		btn_add.addClickListener(e -> showAddWindow());
 		btn_edit.addClickListener(e -> showEditWindow());
 		btn_delete.addClickListener(e -> showRemoveWindow());
 
-		sortItemNumber.addValueChangeListener(e -> evaluateSort(sortItemNumber, "ItemNumber"));
-		sortDescription.addValueChangeListener(e -> evaluateSort(sortDescription, "Description"));
-		sortOrderingPoint.addValueChangeListener(e -> evaluateSort(sortOrderingPoint, "OrderingPoint"));
-		sortInStock.addValueChangeListener(e -> evaluateSort(sortInStock, "InStock"));
-		sortPrice.addValueChangeListener(e -> evaluateSort(sortPrice, "Price"));
-		sortPurchasePrice.addValueChangeListener(e -> evaluateSort(sortPurchasePrice, "PurchasePrice"));
+		sortCustomerNumber.addValueChangeListener(e -> evaluateSort(sortCustomerNumber, "CustomerNumber"));
+		sortName.addValueChangeListener(e -> evaluateSort(sortName, "Name"));
+		sortDate.addValueChangeListener(e -> evaluateSort(sortDate, "Date"));
+		sortStatus.addValueChangeListener(e -> evaluateSort(sortStatus, "Status"));
+		sortChangedBy.addValueChangeListener(e -> evaluateSort(sortChangedBy, "ChangedBy"));
+
 		showSort();
 	}
 
@@ -146,7 +126,7 @@ public class CustomerOrderList extends Composite {
 
 		// default
 		if (selectedSort.size() < 1) {
-			sortItemNumber.setValue(true);
+			sortOrderNumber.setValue(true);
 		}
 
 		String theSort = "";
@@ -162,22 +142,15 @@ public class CustomerOrderList extends Composite {
 
 	public void search() {
 
-		String itemNumberStr = filterItemNumber.getValue() == null ? "" : filterItemNumber.getValue().trim();
-		String descriptionStr = filterDescription.getValue() == null ? "" : filterDescription.getValue().trim();
-
-		// String orderingPointStr = filterOrderingPoint.getValue() == null ? "" :
-		// filterOrderingPoint.getValue().trim();
-		// String inStockStr = filterInStock.getValue() == null ? "" :
-		// filterInStock.getValue().trim();
-
-		// String priceStr = filterPrice.getValue() == null ? "" :
-		// filterPrice.getValue().trim();
-		// String purchasePriceStr = filterPurchasePrice.getValue() == null ? "" :
-		// filterPurchasePrice.getValue().trim();
+		String filterCustomerNumberStr = filterCustomerNumber.getValue() == null ? "" : filterCustomerNumber.getValue().trim();
+		String filterNameStr = filterName.getValue() == null ? "" : filterName.getValue().trim();
+		String filterDateStr = filterDate.getValue() == null ? "" : filterDate.getValue().trim();
+		String filterStatusStr = filterStatus.getValue() == null ? "" : filterStatus.getValue().trim();
+		String filterChangedByStr = filterChangedBy.getValue() == null ? "" : filterChangedBy.getValue().trim();
 
 		String sortOrder = filterSortOrder.getValue();
 
-		RestResponse<List<CustomerOrderHead>> fetched = itemRepository.search(itemNumberStr, descriptionStr, sortOrder);
+		RestResponse<List<CustomerOrderHeadListView>> fetched = itemRepository.search(filterCustomerNumberStr, filterNameStr, filterDateStr, filterStatusStr, filterChangedByStr, sortOrder);
 		if (fetched.getStatus().equals(200)) {
 			grid.setItems(fetched.getEntity());
 			updateHeader();
@@ -200,12 +173,12 @@ public class CustomerOrderList extends Composite {
 
 	private void showEditWindow() {
 		// get from the server, it could have been removed
-		SingleSelect<CustomerOrderHead> selected = grid.asSingleSelect();
+		SingleSelect<CustomerOrderHeadListView> selected = grid.asSingleSelect();
 		Long id = selected.getValue().getOrdernumber();
-		RestResponse<CustomerOrderHead> fetched = itemRepository.getById(id);
+		RestResponse<CustomerOrderHeadListView> fetched = itemRepository.getById(id);
 
 		if (fetched.getStatus().equals(200)) {
-			CustomerOrderHead obj = fetched.getEntity();
+			CustomerOrderHeadListView obj = fetched.getEntity();
 			// ItemForm window = new ItemForm(this, itemRepository, "Edit", obj, CRUD_EDIT);
 			// getUI().addWindow(window);
 		} else {
