@@ -1,5 +1,7 @@
 package com.fnt.customerorder;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.Base64.Encoder;
 import java.util.List;
@@ -40,15 +42,22 @@ public class CustomerOrderRepository {
 		return client;
 	}
 
-	public RestResponse<List<CustomerOrderHeadListView>> search(String filterCustomerNumberStr, String filterNameStr, String filterDateStr, String filterStatusStr, String filterChangedByStr, String sortOrderStr) {
-		Encoder encoder = Base64.getEncoder();
+	public RestResponse<List<CustomerOrderHeadListView>> search(String filterCustomerNumberStr, String filterNameStr, LocalDate filterDate, String filterStatusStr, String filterChangedByStr, String sortOrderStr) {
+		Encoder encoder = Base64.getUrlEncoder();
 
 		String customernumber = encoder.encodeToString(filterCustomerNumberStr.getBytes());
 		String name = encoder.encodeToString(filterNameStr.getBytes());
-		String date = encoder.encodeToString(filterDateStr.getBytes());
+
+		String formattedDateString = "";
+		if (filterDate != null) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			formattedDateString = filterDate.format(formatter);
+		}
+
 		String orderstatus = encoder.encodeToString(filterStatusStr.getBytes());
 		String changedby = encoder.encodeToString(filterChangedByStr.getBytes());
 		String sortorder = encoder.encodeToString(sortOrderStr.getBytes());
+		String theDate = encoder.encodeToString(formattedDateString.getBytes());
 
 		// @formatter:off
 		Client client = null;
@@ -57,7 +66,7 @@ public class CustomerOrderRepository {
 			Response response = client.target(REST_CUSTOMER_ORDER_END_POINT).path("search")
 					.queryParam("customernumber", customernumber)
 					.queryParam("name", name)
-					.queryParam("date", date)
+					.queryParam("date", theDate)
 					.queryParam("orderstatus", orderstatus)
 					.queryParam("changedby", changedby)
 					.queryParam("sortorder", sortorder)

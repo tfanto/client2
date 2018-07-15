@@ -1,6 +1,7 @@
 package com.fnt.sys;
 
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
@@ -8,6 +9,15 @@ import com.vaadin.ui.TextField;
 public class Fnc {
 
 	public HorizontalLayout createFilterField(String caption, TextField field, CheckBox chk) {
+		HorizontalLayout hl = new HorizontalLayout();
+		hl.addComponent(new Label(caption));
+		hl.addComponent(field);
+		hl.addComponent(chk);
+		field.setHeight("95%");
+		return hl;
+	}
+
+	public HorizontalLayout createFilterField(String caption, DateField field, CheckBox chk) {
 		HorizontalLayout hl = new HorizontalLayout();
 		hl.addComponent(new Label(caption));
 		hl.addComponent(field);
