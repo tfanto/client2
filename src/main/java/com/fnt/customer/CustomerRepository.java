@@ -18,9 +18,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fnt.entity.Customer;
+import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
 
 public class CustomerRepository {
+
+	private Fnc fnc = new Fnc();
 
 	private static final String REST_CUSTOMER_END_POINT = "http://localhost:8080/server2/rest/customer";
 
@@ -40,7 +43,7 @@ public class CustomerRepository {
 	}
 
 	public RestResponse<List<Customer>> search(String customernumber, String name, String sortorder) {
-		
+
 		Encoder encoder = Base64.getEncoder();
 
 		String cn = encoder.encodeToString(customernumber.getBytes());
@@ -51,9 +54,7 @@ public class CustomerRepository {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_CUSTOMER_END_POINT).path("search").queryParam("customernumber", cn)
-					.queryParam("name", n).queryParam("sortorder", so).request(MediaType.APPLICATION_JSON)
-					.get(Response.class);
+			Response response = client.target(REST_CUSTOMER_END_POINT).path("search").queryParam("customernumber", cn).queryParam("name", n).queryParam("sortorder", so).request(MediaType.APPLICATION_JSON).get(Response.class);
 			int status = response.getStatus();
 			if (status == 200) {
 				List<Customer> theList = response.readEntity(new GenericType<List<Customer>>() {
@@ -76,8 +77,7 @@ public class CustomerRepository {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_CUSTOMER_END_POINT).path(idStr).request(MediaType.APPLICATION_JSON)
-					.get(Response.class);
+			Response response = client.target(REST_CUSTOMER_END_POINT).path(idStr).request(MediaType.APPLICATION_JSON).get(Response.class);
 			int status = response.getStatus();
 			if (status == 200) {
 				Customer data = response.readEntity(new GenericType<Customer>() {
@@ -86,7 +86,7 @@ public class CustomerRepository {
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
-				return new RestResponse<>(404, formatAppMsg(appMsg));
+				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
 			}
 		} finally {
 			if (client != null) {
@@ -99,8 +99,7 @@ public class CustomerRepository {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_CUSTOMER_END_POINT).request(MediaType.APPLICATION_JSON)
-					.post(Entity.entity(customer, MediaType.APPLICATION_JSON), Response.class);
+			Response response = client.target(REST_CUSTOMER_END_POINT).request(MediaType.APPLICATION_JSON).post(Entity.entity(customer, MediaType.APPLICATION_JSON), Response.class);
 			int status = response.getStatus();
 			if (status == 200) {
 				Customer data = response.readEntity(new GenericType<Customer>() {
@@ -109,7 +108,7 @@ public class CustomerRepository {
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
-				return new RestResponse<>(status, formatAppMsg(appMsg));
+				return new RestResponse<>(status, fnc.formatAppMsg(appMsg));
 			}
 		} finally {
 			if (client != null) {
@@ -122,8 +121,7 @@ public class CustomerRepository {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_CUSTOMER_END_POINT).request(MediaType.APPLICATION_JSON)
-					.put(Entity.entity(customer, MediaType.APPLICATION_JSON), Response.class);
+			Response response = client.target(REST_CUSTOMER_END_POINT).request(MediaType.APPLICATION_JSON).put(Entity.entity(customer, MediaType.APPLICATION_JSON), Response.class);
 			int status = response.getStatus();
 			if (status == 200) {
 				Customer data = response.readEntity(new GenericType<Customer>() {
@@ -132,7 +130,7 @@ public class CustomerRepository {
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
-				return new RestResponse<>(status, formatAppMsg(appMsg));
+				return new RestResponse<>(status, fnc.formatAppMsg(appMsg));
 			}
 		} finally {
 			if (client != null) {
@@ -147,13 +145,12 @@ public class CustomerRepository {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_CUSTOMER_END_POINT).path(idStr).request(MediaType.APPLICATION_JSON)
-					.delete();
+			Response response = client.target(REST_CUSTOMER_END_POINT).path(idStr).request(MediaType.APPLICATION_JSON).delete();
 			int status = response.getStatus();
 			if (status != 200) {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
-				return new RestResponse<>(status, formatAppMsg(appMsg));
+				return new RestResponse<>(status, fnc.formatAppMsg(appMsg));
 			} else {
 				return new RestResponse<>(status);
 			}
@@ -162,22 +159,6 @@ public class CustomerRepository {
 				client.close();
 			}
 		}
-	}
-
-	private String formatAppMsg(String appMsg) {
-		if (appMsg == null)
-			return null;
-		if (appMsg.startsWith("["))
-			appMsg = appMsg.substring(1);
-		if (appMsg.endsWith("]"))
-			appMsg = appMsg.substring(0, appMsg.length() - 1);
-		String parts[] = appMsg.split(",");
-		String ret = "";
-		for (int i = 0; i < parts.length; i++) {
-			ret += parts[i];
-			ret += "\n";
-		}
-		return ret;
 	}
 
 }

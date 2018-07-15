@@ -17,9 +17,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fnt.entity.Item;
+import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
 
 public class ItemRepository {
+	
+	private Fnc fnc = new Fnc();
 
 	private static final String REST_ITEM_END_POINT = "http://localhost:8080/server2/rest/item";
 
@@ -60,7 +63,7 @@ public class ItemRepository {
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
-				return new RestResponse<>(404, formatAppMsg(appMsg));
+				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
 			}
 		} finally {
 			if (client != null) {
@@ -86,7 +89,7 @@ public class ItemRepository {
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
-				return new RestResponse<>(404, formatAppMsg(appMsg));
+				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
 			}
 		} finally {
 			if (client != null) {
@@ -109,7 +112,7 @@ public class ItemRepository {
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
-				return new RestResponse<>(status, formatAppMsg(appMsg));
+				return new RestResponse<>(status, fnc.formatAppMsg(appMsg));
 			}
 		} finally {
 			if (client != null) {
@@ -132,7 +135,7 @@ public class ItemRepository {
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
-				return new RestResponse<>(status, formatAppMsg(appMsg));
+				return new RestResponse<>(status, fnc.formatAppMsg(appMsg));
 			}
 		} finally {
 			if (client != null) {
@@ -153,7 +156,7 @@ public class ItemRepository {
 			if (status != 200) {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
-				return new RestResponse<>(status, formatAppMsg(appMsg));
+				return new RestResponse<>(status, fnc.formatAppMsg(appMsg));
 			} else {
 				return new RestResponse<>(status);
 			}
@@ -162,22 +165,6 @@ public class ItemRepository {
 				client.close();
 			}
 		}
-	}
-
-	private String formatAppMsg(String appMsg) {
-		if (appMsg == null)
-			return null;
-		if (appMsg.startsWith("["))
-			appMsg = appMsg.substring(1);
-		if (appMsg.endsWith("]"))
-			appMsg = appMsg.substring(0, appMsg.length() - 1);
-		String parts[] = appMsg.split(",");
-		String ret = "";
-		for (int i = 0; i < parts.length; i++) {
-			ret += parts[i];
-			ret += "\n";
-		}
-		return ret;
 	}
 
 }

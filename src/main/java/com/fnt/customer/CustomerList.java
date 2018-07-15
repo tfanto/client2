@@ -123,10 +123,6 @@ public class CustomerList extends Composite {
 
 	private void showSort() {
 
-		if (selectedSort.size() < 1) {
-			sortCustomerNumber.setValue(true);
-		}
-
 		String theSort = "";
 		for (String dta : selectedSort) {
 			theSort += dta;

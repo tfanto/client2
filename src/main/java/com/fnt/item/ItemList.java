@@ -138,11 +138,6 @@ public class ItemList extends Composite {
 
 	private void showSort() {
 
-		// default
-		if (selectedSort.size() < 1) {
-			sortItemNumber.setValue(true);
-		}
-
 		String theSort = "";
 		for (String dta : selectedSort) {
 			theSort += dta;
