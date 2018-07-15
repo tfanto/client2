@@ -55,7 +55,7 @@ public class CustomerOrderList extends Composite {
 	private CheckBox sortStatus = new CheckBox();
 	private CheckBox sortChangedBy = new CheckBox();
 
-	private Grid<CustomerOrderHeadListView> grid = new Grid<>(CustomerOrderHeadListView.class);
+	private Grid<CustomerOrderHeadListView> grid = new Grid(CustomerOrderHeadListView.class);
 
 	public CustomerOrderList() {
 		initLayout();
@@ -82,7 +82,7 @@ public class CustomerOrderList extends Composite {
 		headerRow.getCell("changedby").setComponent(fnc.createFilterField("Changedby", filterChangedBy, sortChangedBy));
 
 		grid.setSizeFull();
-
+		
 		for (@SuppressWarnings("rawtypes")
 		Grid.Column column : grid.getColumns()) {
 			column.setSortable(false);
@@ -94,7 +94,6 @@ public class CustomerOrderList extends Composite {
 	}
 
 	private void initBehavior() {
-
 
 		grid.asSingleSelect().addValueChangeListener(e -> updateHeader());
 		btn_refresh.addClickListener(e -> search());
@@ -121,13 +120,8 @@ public class CustomerOrderList extends Composite {
 		showSort();
 		return null;
 	}
-
+	
 	private void showSort() {
-
-		// default
-		if (selectedSort.size() < 1) {
-			sortOrderNumber.setValue(true);
-		}
 
 		String theSort = "";
 		for (String dta : selectedSort) {
@@ -173,9 +167,10 @@ public class CustomerOrderList extends Composite {
 
 	private void showEditWindow() {
 		// get from the server, it could have been removed
+		/*
 		SingleSelect<CustomerOrderHeadListView> selected = grid.asSingleSelect();
-		Long id = selected.getValue().getOrdernumber();
-		RestResponse<CustomerOrderHeadListView> fetched = itemRepository.getById(id);
+		Long id = selected.getValue().getId();
+		RestResponse<CustomerOrderHead> fetched = itemRepository.getById(id);
 
 		if (fetched.getStatus().equals(200)) {
 			CustomerOrderHeadListView obj = fetched.getEntity();
@@ -184,6 +179,7 @@ public class CustomerOrderList extends Composite {
 		} else {
 			Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
 		}
+		*/
 	}
 
 	private void showRemoveWindow() {

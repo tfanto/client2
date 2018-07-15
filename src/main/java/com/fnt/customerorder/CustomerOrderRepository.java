@@ -50,11 +50,19 @@ public class CustomerOrderRepository {
 		String changedby = encoder.encodeToString(filterChangedByStr.getBytes());
 		String sortorder = encoder.encodeToString(sortOrderStr.getBytes());
 
+		// @formatter:off
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_CUSTOMER_ORDER_END_POINT).path("search").queryParam("customernumber", customernumber).queryParam("name", name).queryParam("date", date).queryParam("orderstatus", orderstatus)
-					.queryParam("changedby", changedby).queryParam("sortorder", sortorder).request(MediaType.APPLICATION_JSON).get(Response.class);
+			Response response = client.target(REST_CUSTOMER_ORDER_END_POINT).path("search")
+					.queryParam("customernumber", customernumber)
+					.queryParam("name", name)
+					.queryParam("date", date)
+					.queryParam("orderstatus", orderstatus)
+					.queryParam("changedby", changedby)
+					.queryParam("sortorder", sortorder)
+					.request(MediaType.APPLICATION_JSON).get(Response.class);
+			// @formatter:on
 			int status = response.getStatus();
 			if (status == 200) {
 				List<CustomerOrderHeadListView> theList = response.readEntity(new GenericType<List<CustomerOrderHeadListView>>() {
