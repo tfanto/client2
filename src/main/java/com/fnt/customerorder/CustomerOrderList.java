@@ -1,5 +1,6 @@
 package com.fnt.customerorder;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,11 +11,11 @@ import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Composite;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.SingleSelect;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.components.grid.HeaderRow;
@@ -40,7 +41,7 @@ public class CustomerOrderList extends Composite {
 	private TextField filterOrderNumber = new TextField();
 	private TextField filterCustomerNumber = new TextField();
 	private TextField filterName = new TextField();
-	private TextField filterDate = new TextField();
+	private DateField filterDate = new DateField();
 	private TextField filterStatus = new TextField();
 	private TextField filterChangedBy = new TextField();
 
@@ -82,7 +83,7 @@ public class CustomerOrderList extends Composite {
 		headerRow.getCell("changedby").setComponent(fnc.createFilterField("Changedby", filterChangedBy, sortChangedBy));
 
 		grid.setSizeFull();
-		
+
 		for (@SuppressWarnings("rawtypes")
 		Grid.Column column : grid.getColumns()) {
 			column.setSortable(false);
@@ -120,7 +121,7 @@ public class CustomerOrderList extends Composite {
 		showSort();
 		return null;
 	}
-	
+
 	private void showSort() {
 
 		String theSort = "";
@@ -138,7 +139,7 @@ public class CustomerOrderList extends Composite {
 
 		String filterCustomerNumberStr = filterCustomerNumber.getValue() == null ? "" : filterCustomerNumber.getValue().trim();
 		String filterNameStr = filterName.getValue() == null ? "" : filterName.getValue().trim();
-		String filterDateStr = filterDate.getValue() == null ? "" : filterDate.getValue().trim();
+		LocalDate filterDateStr = filterDate.getValue();
 		String filterStatusStr = filterStatus.getValue() == null ? "" : filterStatus.getValue().trim();
 		String filterChangedByStr = filterChangedBy.getValue() == null ? "" : filterChangedBy.getValue().trim();
 
@@ -168,18 +169,16 @@ public class CustomerOrderList extends Composite {
 	private void showEditWindow() {
 		// get from the server, it could have been removed
 		/*
-		SingleSelect<CustomerOrderHeadListView> selected = grid.asSingleSelect();
-		Long id = selected.getValue().getId();
-		RestResponse<CustomerOrderHead> fetched = itemRepository.getById(id);
-
-		if (fetched.getStatus().equals(200)) {
-			CustomerOrderHeadListView obj = fetched.getEntity();
-			// ItemForm window = new ItemForm(this, itemRepository, "Edit", obj, CRUD_EDIT);
-			// getUI().addWindow(window);
-		} else {
-			Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
-		}
-		*/
+		 * SingleSelect<CustomerOrderHeadListView> selected = grid.asSingleSelect();
+		 * Long id = selected.getValue().getId(); RestResponse<CustomerOrderHead>
+		 * fetched = itemRepository.getById(id);
+		 * 
+		 * if (fetched.getStatus().equals(200)) { CustomerOrderHeadListView obj =
+		 * fetched.getEntity(); // ItemForm window = new ItemForm(this, itemRepository,
+		 * "Edit", obj, CRUD_EDIT); // getUI().addWindow(window); } else {
+		 * Notification.show("ERROR", fetched.getMsg(),
+		 * Notification.Type.ERROR_MESSAGE); }
+		 */
 	}
 
 	private void showRemoveWindow() {

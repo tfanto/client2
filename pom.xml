@@ -72,6 +72,8 @@
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-themes</artifactId>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.webjars.bower/vaadin-date-picker -->
+
 
 
 
