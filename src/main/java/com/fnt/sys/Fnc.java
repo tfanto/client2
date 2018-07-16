@@ -10,7 +10,8 @@ import com.vaadin.ui.components.grid.HeaderRow;
 public class Fnc {
 
 	public void createFilterField(HeaderRow row1, HeaderRow row2, HeaderRow row3, String columnname, String caption, TextField field, CheckBox chk) {
-		row1.getCell(columnname).setComponent(new Label(caption));
+		Label lbl = new Label(caption);
+		row1.getCell(columnname).setComponent(lbl);
 		field.setHeight("90%");
 		row2.getCell(columnname).setComponent(field);
 		row3.getCell(columnname).setComponent(chk);

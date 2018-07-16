@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fnt.dto.CustomerOrderHeadListView;
+import com.fnt.entity.CustomerOrderHead;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
 import com.vaadin.icons.VaadinIcons;
@@ -16,6 +17,7 @@ import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.SingleSelect;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.components.grid.HeaderRow;
@@ -30,7 +32,7 @@ public class CustomerOrderList extends Composite {
 	public static final int CRUD_EDIT = 2;
 	public static final int CRUD_DELETE = 4;
 
-	CustomerOrderRepository itemRepository = new CustomerOrderRepository();
+	CustomerOrderRepository customerOrderRepository = new CustomerOrderRepository();
 
 	// crud
 	private Button btn_refresh = new Button("", VaadinIcons.SEARCH);
@@ -78,13 +80,11 @@ public class CustomerOrderList extends Composite {
 		HeaderRow row2 = grid.addHeaderRowAt(grid.getHeaderRowCount());
 		HeaderRow row3 = grid.addHeaderRowAt(grid.getHeaderRowCount());
 
-	
 		fnc.createFilterField(row1, row2, row3, "customernumber", "Customernumber", filterCustomerNumber, sortCustomerNumber);
 		fnc.createFilterField(row1, row2, row3, "name", "Name", filterName, sortName);
 		fnc.createFilterField(row1, row2, row3, "date", "Date", filterDate, sortDate);
 		fnc.createFilterField(row1, row2, row3, "status", "Status", filterStatus, sortStatus);
 		fnc.createFilterField(row1, row2, row3, "changedby", "Changedby", filterChangedBy, sortChangedBy);
-
 
 		grid.setSizeFull();
 
@@ -149,7 +149,7 @@ public class CustomerOrderList extends Composite {
 
 		String sortOrder = filterSortOrder.getValue();
 
-		RestResponse<List<CustomerOrderHeadListView>> fetched = itemRepository.search(filterCustomerNumberStr, filterNameStr, filterDateStr, filterStatusStr, filterChangedByStr, sortOrder);
+		RestResponse<List<CustomerOrderHeadListView>> fetched = customerOrderRepository.search(filterCustomerNumberStr, filterNameStr, filterDateStr, filterStatusStr, filterChangedByStr, sortOrder);
 		if (fetched.getStatus().equals(200)) {
 			grid.setItems(fetched.getEntity());
 			updateHeader();
@@ -165,30 +165,37 @@ public class CustomerOrderList extends Composite {
 	}
 
 	private void showAddWindow() {
-		// ItemForm window = new ItemForm(this, itemRepository, "Add", new Item(),
-		// CRUD_CREATE);
-		// getUI().addWindow(window);
+		CustomerOrderForm window = new CustomerOrderForm(this, customerOrderRepository, "Add", new CustomerOrderHead(), CRUD_CREATE);
+		getUI().addWindow(window);
 	}
 
 	private void showEditWindow() {
-		// get from the server, it could have been removed
-		/*
-		 * SingleSelect<CustomerOrderHeadListView> selected = grid.asSingleSelect();
-		 * Long id = selected.getValue().getId(); RestResponse<CustomerOrderHead>
-		 * fetched = itemRepository.getById(id);
-		 * 
-		 * if (fetched.getStatus().equals(200)) { CustomerOrderHeadListView obj =
-		 * fetched.getEntity(); // ItemForm window = new ItemForm(this, itemRepository,
-		 * "Edit", obj, CRUD_EDIT); // getUI().addWindow(window); } else {
-		 * Notification.show("ERROR", fetched.getMsg(),
-		 * Notification.Type.ERROR_MESSAGE); }
-		 */
+
+		SingleSelect<CustomerOrderHeadListView> selected = grid.asSingleSelect();
+		Long id = selected.getValue().getId();
+		RestResponse<CustomerOrderHead> fetched = customerOrderRepository.getById(id);
+
+		if (fetched.getStatus().equals(200)) {
+			CustomerOrderHead obj = fetched.getEntity(); //
+			CustomerOrderForm window = new CustomerOrderForm(this, customerOrderRepository, "Edit", obj, CRUD_EDIT); //
+			getUI().addWindow(window);
+		} else {
+			Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
+		}
+
 	}
 
 	private void showRemoveWindow() {
-		// ItemForm window = new ItemForm(this, itemRepository, "Delete",
-		// grid.asSingleSelect().getValue(), CRUD_DELETE);
-		// getUI().addWindow(window);
+
+		SingleSelect<CustomerOrderHeadListView> selected = grid.asSingleSelect();
+		Long id = selected.getValue().getId();
+		RestResponse<CustomerOrderHead> fetched = customerOrderRepository.getById(id);
+		if (fetched.getStatus().equals(200)) {
+			CustomerOrderForm window = new CustomerOrderForm(this, customerOrderRepository, "Delete", fetched.getEntity(), CRUD_DELETE);
+			getUI().addWindow(window);
+		} else {
+			Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
+		}
 	}
 
 }

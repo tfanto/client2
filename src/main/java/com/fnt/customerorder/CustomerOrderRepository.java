@@ -18,6 +18,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fnt.dto.CustomerOrderHeadListView;
+import com.fnt.entity.CustomerOrderHead;
+import com.fnt.entity.Item;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
 
@@ -89,7 +91,22 @@ public class CustomerOrderRepository {
 		}
 	}
 
-	public RestResponse<CustomerOrderHeadListView> getById(Long id) {
+	public RestResponse<CustomerOrderHead> getById(Long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public RestResponse<Item> create(CustomerOrderHead obj) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public RestResponse<Item> update(CustomerOrderHead obj) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public RestResponse<Item> delete(CustomerOrderHead obj) {
 		// TODO Auto-generated method stub
 		return null;
 	}
