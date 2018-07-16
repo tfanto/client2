@@ -56,7 +56,7 @@ public class CustomerOrderList extends Composite {
 	private CheckBox sortStatus = new CheckBox();
 	private CheckBox sortChangedBy = new CheckBox();
 
-	private Grid<CustomerOrderHeadListView> grid = new Grid(CustomerOrderHeadListView.class);
+	private Grid<CustomerOrderHeadListView> grid = new Grid<>(CustomerOrderHeadListView.class);
 
 	public CustomerOrderList() {
 		initLayout();
@@ -74,13 +74,17 @@ public class CustomerOrderList extends Composite {
 
 		grid.setColumns("customernumber", "name", "date", "changedby", "status");
 
-		HeaderRow headerRow = grid.getDefaultHeaderRow();
+		HeaderRow row1 = grid.getDefaultHeaderRow();
+		HeaderRow row2 = grid.addHeaderRowAt(grid.getHeaderRowCount());
+		HeaderRow row3 = grid.addHeaderRowAt(grid.getHeaderRowCount());
 
-		headerRow.getCell("customernumber").setComponent(fnc.createFilterField("Customernumber", filterCustomerNumber, sortCustomerNumber));
-		headerRow.getCell("name").setComponent(fnc.createFilterField("Name", filterName, sortName));
-		headerRow.getCell("date").setComponent(fnc.createFilterField("Date", filterDate, sortDate));
-		headerRow.getCell("status").setComponent(fnc.createFilterField("Status", filterStatus, sortStatus));
-		headerRow.getCell("changedby").setComponent(fnc.createFilterField("Changedby", filterChangedBy, sortChangedBy));
+	
+		fnc.createFilterField(row1, row2, row3, "customernumber", "Customernumber", filterCustomerNumber, sortCustomerNumber);
+		fnc.createFilterField(row1, row2, row3, "name", "Name", filterName, sortName);
+		fnc.createFilterField(row1, row2, row3, "date", "Date", filterDate, sortDate);
+		fnc.createFilterField(row1, row2, row3, "status", "Status", filterStatus, sortStatus);
+		fnc.createFilterField(row1, row2, row3, "changedby", "Changedby", filterChangedBy, sortChangedBy);
+
 
 		grid.setSizeFull();
 
