@@ -1,10 +1,12 @@
 package com.fnt.sys;
 
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.components.grid.HeaderRow;
 
 public class Fnc {
@@ -16,7 +18,7 @@ public class Fnc {
 		row2.getCell(columnname).setComponent(field);
 		row3.getCell(columnname).setComponent(chk);
 	}
-	
+
 	public void createFilterField(HeaderRow row1, HeaderRow row2, HeaderRow row3, String columnname, String caption, DateField field, CheckBox chk) {
 		row1.getCell(columnname).setComponent(new Label(caption));
 		field.setHeight("90%");
@@ -64,5 +66,20 @@ public class Fnc {
 		}
 		return ret;
 	}
+
+	public VerticalLayout createLineFragment(String caption, Component component) {
+		VerticalLayout vertical = new VerticalLayout();
+		HorizontalLayout captionLayout = new HorizontalLayout();
+		HorizontalLayout dataLayout = new HorizontalLayout();
+		captionLayout.setSpacing(false);
+		dataLayout.setSpacing(false);
+		vertical.addComponent(captionLayout);
+		vertical.addComponent(dataLayout);
+		Label label = new Label(caption);
+		captionLayout.addComponent(label);
+		dataLayout.addComponent(component);
+		return vertical;
+	}
+
 
 }
