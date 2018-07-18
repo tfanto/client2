@@ -74,7 +74,7 @@ public class CustomerOrderList extends Composite {
 		header.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		header.setSpacing(true);
 
-		grid.setColumns("customernumber", "name", "date", "changedby", "status");
+		grid.setColumns("date", "customernumber", "name",  "changedby", "status");
 
 		HeaderRow row1 = grid.getDefaultHeaderRow();
 		HeaderRow row2 = grid.addHeaderRowAt(grid.getHeaderRowCount());

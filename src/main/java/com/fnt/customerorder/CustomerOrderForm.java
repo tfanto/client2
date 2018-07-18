@@ -32,7 +32,7 @@ public class CustomerOrderForm extends Window {
 	CustomerOrderList owner;
 
 	// headerInfo
-	private DateField orderdate = new DateField("Orderdate");
+	private DateField orderdate = new DateField("Date");
 	private ComboBox<String> customernumber = new ComboBox<>("Customernumber");
 	private ComboBox<String> name = new ComboBox<>("Name");
 	// lineInfo
