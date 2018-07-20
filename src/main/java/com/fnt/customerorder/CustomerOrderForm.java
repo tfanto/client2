@@ -1,11 +1,16 @@
 package com.fnt.customerorder;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fnt.customer.CustomerRepository;
 import com.fnt.dto.CustomerOrderLineListView;
 import com.fnt.entity.CustomerOrderHead;
 import com.fnt.entity.Item;
+import com.fnt.item.ItemRepository;
+import com.fnt.search.SearchForm;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
 import com.vaadin.data.BeanValidationBinder;
@@ -18,7 +23,6 @@ import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
@@ -32,6 +36,8 @@ public class CustomerOrderForm extends Window {
 
 	private Fnc fnc = new Fnc();
 
+	NumberFormat numberFormat = new DecimalFormat("#,###.00");
+
 	private Grid<CustomerOrderLineListView> grid = new Grid<>();
 
 	private static final long serialVersionUID = -214415727456373593L;
@@ -41,13 +47,15 @@ public class CustomerOrderForm extends Window {
 
 	// headerInfo
 	private DateField orderdate = new DateField("Date");
-	private ComboBox<String> customernumber = new ComboBox<>("Customernumber");
-	private ComboBox<String> name = new ComboBox<>("Name");
+	private TextField customernumber = new TextField("Customer no");
+	private Button btn_customernumber = new Button("...");
+	private TextField name = new TextField("Name");
 	// lineInfo
 
-	private ComboBox<String> itemnumber = new ComboBox<>("Itemnumber");
-	private ComboBox<String> itemndescription = new ComboBox<>("Description");
-	private TextField numberofitems = new TextField("Units");
+	private TextField itemnumber = new TextField("Item no");
+	private Button btn_itemnumber = new Button("...");
+	private TextField itemdescription = new TextField("Description");
+	private TextField units = new TextField("Units");
 	private TextField priceperitem = new TextField("Price per Item");
 	private Button btn_clearline = new Button("Clear");
 	private Button btn_addline = new Button("Add");
@@ -80,16 +88,14 @@ public class CustomerOrderForm extends Window {
 		// HEADER - registration / selection
 
 		HorizontalLayout orderheader = new HorizontalLayout();
-		orderheader.setSpacing(false);
+		// orderheader.setSpacing(false);
 		orderheader.addComponent(orderdate);
-		orderheader.addComponent(customernumber);
-		orderheader.addComponent(name);
+		orderheader.addComponent(fnc.createPrompt(customernumber, name, btn_customernumber));
 
 		HorizontalLayout orderline = new HorizontalLayout();
-		orderline.setSpacing(false);
-		orderline.addComponent(itemnumber);
-		orderline.addComponent(itemndescription);
-		orderline.addComponent(numberofitems);
+		// orderline.setSpacing(false);
+		orderline.addComponent(fnc.createPrompt(itemnumber, itemdescription, btn_itemnumber));
+		orderline.addComponent(units);
 		orderline.addComponent(priceperitem);
 
 		HorizontalLayout orderlineButtons = new HorizontalLayout();
@@ -133,7 +139,7 @@ public class CustomerOrderForm extends Window {
 	        .setEditorBinding(binder
 	                .forField(new TextField())
 	                .withConverter(new StringToDoubleConverter("Please enter a number"))
-	                .withValidator(new BeanValidator(CustomerOrderLineListView.class, "priceoeritem"))
+	                .withValidator(new BeanValidator(CustomerOrderLineListView.class, "priceperitem"))
 	                .bind(CustomerOrderLineListView::getPriceperitem, CustomerOrderLineListView::setPriceperitem));
 	        grid.addColumn(CustomerOrderLineListView::getLinetotal)
 	        .setCaption("Line total")
@@ -142,7 +148,7 @@ public class CustomerOrderForm extends Window {
 	                .withConverter(new StringToDoubleConverter("Please enter a number"))
 	                .withValidator(new BeanValidator(CustomerOrderLineListView.class, "linetotal"))
 	                .bind(CustomerOrderLineListView::getLinetotal, CustomerOrderLineListView::setLinetotal));
-		
+	        
 		
 	        grid.setSizeFull();
 		
@@ -150,11 +156,11 @@ public class CustomerOrderForm extends Window {
 
 		// VerticalLayout layout = new VerticalLayout(orderform, grid, buttons);
 		VerticalLayout layout = new VerticalLayout();
-		layout.addComponents(orderform, grid,buttons);
+		layout.addComponents(orderform, grid, buttons);
 		setContent(layout);
 		setModal(true);
 		setSizeFull();
-		//center();
+		// center();
 	}
 
 	private void initBehavior(CustomerOrderHead orderHead) {
@@ -166,26 +172,12 @@ public class CustomerOrderForm extends Window {
 			orderdate.setValue(LocalDate.now());
 		}
 
-		// binder.forField(orderingpoint).withConverter(new
-		// StringToIntegerConverter("Please enter a
-		// number")).bind(Item::getOrderingpoint, Item::setOrderingpoint);
-		// binder.forField(instock).withConverter(new StringToIntegerConverter("Please
-		// enter a number")).bind(Item::getInstock, Item::setInstock);
-		// binder.forField(price).withConverter(new StringToDoubleConverter("Please
-		// enter a number")).bind(Item::getPrice,Item::setPrice);
-		// binder.forField(purchaseprice).withConverter(new
-		// StringToDoubleConverter("Please enter a
-		// number")).bind(Item::getPurchaseprice, Item::setPurchaseprice);
-		// binder.forField(customernumber).bind(CustomerOrderHead::get,
-		// CustomerOrderHead::setDate);
-		// binder.bindInstanceFields(this);
-		// binder.readBean(orderHead);
+		// header
 
-		// btn_refresh.addClickListener(e -> fetchCustomer(customer.getId()));
+		btn_customernumber.addClickListener(e -> searchCustomer());
+		btn_itemnumber.addClickListener(e -> searchItem());
 
-		btn_cancel.addClickListener(e ->
-
-		close());
+		btn_cancel.addClickListener(e -> close());
 		btn_save.addClickListener(e -> {
 			try {
 				binder.validate();
@@ -222,6 +214,21 @@ public class CustomerOrderForm extends Window {
 				Notification.show("ERROR", msg, Notification.Type.ERROR_MESSAGE);
 			}
 		});
+	}
+
+	private Object searchItem() {
+
+		ItemRepository itemRepository = new ItemRepository();
+		SearchForm prompt = new SearchForm(SearchForm.ITEMS, itemnumber, itemdescription, customerOrderRepository);
+		getUI().addWindow(prompt);
+		return null;
+	}
+
+	private Object searchCustomer() {
+		CustomerRepository customerRepository = new CustomerRepository();
+		SearchForm prompt = new SearchForm(SearchForm.CUSTOMERS, customernumber, name, customerOrderRepository);
+		getUI().addWindow(prompt);
+		return null;
 	}
 
 }

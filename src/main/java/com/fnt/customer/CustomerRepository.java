@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fnt.dto.SearchData;
 import com.fnt.entity.Customer;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
@@ -159,6 +160,11 @@ public class CustomerRepository {
 				client.close();
 			}
 		}
+	}
+
+	public List<SearchData> selectList(String value, String value2) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

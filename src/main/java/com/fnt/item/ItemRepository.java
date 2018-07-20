@@ -16,12 +16,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fnt.dto.SearchData;
 import com.fnt.entity.Item;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
 
 public class ItemRepository {
-	
+
 	private Fnc fnc = new Fnc();
 
 	private static final String REST_ITEM_END_POINT = "http://localhost:8080/server2/rest/item";
@@ -52,9 +53,8 @@ public class ItemRepository {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_ITEM_END_POINT).path("search").queryParam("itemnumber", itemnumber)
-					.queryParam("description", description).queryParam("sortorder", sortorder)
-					.request(MediaType.APPLICATION_JSON).get(Response.class);
+			Response response = client.target(REST_ITEM_END_POINT).path("search").queryParam("itemnumber", itemnumber).queryParam("description", description).queryParam("sortorder", sortorder).request(MediaType.APPLICATION_JSON)
+					.get(Response.class);
 			int status = response.getStatus();
 			if (status == 200) {
 				List<Item> theList = response.readEntity(new GenericType<List<Item>>() {
@@ -79,8 +79,7 @@ public class ItemRepository {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_ITEM_END_POINT).path(idStr).request(MediaType.APPLICATION_JSON)
-					.get(Response.class);
+			Response response = client.target(REST_ITEM_END_POINT).path(idStr).request(MediaType.APPLICATION_JSON).get(Response.class);
 			int status = response.getStatus();
 			if (status == 200) {
 				Item data = response.readEntity(new GenericType<Item>() {
@@ -102,8 +101,7 @@ public class ItemRepository {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_ITEM_END_POINT).request(MediaType.APPLICATION_JSON)
-					.post(Entity.entity(obj, MediaType.APPLICATION_JSON), Response.class);
+			Response response = client.target(REST_ITEM_END_POINT).request(MediaType.APPLICATION_JSON).post(Entity.entity(obj, MediaType.APPLICATION_JSON), Response.class);
 			int status = response.getStatus();
 			if (status == 200) {
 				Item data = response.readEntity(new GenericType<Item>() {
@@ -125,8 +123,7 @@ public class ItemRepository {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_ITEM_END_POINT).request(MediaType.APPLICATION_JSON)
-					.put(Entity.entity(obj, MediaType.APPLICATION_JSON), Response.class);
+			Response response = client.target(REST_ITEM_END_POINT).request(MediaType.APPLICATION_JSON).put(Entity.entity(obj, MediaType.APPLICATION_JSON), Response.class);
 			int status = response.getStatus();
 			if (status == 200) {
 				Item data = response.readEntity(new GenericType<Item>() {
@@ -150,8 +147,7 @@ public class ItemRepository {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_ITEM_END_POINT).path(idStr).request(MediaType.APPLICATION_JSON)
-					.delete();
+			Response response = client.target(REST_ITEM_END_POINT).path(idStr).request(MediaType.APPLICATION_JSON).delete();
 			int status = response.getStatus();
 			if (status != 200) {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
@@ -165,6 +161,11 @@ public class ItemRepository {
 				client.close();
 			}
 		}
+	}
+
+	public List<SearchData> selectList(String value, String value2) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

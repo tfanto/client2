@@ -1,5 +1,7 @@
 package com.fnt.sys;
 
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
@@ -10,6 +12,12 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.components.grid.HeaderRow;
 
 public class Fnc {
+
+	public HorizontalLayout createFilterField(TextField field) {
+		HorizontalLayout hl = new HorizontalLayout();
+		hl.addComponent(field);
+		return hl;
+	}
 
 	public void createFilterField(HeaderRow row1, HeaderRow row2, HeaderRow row3, String columnname, String caption, TextField field, CheckBox chk) {
 		Label lbl = new Label(caption);
@@ -26,29 +34,23 @@ public class Fnc {
 		row3.getCell(columnname).setComponent(chk);
 	}
 
-	public HorizontalLayout createFilterField(String caption, TextField field, CheckBox chk) {
-		HorizontalLayout hl = new HorizontalLayout();
-		hl.addComponent(new Label(caption));
-		hl.addComponent(field);
-		hl.addComponent(chk);
-		field.setHeight("97%");
-		return hl;
+	public HorizontalLayout createPrompt(TextField fld, Button btn) {
+		HorizontalLayout layout = new HorizontalLayout();
+		layout.setSpacing(false);
+		layout.addComponent(fld);
+		layout.addComponent(btn);
+		layout.setComponentAlignment(btn, Alignment.BOTTOM_LEFT);
+		return layout;
 	}
 
-	public HorizontalLayout createFilterField(String caption, DateField field, CheckBox chk) {
-		HorizontalLayout hl = new HorizontalLayout();
-		hl.addComponent(new Label(caption));
-		hl.addComponent(field);
-		hl.addComponent(chk);
-		field.setHeight("95%");
-		return hl;
-	}
-
-	public HorizontalLayout createSortField(String caption, CheckBox chk) {
-		HorizontalLayout hl = new HorizontalLayout();
-		hl.addComponent(new Label(caption));
-		hl.addComponent(chk);
-		return hl;
+	public HorizontalLayout createPrompt(TextField fld1, TextField fld2, Button btn) {
+		HorizontalLayout layout = new HorizontalLayout();
+		layout.setSpacing(false);
+		layout.addComponent(fld1);
+		layout.addComponent(fld2);
+		layout.addComponent(btn);
+		layout.setComponentAlignment(btn, Alignment.BOTTOM_LEFT);
+		return layout;
 	}
 
 	public String formatAppMsg(String appMsg) {
@@ -80,6 +82,5 @@ public class Fnc {
 		dataLayout.addComponent(component);
 		return vertical;
 	}
-
 
 }
