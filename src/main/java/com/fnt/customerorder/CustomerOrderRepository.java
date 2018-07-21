@@ -31,6 +31,7 @@ public class CustomerOrderRepository {
 	private Fnc fnc = new Fnc();
 
 	private String REST_CUSTOMER_ORDER_END_POINT = "http://localhost:8080/server2/rest/customerorder";
+	
 	private CustomerRepository customerRepository = new CustomerRepository();
 	private ItemRepository itemRepository = new ItemRepository();
 
@@ -116,11 +117,11 @@ public class CustomerOrderRepository {
 		return null;
 	}
 
-	public List<SearchData> selectListCustomers(String value, String value2) {
+	public RestResponse<List<SearchData>> selectListCustomers(String value, String value2) {
 		return customerRepository.selectList(value, value2);
 	}
 
-	public List<SearchData> selectListItems(String value, String value2) {
+	public RestResponse<List<SearchData>> selectListItems(String value, String value2) {
 		return itemRepository.selectList(value, value2);
 	}
 

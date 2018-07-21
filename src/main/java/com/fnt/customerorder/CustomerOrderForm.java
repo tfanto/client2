@@ -21,6 +21,7 @@ import com.vaadin.data.converter.StringToDoubleConverter;
 import com.vaadin.data.converter.StringToLongConverter;
 import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.icons.VaadinIcons;
+import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.DateField;
@@ -79,6 +80,8 @@ public class CustomerOrderForm extends Window {
 	}
 
 	private void initLayout(String caption) {
+		
+		grid.setHeightMode(HeightMode.UNDEFINED);
 		setCaption(caption);
 		btn_save.addStyleName(ValoTheme.BUTTON_PRIMARY);
 
@@ -86,17 +89,24 @@ public class CustomerOrderForm extends Window {
 		buttons.setSpacing(true);
 
 		// HEADER - registration / selection
+		orderdate.addStyleName(ValoTheme.DATEFIELD_TINY);
+
 
 		HorizontalLayout orderheader = new HorizontalLayout();
-		// orderheader.setSpacing(false);
 		orderheader.addComponent(orderdate);
 		orderheader.addComponent(fnc.createPrompt(customernumber, name, btn_customernumber));
 
 		HorizontalLayout orderline = new HorizontalLayout();
-		// orderline.setSpacing(false);
 		orderline.addComponent(fnc.createPrompt(itemnumber, itemdescription, btn_itemnumber));
+		
+		units.addStyleName(ValoTheme.TEXTFIELD_TINY);
+		priceperitem.addStyleName(ValoTheme.TEXTFIELD_TINY);
+		btn_clearline.addStyleName(ValoTheme.BUTTON_TINY);
+		btn_addline.addStyleName(ValoTheme.BUTTON_TINY);
+
 		orderline.addComponent(units);
 		orderline.addComponent(priceperitem);
+		
 
 		HorizontalLayout orderlineButtons = new HorizontalLayout();
 		orderlineButtons.setSpacing(false);

@@ -10,32 +10,36 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.components.grid.HeaderRow;
+import com.vaadin.ui.themes.ValoTheme;
 
 public class Fnc {
 
 	public HorizontalLayout createFilterField(TextField field) {
 		HorizontalLayout hl = new HorizontalLayout();
+		field.addStyleName(ValoTheme.TEXTFIELD_TINY);
 		hl.addComponent(field);
 		return hl;
 	}
 
 	public void createFilterField(HeaderRow row1, HeaderRow row2, HeaderRow row3, String columnname, String caption, TextField field, CheckBox chk) {
 		Label lbl = new Label(caption);
+		field.addStyleName(ValoTheme.TEXTFIELD_TINY);
 		row1.getCell(columnname).setComponent(lbl);
-		field.setHeight("90%");
 		row2.getCell(columnname).setComponent(field);
 		row3.getCell(columnname).setComponent(chk);
 	}
 
 	public void createFilterField(HeaderRow row1, HeaderRow row2, HeaderRow row3, String columnname, String caption, DateField field, CheckBox chk) {
+		field.addStyleName(ValoTheme.DATEFIELD_TINY);
 		row1.getCell(columnname).setComponent(new Label(caption));
-		field.setHeight("90%");
 		row2.getCell(columnname).setComponent(field);
 		row3.getCell(columnname).setComponent(chk);
 	}
 
 	public HorizontalLayout createPrompt(TextField fld, Button btn) {
 		HorizontalLayout layout = new HorizontalLayout();
+		fld.addStyleName(ValoTheme.TEXTFIELD_TINY);
+		btn.addStyleName(ValoTheme.BUTTON_TINY);
 		layout.setSpacing(false);
 		layout.addComponent(fld);
 		layout.addComponent(btn);
@@ -45,6 +49,9 @@ public class Fnc {
 
 	public HorizontalLayout createPrompt(TextField fld1, TextField fld2, Button btn) {
 		HorizontalLayout layout = new HorizontalLayout();
+		fld1.addStyleName(ValoTheme.TEXTFIELD_TINY);
+		fld2.addStyleName(ValoTheme.TEXTFIELD_TINY);
+		btn.addStyleName(ValoTheme.BUTTON_TINY);
 		layout.setSpacing(false);
 		layout.addComponent(fld1);
 		layout.addComponent(fld2);

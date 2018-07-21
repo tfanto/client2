@@ -5,10 +5,12 @@ import java.util.List;
 import com.fnt.customerorder.CustomerOrderRepository;
 import com.fnt.dto.SearchData;
 import com.fnt.sys.Fnc;
+import com.fnt.sys.RestResponse;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.SingleSelect;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -22,6 +24,11 @@ public class SearchForm extends Window {
 	private CustomerOrderRepository searchRepository;
 	private TextField search1 = new TextField();
 	private TextField search2 = new TextField();
+	private String old_search1;
+	private String old_search2;
+
+	private TextField searchField1;
+	private TextField searchField2;
 
 	private static final long serialVersionUID = 1L;
 
@@ -29,7 +36,7 @@ public class SearchForm extends Window {
 
 	private Button btn_cancel = new Button("Cancel");
 	private Button btn_search = new Button("Search", VaadinIcons.SEARCH);
-	private Button btn_select = new Button("Select", VaadinIcons.CHECK);
+	private Button btn_ok = new Button("Ok", VaadinIcons.CHECK);
 
 	private Grid<SearchData> grid = new Grid<>(SearchData.class);
 
@@ -37,6 +44,10 @@ public class SearchForm extends Window {
 		this.searchRepository = searchRepository;
 		search1.setValue(searchField1.getValue());
 		search2.setValue(searchField2.getValue());
+		old_search1 = searchField1.getValue();
+		old_search2 = searchField2.getValue();
+		this.searchField1 = searchField1;
+		this.searchField2 = searchField2;
 
 		this.searchType = searchType;
 		switch (searchType) {
@@ -53,6 +64,13 @@ public class SearchForm extends Window {
 		initLayout();
 		initBehavior();
 
+		btn_ok.setEnabled(false);
+		String s1 = search1.getValue() == null ? "" : search1.getValue().trim();
+		String s2 = search1.getValue() == null ? "" : search2.getValue().trim();
+		if ((s1.length() > 0) || (s2.length() > 0)) {
+			search();
+		}
+
 	}
 
 	private void initLayout() {
@@ -62,7 +80,7 @@ public class SearchForm extends Window {
 		HeaderRow headerRow = grid.getDefaultHeaderRow();
 		headerRow.getCell("id").setComponent(fnc.createFilterField(search1));
 		headerRow.getCell("description").setComponent(fnc.createFilterField(search2));
-		HorizontalLayout buttons = new HorizontalLayout(btn_cancel, btn_search, btn_select);
+		HorizontalLayout buttons = new HorizontalLayout(btn_cancel, btn_search, btn_ok);
 		buttons.setSpacing(true);
 		VerticalLayout layout = new VerticalLayout();
 		layout.addComponents(grid, buttons);
@@ -73,14 +91,27 @@ public class SearchForm extends Window {
 
 	private void initBehavior() {
 
-		btn_cancel.addClickListener(e -> close());
+		grid.asSingleSelect().addValueChangeListener(e -> select());
+		btn_cancel.addClickListener(e -> {
+			searchField1.setValue(old_search1);
+			searchField2.setValue(old_search2);
+			close();
+		});
 		btn_search.addClickListener(e -> search());
-		btn_select.addClickListener(e -> select());
+		btn_ok.addClickListener(e -> close());
 
 	}
 
 	private Object select() {
-		// TODO Auto-generated method stub
+		boolean sel = !grid.asSingleSelect().isEmpty();
+		btn_ok.setEnabled(sel);
+		if (sel) {
+			SingleSelect<SearchData> selected = grid.asSingleSelect();
+			search1.setValue(selected.getValue().getId());
+			search2.setValue(selected.getValue().getDescription());
+			searchField1.setValue(search1.getValue());
+			searchField2.setValue(search2.getValue());
+		}
 		return null;
 	}
 
@@ -88,16 +119,17 @@ public class SearchForm extends Window {
 
 		switch (searchType) {
 		case CUSTOMERS: {
-			List<SearchData> resultSet = searchRepository.selectListCustomers(search1.getValue(), search2.getValue());
-			grid.setItems(resultSet);
+			RestResponse<List<SearchData>> resultSet = searchRepository.selectListCustomers(search1.getValue(), search2.getValue());
+			grid.setItems(resultSet.getEntity());
 			break;
 		}
 		case ITEMS: {
-			List<SearchData> resultSet = searchRepository.selectListItems(search1.getValue(), search2.getValue());
-			grid.setItems(resultSet);
+			RestResponse<List<SearchData>> resultSet = searchRepository.selectListItems(search1.getValue(), search2.getValue());
+			grid.setItems(resultSet.getEntity());
 			break;
 		}
 		}
+
 		return null;
 	}
 

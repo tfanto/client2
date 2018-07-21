@@ -162,9 +162,29 @@ public class CustomerRepository {
 		}
 	}
 
-	public List<SearchData> selectList(String value, String value2) {
-		// TODO Auto-generated method stub
-		return null;
+	public RestResponse<List<SearchData>> selectList(String value, String value2) {
+		Encoder encoder = Base64.getEncoder();
+
+		String v1 = encoder.encodeToString(value.getBytes());
+		String v2 = encoder.encodeToString(value2.getBytes());
+
+		Client client = null;
+		try {
+			client = createClient();
+			Response response = client.target(REST_CUSTOMER_END_POINT).path("prompt").queryParam("customernumber", v1).queryParam("name", v2).request(MediaType.APPLICATION_JSON).get(Response.class);
+			int status = response.getStatus();
+			if (status == 200) {
+				List<SearchData> theList = response.readEntity(new GenericType<List<SearchData>>() {
+				});
+				return new RestResponse<>(status, theList);
+			} else {
+				return new RestResponse<>(200, new ArrayList<>());
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
 	}
 
 }
