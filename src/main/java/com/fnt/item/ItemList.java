@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fnt.entity.Item;
+import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Button;
@@ -20,6 +21,8 @@ import com.vaadin.ui.components.grid.HeaderRow;
 import com.vaadin.ui.themes.ValoTheme;
 
 public class ItemList extends Composite {
+
+	private Fnc fnc = new Fnc();
 
 	private static final long serialVersionUID = 4797579884478708862L;
 
@@ -85,17 +88,16 @@ public class ItemList extends Composite {
 
 		grid.setColumns("itemnumber", "description", "orderingpoint", "instock", "price", "purchaseprice");
 
-		HeaderRow headerRow = grid.getDefaultHeaderRow();
-		headerRow.getCell("itemnumber")
-				.setComponent(createFilterField("Item number", filterItemNumber, sortItemNumber));
+		HeaderRow row1 = grid.getDefaultHeaderRow();
+		HeaderRow row2 = grid.addHeaderRowAt(grid.getHeaderRowCount());
+		HeaderRow row3 = grid.addHeaderRowAt(grid.getHeaderRowCount());
 
-		headerRow.getCell("description")
-				.setComponent(createFilterField("Description", filterDescription, sortDescription));
-
-		headerRow.getCell("orderingpoint").setComponent(createSortField("OrderingPoint", sortOrderingPoint));
-		headerRow.getCell("instock").setComponent(createSortField("In Stock", sortInStock));
-		headerRow.getCell("price").setComponent(createSortField("Price", sortPrice));
-		headerRow.getCell("purchaseprice").setComponent(createSortField("Purchase price", sortPurchasePrice));
+		fnc.createFilterField(row1, row2, row3, "itemnumber", "Itemnumber", filterItemNumber, sortItemNumber);
+		fnc.createFilterField(row1, row2, row3, "description", "Description", filterDescription, sortDescription);
+		fnc.createFilterField(row1, row2, row3, "orderingpoint", "Orderingpoint",  sortOrderingPoint);
+		fnc.createFilterField(row1, row2, row3, "instock", "In stock",  sortInStock);
+		fnc.createFilterField(row1, row2, row3, "price", "Price",  sortPrice);
+		fnc.createFilterField(row1, row2, row3, "purchaseprice", "Purchaseprice",  sortPurchasePrice);
 
 		grid.setSizeFull();
 

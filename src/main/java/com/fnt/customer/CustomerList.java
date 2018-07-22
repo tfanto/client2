@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fnt.entity.Customer;
+import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Button;
@@ -20,6 +21,8 @@ import com.vaadin.ui.components.grid.HeaderRow;
 import com.vaadin.ui.themes.ValoTheme;
 
 public class CustomerList extends Composite {
+
+	private Fnc fnc = new Fnc();
 
 	private static final long serialVersionUID = 4797579884478708862L;
 
@@ -51,15 +54,6 @@ public class CustomerList extends Composite {
 		search();
 	}
 
-	private HorizontalLayout createFilterField(String caption, TextField field, CheckBox chk) {
-		HorizontalLayout hl = new HorizontalLayout();
-		hl.addComponent(new Label(caption));
-		hl.addComponent(field);
-		hl.addComponent(chk);
-		field.setHeight("95%");
-		return hl;
-	}
-
 	private void initLayout() {
 
 		HorizontalLayout buttons = new HorizontalLayout(btn_add, btn_edit, btn_delete, btn_refresh);
@@ -69,11 +63,13 @@ public class CustomerList extends Composite {
 		header.setSpacing(true);
 
 		grid.setColumns("customernumber", "name");
+		
+		HeaderRow row1 = grid.getDefaultHeaderRow();
+		HeaderRow row2 = grid.addHeaderRowAt(grid.getHeaderRowCount());
+		HeaderRow row3 = grid.addHeaderRowAt(grid.getHeaderRowCount());
 
-		HeaderRow headerRow = grid.getDefaultHeaderRow();
-		headerRow.getCell("customernumber")
-				.setComponent(createFilterField("Customer number", filterCustomerNumber, sortCustomerNumber));
-		headerRow.getCell("name").setComponent(createFilterField("Name", filterName, sortName));
+		fnc.createFilterField(row1, row2, row3, "customernumber", "Customernumber", filterCustomerNumber, sortCustomerNumber);
+		fnc.createFilterField(row1, row2, row3, "name", "Name", filterName, sortName);
 
 		grid.setSizeFull();
 
@@ -136,8 +132,7 @@ public class CustomerList extends Composite {
 
 	public void search() {
 
-		String customerNumberStr = filterCustomerNumber.getValue() == null ? ""
-				: filterCustomerNumber.getValue().trim();
+		String customerNumberStr = filterCustomerNumber.getValue() == null ? "" : filterCustomerNumber.getValue().trim();
 		String nameStr = filterName.getValue() == null ? "" : filterName.getValue().trim();
 		String sortOrder = filterSortOrder.getValue();
 
@@ -173,8 +168,7 @@ public class CustomerList extends Composite {
 	}
 
 	private void showRemoveWindow() {
-		CustomerForm window = new CustomerForm(this, customerRepository, "Delete", grid.asSingleSelect().getValue(),
-				CRUD_DELETE);
+		CustomerForm window = new CustomerForm(this, customerRepository, "Delete", grid.asSingleSelect().getValue(), CRUD_DELETE);
 		getUI().addWindow(window);
 	}
 }

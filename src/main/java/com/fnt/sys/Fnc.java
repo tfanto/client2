@@ -20,6 +20,13 @@ public class Fnc {
 		hl.addComponent(field);
 		return hl;
 	}
+	
+	public void createFilterField(HeaderRow row1, HeaderRow row2, HeaderRow row3, String columnname, String caption,  CheckBox chk) {
+		Label lbl = new Label(caption);
+		row1.getCell(columnname).setComponent(lbl);
+		row3.getCell(columnname).setComponent(chk);
+	}
+
 
 	public void createFilterField(HeaderRow row1, HeaderRow row2, HeaderRow row3, String columnname, String caption, TextField field, CheckBox chk) {
 		Label lbl = new Label(caption);
