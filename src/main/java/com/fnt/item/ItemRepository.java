@@ -1,5 +1,6 @@
 package com.fnt.item;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Base64.Encoder;
 import java.util.List;
@@ -164,8 +165,28 @@ public class ItemRepository {
 	}
 
 	public RestResponse<List<SearchData>> selectList(String value, String value2) {
-		// TODO Auto-generated method stub
-		return null;
+		Encoder encoder = Base64.getEncoder();
+
+		String v1 = encoder.encodeToString(value.getBytes());
+		String v2 = encoder.encodeToString(value2.getBytes());
+
+		Client client = null;
+		try {
+			client = createClient();
+			Response response = client.target(REST_ITEM_END_POINT).path("prompt").queryParam("itemnumber", v1).queryParam("description", v2).request(MediaType.APPLICATION_JSON).get(Response.class);
+			int status = response.getStatus();
+			if (status == 200) {
+				List<SearchData> theList = response.readEntity(new GenericType<List<SearchData>>() {
+				});
+				return new RestResponse<>(status, theList);
+			} else {
+				return new RestResponse<>(200, new ArrayList<>());
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
 	}
 
 }

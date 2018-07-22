@@ -1,5 +1,6 @@
 package com.fnt.search;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import com.fnt.customerorder.CustomerOrderRepository;
@@ -26,9 +27,11 @@ public class SearchForm extends Window {
 	private TextField search2 = new TextField();
 	private String old_search1;
 	private String old_search2;
+	private String old_search3;
 
 	private TextField searchField1;
 	private TextField searchField2;
+	private TextField searchField3;
 
 	private static final long serialVersionUID = 1L;
 
@@ -38,9 +41,11 @@ public class SearchForm extends Window {
 	private Button btn_search = new Button("Search", VaadinIcons.SEARCH);
 	private Button btn_ok = new Button("Ok", VaadinIcons.CHECK);
 
+	private static DecimalFormat df2 = new DecimalFormat(".##");
+
 	private Grid<SearchData> grid = new Grid<>(SearchData.class);
 
-	public SearchForm(int searchType, TextField searchField1, TextField searchField2, CustomerOrderRepository searchRepository) {
+	public SearchForm(int searchType, TextField searchField1, TextField searchField2, TextField searchField3, CustomerOrderRepository searchRepository) {
 		this.searchRepository = searchRepository;
 		search1.setValue(searchField1.getValue());
 		search2.setValue(searchField2.getValue());
@@ -48,6 +53,10 @@ public class SearchForm extends Window {
 		old_search2 = searchField2.getValue();
 		this.searchField1 = searchField1;
 		this.searchField2 = searchField2;
+		if (searchField3 != null) {
+			this.searchField3 = searchField3;
+			old_search3 = searchField3.getValue();
+		}
 
 		this.searchType = searchType;
 		switch (searchType) {
@@ -111,6 +120,14 @@ public class SearchForm extends Window {
 			search2.setValue(selected.getValue().getDescription());
 			searchField1.setValue(search1.getValue());
 			searchField2.setValue(search2.getValue());
+			if (searchField3 != null) {
+
+				String str = selected.getValue().getExtra();
+				Double dbl = Double.parseDouble(str);
+				String formatted = df2.format(dbl);
+
+				searchField3.setValue(formatted);
+			}
 		}
 		return null;
 	}

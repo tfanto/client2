@@ -104,6 +104,7 @@ public class CustomerOrderForm extends Window {
 		btn_clearline.addStyleName(ValoTheme.BUTTON_TINY);
 		btn_addline.addStyleName(ValoTheme.BUTTON_TINY);
 
+		units.setValue("1");
 		orderline.addComponent(units);
 		orderline.addComponent(priceperitem);
 		
@@ -228,15 +229,13 @@ public class CustomerOrderForm extends Window {
 
 	private Object searchItem() {
 
-		ItemRepository itemRepository = new ItemRepository();
-		SearchForm prompt = new SearchForm(SearchForm.ITEMS, itemnumber, itemdescription, customerOrderRepository);
+		SearchForm prompt = new SearchForm(SearchForm.ITEMS, itemnumber, itemdescription, priceperitem, customerOrderRepository);
 		getUI().addWindow(prompt);
 		return null;
 	}
 
 	private Object searchCustomer() {
-		CustomerRepository customerRepository = new CustomerRepository();
-		SearchForm prompt = new SearchForm(SearchForm.CUSTOMERS, customernumber, name, customerOrderRepository);
+		SearchForm prompt = new SearchForm(SearchForm.CUSTOMERS, customernumber, name, null, customerOrderRepository);
 		getUI().addWindow(prompt);
 		return null;
 	}
