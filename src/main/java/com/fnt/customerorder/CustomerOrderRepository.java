@@ -17,7 +17,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fnt.customer.CustomerRepository;
 import com.fnt.dto.CustomerOrderHeadListView;
+import com.fnt.dto.SearchData;
+import com.fnt.entity.CustomerOrderHead;
+import com.fnt.entity.Item;
+import com.fnt.item.ItemRepository;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
 
@@ -26,6 +31,9 @@ public class CustomerOrderRepository {
 	private Fnc fnc = new Fnc();
 
 	private String REST_CUSTOMER_ORDER_END_POINT = "http://localhost:8080/server2/rest/customerorder";
+	
+	private CustomerRepository customerRepository = new CustomerRepository();
+	private ItemRepository itemRepository = new ItemRepository();
 
 	public Client createClient() {
 
@@ -89,9 +97,32 @@ public class CustomerOrderRepository {
 		}
 	}
 
-	public RestResponse<CustomerOrderHeadListView> getById(Long id) {
+	public RestResponse<CustomerOrderHead> getById(Long id) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public RestResponse<Item> create(CustomerOrderHead obj) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public RestResponse<Item> update(CustomerOrderHead obj) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public RestResponse<Item> delete(CustomerOrderHead obj) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public RestResponse<List<SearchData>> selectListCustomers(String value, String value2) {
+		return customerRepository.selectList(value, value2);
+	}
+
+	public RestResponse<List<SearchData>> selectListItems(String value, String value2) {
+		return itemRepository.selectList(value, value2);
 	}
 
 }
