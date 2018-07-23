@@ -64,6 +64,7 @@ public class CustomerOrderList extends Composite {
 		initLayout();
 		initBehavior();
 		// search();
+		updateHeader();
 	}
 
 	private void initLayout() {
