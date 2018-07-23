@@ -6,6 +6,10 @@ import java.util.List;
 import com.fnt.entity.Item;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
+import com.vaadin.data.Binder;
+import com.vaadin.data.converter.StringToDoubleConverter;
+import com.vaadin.data.converter.StringToIntegerConverter;
+import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
@@ -59,7 +63,7 @@ public class ItemList extends Composite {
 	public ItemList() {
 		initLayout();
 		initBehavior();
-		// search();
+		updateHeader();
 	}
 
 	private HorizontalLayout createFilterField(String caption, TextField field, CheckBox chk) {
@@ -87,6 +91,57 @@ public class ItemList extends Composite {
 		header.setSpacing(true);
 
 		grid.setColumns("itemnumber", "description", "orderingpoint", "instock", "price", "purchaseprice");
+		
+		/*
+		// @formatter:off
+	       Binder<Item> binder = grid.getEditor().getBinder();
+
+	       grid.getColumn("itemnumber").
+	        setEditorBinding(binder
+	                .forField(new TextField())
+	                .withNullRepresentation("")
+	                .withValidator(new BeanValidator(Item.class, "itemnumber"))
+	                .bind(Item::getItemnumber, Item::setItemnumber));
+	       	       
+	        grid.getColumn("description")
+	        .setEditorBinding(binder
+	                .forField(new TextField())
+	                .withNullRepresentation("")
+	                .withValidator(new BeanValidator(Item.class, "description"))
+	                .bind(Item::getDescription, Item::setDescription));
+	        
+	        grid.getColumn("orderingpoint")
+	        .setEditorBinding(binder
+	                .forField(new TextField())
+	                .withConverter(new StringToIntegerConverter("Please enter a number"))
+	                .withValidator(new BeanValidator(Item.class, "orderingpoint"))
+	                .bind(Item::getOrderingpoint, Item::setOrderingpoint));
+	        
+	        grid.getColumn("instock")	        
+	        .setEditorBinding(binder
+	                .forField(new TextField())
+	                .withConverter(new StringToIntegerConverter("Please enter a number"))
+	                .withValidator(new BeanValidator(Item.class, "instock"))
+	                .bind(Item::getInstock, Item::setInstock));
+	        
+	        grid.getColumn("price")	        
+	        .setEditorBinding(binder
+	                .forField(new TextField())
+	                .withConverter(new StringToDoubleConverter("Please enter a number"))
+	                .withValidator(new BeanValidator(Item.class, "priceperitem"))
+	                .bind(Item::getPrice, Item::setPrice));
+	        
+	        grid.getColumn("purchaseprice")	        
+	        .setEditorBinding(binder
+	                .forField(new TextField())
+	                .withConverter(new StringToDoubleConverter("Please enter a number"))
+	                .withValidator(new BeanValidator(Item.class, "purchaseprice"))
+	                .bind(Item::getPurchaseprice, Item::setPurchaseprice));
+		
+	        grid.setSizeFull();
+		
+			// @formatter:on
+		*/
 
 		HeaderRow row1 = grid.getDefaultHeaderRow();
 		HeaderRow row2 = grid.addHeaderRowAt(grid.getHeaderRowCount());
@@ -94,10 +149,10 @@ public class ItemList extends Composite {
 
 		fnc.createFilterField(row1, row2, row3, "itemnumber", "Itemnumber", filterItemNumber, sortItemNumber);
 		fnc.createFilterField(row1, row2, row3, "description", "Description", filterDescription, sortDescription);
-		fnc.createFilterField(row1, row2, row3, "orderingpoint", "Orderingpoint",  sortOrderingPoint);
-		fnc.createFilterField(row1, row2, row3, "instock", "In stock",  sortInStock);
-		fnc.createFilterField(row1, row2, row3, "price", "Price",  sortPrice);
-		fnc.createFilterField(row1, row2, row3, "purchaseprice", "Purchaseprice",  sortPurchasePrice);
+		fnc.createFilterField(row1, row2, row3, "orderingpoint", "Orderingpoint", sortOrderingPoint);
+		fnc.createFilterField(row1, row2, row3, "instock", "In stock", sortInStock);
+		fnc.createFilterField(row1, row2, row3, "price", "Price", sortPrice);
+		fnc.createFilterField(row1, row2, row3, "purchaseprice", "Purchaseprice", sortPurchasePrice);
 
 		grid.setSizeFull();
 

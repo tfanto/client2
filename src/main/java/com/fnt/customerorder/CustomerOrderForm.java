@@ -5,11 +5,9 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.fnt.customer.CustomerRepository;
 import com.fnt.dto.CustomerOrderLineListView;
 import com.fnt.entity.CustomerOrderHead;
 import com.fnt.entity.Item;
-import com.fnt.item.ItemRepository;
 import com.fnt.search.SearchForm;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
@@ -31,6 +29,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.renderers.NumberRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
 public class CustomerOrderForm extends Window {
@@ -51,6 +50,8 @@ public class CustomerOrderForm extends Window {
 	private TextField customernumber = new TextField("Customer no");
 	private Button btn_customernumber = new Button("...");
 	private TextField name = new TextField("Name");
+	
+	private Button btn_create = new Button("Create");
 	// lineInfo
 
 	private TextField itemnumber = new TextField("Item no");
@@ -59,46 +60,42 @@ public class CustomerOrderForm extends Window {
 	private TextField units = new TextField("Units");
 	private TextField priceperitem = new TextField("Price per Item");
 	private Button btn_clearline = new Button("Clear");
-	private Button btn_addline = new Button("Add");
+	private Button btn_addline = new Button("Add line");
 
-	private Button btn_cancel = new Button("Cancel");
-	private Button btn_save = new Button("Ok", VaadinIcons.CHECK);
+	private Button btn_cancel = new Button("Cancel order");
 
 	public CustomerOrderForm(CustomerOrderList owner, CustomerOrderRepository customerOrderRepository, String caption, CustomerOrderHead orderHead, int crudFunction) {
 
 		this.owner = owner;
 		this.customerOrderRepository = customerOrderRepository;
 		this.crudFunction = crudFunction;
-
-		switch (crudFunction) {
-		case CustomerOrderList.CRUD_DELETE:
-			btn_save.setCaption("Confirm delete");
-			break;
-		}
 		initLayout(caption);
 		initBehavior(orderHead);
 	}
 
 	private void initLayout(String caption) {
-		
+
 		grid.setHeightMode(HeightMode.UNDEFINED);
 		setCaption(caption);
-		btn_save.addStyleName(ValoTheme.BUTTON_PRIMARY);
 
-		HorizontalLayout buttons = new HorizontalLayout(btn_cancel, btn_save);
+		btn_cancel.addStyleName(ValoTheme.BUTTON_TINY);
+		HorizontalLayout buttons = new HorizontalLayout(btn_cancel);
 		buttons.setSpacing(true);
 
 		// HEADER - registration / selection
 		orderdate.addStyleName(ValoTheme.DATEFIELD_TINY);
 
-
 		HorizontalLayout orderheader = new HorizontalLayout();
 		orderheader.addComponent(orderdate);
 		orderheader.addComponent(fnc.createPrompt(customernumber, name, btn_customernumber));
+		btn_create.addStyleName(ValoTheme.BUTTON_TINY);
+		orderheader.addComponent(btn_create);
+		orderheader.setComponentAlignment(btn_create, Alignment.BOTTOM_LEFT);
 
 		HorizontalLayout orderline = new HorizontalLayout();
 		orderline.addComponent(fnc.createPrompt(itemnumber, itemdescription, btn_itemnumber));
-		
+
+
 		units.addStyleName(ValoTheme.TEXTFIELD_TINY);
 		priceperitem.addStyleName(ValoTheme.TEXTFIELD_TINY);
 		btn_clearline.addStyleName(ValoTheme.BUTTON_TINY);
@@ -107,7 +104,6 @@ public class CustomerOrderForm extends Window {
 		units.setValue("1");
 		orderline.addComponent(units);
 		orderline.addComponent(priceperitem);
-		
 
 		HorizontalLayout orderlineButtons = new HorizontalLayout();
 		orderlineButtons.setSpacing(false);
@@ -138,7 +134,7 @@ public class CustomerOrderForm extends Window {
 	                .withNullRepresentation("")
 	                .withValidator(new BeanValidator(CustomerOrderLineListView.class, "description"))
 	                .bind(CustomerOrderLineListView::getDescription, CustomerOrderLineListView::setDescription));
-	        grid.addColumn(CustomerOrderLineListView::getUnits)
+	        grid.addColumn(CustomerOrderLineListView::getUnits, new NumberRenderer())
 	        .setCaption("Units")
 	        .setEditorBinding(binder
 	                .forField(new TextField())
@@ -178,25 +174,25 @@ public class CustomerOrderForm extends Window {
 		BeanValidationBinder<CustomerOrderHead> binder = new BeanValidationBinder<>(CustomerOrderHead.class);
 
 		if (crudFunction == CustomerOrderList.CRUD_CREATE) {
-			orderHead.setChangedby("test");
-			orderHead.setStatus(1);
 			orderdate.setValue(LocalDate.now());
 		}
-
-		// header
 
 		btn_customernumber.addClickListener(e -> searchCustomer());
 		btn_itemnumber.addClickListener(e -> searchItem());
 
 		btn_cancel.addClickListener(e -> close());
-		btn_save.addClickListener(e -> {
+		btn_create.addClickListener(e -> {
+			
+			Notification.show("Info", "Add the header ", Notification.Type.TRAY_NOTIFICATION);
+
+			
 			try {
 				binder.validate();
 				binder.writeBean(orderHead);
-				RestResponse<Item> rs = null;
+				RestResponse<CustomerOrderHead> rs = null;
 				switch (crudFunction) {
 				case CustomerOrderList.CRUD_CREATE:
-					rs = customerOrderRepository.create(orderHead);
+					rs = customerOrderRepository.createHead(orderdate.getValue(), customernumber.getValue());
 					break;
 				case CustomerOrderList.CRUD_EDIT:
 					rs = customerOrderRepository.update(orderHead);
@@ -211,8 +207,8 @@ public class CustomerOrderForm extends Window {
 				if (!rs.getStatus().equals(200)) {
 					Notification.show("ERROR", rs.getMsg(), Notification.Type.ERROR_MESSAGE);
 				} else {
-					close();
-					owner.search();
+					//close();
+					//owner.search();
 				}
 			} catch (ValidationException ex) {
 				List<BindingValidationStatus<?>> errors = ex.getFieldValidationErrors();
@@ -224,6 +220,12 @@ public class CustomerOrderForm extends Window {
 				}
 				Notification.show("ERROR", msg, Notification.Type.ERROR_MESSAGE);
 			}
+		});
+		
+		
+		btn_addline.addClickListener(e -> {
+			Notification.show("Info", "Add the line to grid", Notification.Type.TRAY_NOTIFICATION);
+			
 		});
 	}
 
