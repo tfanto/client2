@@ -21,7 +21,6 @@ import com.fnt.customer.CustomerRepository;
 import com.fnt.dto.CustomerOrderHeadListView;
 import com.fnt.dto.SearchData;
 import com.fnt.entity.CustomerOrderHead;
-import com.fnt.entity.Item;
 import com.fnt.item.ItemRepository;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
@@ -31,7 +30,7 @@ public class CustomerOrderRepository {
 	private Fnc fnc = new Fnc();
 
 	private String REST_CUSTOMER_ORDER_END_POINT = "http://localhost:8080/server2/rest/customerorder";
-	
+
 	private CustomerRepository customerRepository = new CustomerRepository();
 	private ItemRepository itemRepository = new ItemRepository();
 
@@ -98,13 +97,33 @@ public class CustomerOrderRepository {
 	}
 
 	public RestResponse<CustomerOrderHead> getById(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		// @formatter:off
+		Client client = null;
+		try {
+			client = createClient();
+			Response response = client.target(REST_CUSTOMER_ORDER_END_POINT).path(String.valueOf(id))
+					.request(MediaType.APPLICATION_JSON).get(Response.class);
+			// @formatter:on
+			int status = response.getStatus();
+			if (status == 200) {
+				CustomerOrderHead obj = response.readEntity(new GenericType<CustomerOrderHead>() {
+				});
+				return new RestResponse<>(status, obj);
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
 	}
 
 	public RestResponse<CustomerOrderHead> createHead(LocalDate orderDate, String customerNumber) {
+		
 		Encoder encoder = Base64.getUrlEncoder();
-
 		String formattedDateString = "";
 		if (orderDate != null) {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -137,11 +156,47 @@ public class CustomerOrderRepository {
 			if (client != null) {
 				client.close();
 			}
-		}	}
+		}
+	}
 
-	public RestResponse<CustomerOrderHead> update(CustomerOrderHead obj) {
-		// TODO Auto-generated method stub
-		return null;
+	public RestResponse<CustomerOrderHead> updateHead(Long ordernumber, LocalDate orderDate, String customerNumber) {
+
+		Encoder encoder = Base64.getUrlEncoder();
+
+		String formattedDateString = "";
+		if (orderDate != null) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			formattedDateString = orderDate.format(formatter);
+		}
+
+		String theCustomerNumber = encoder.encodeToString(customerNumber.getBytes());
+		String theDate = encoder.encodeToString(formattedDateString.getBytes());
+
+		// @formatter:off
+		Client client = null;
+		try {
+			client = createClient();
+			Response response = client.target(REST_CUSTOMER_ORDER_END_POINT).path("header")
+					.queryParam("ordernumber", String.valueOf(ordernumber))
+					.queryParam("customernumber", theCustomerNumber)
+					.queryParam("date", theDate)
+					.request(MediaType.APPLICATION_JSON).put(null,Response.class);
+			// @formatter:on
+			int status = response.getStatus();
+			if (status == 200) {
+				CustomerOrderHead obj = response.readEntity(new GenericType<CustomerOrderHead>() {
+				});
+				return new RestResponse<>(status, obj);
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
 	}
 
 	public RestResponse<CustomerOrderHead> delete(CustomerOrderHead obj) {
@@ -156,5 +211,6 @@ public class CustomerOrderRepository {
 	public RestResponse<List<SearchData>> selectListItems(String value, String value2) {
 		return itemRepository.selectList(value, value2);
 	}
+
 
 }

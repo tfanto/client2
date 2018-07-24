@@ -166,7 +166,7 @@ public class CustomerOrderList extends Composite {
 	}
 
 	private void showAddWindow() {
-		CustomerOrderForm window = new CustomerOrderForm(this, customerOrderRepository, "Add", new CustomerOrderHead(), CRUD_CREATE);
+		CustomerOrderForm window = new CustomerOrderForm(this, customerOrderRepository, "Add", new CustomerOrderHeadListView(), null, CRUD_CREATE);
 		getUI().addWindow(window);
 	}
 
@@ -175,10 +175,9 @@ public class CustomerOrderList extends Composite {
 		SingleSelect<CustomerOrderHeadListView> selected = grid.asSingleSelect();
 		Long id = selected.getValue().getId();
 		RestResponse<CustomerOrderHead> fetched = customerOrderRepository.getById(id);
-
+		// ensure order is still there
 		if (fetched.getStatus().equals(200)) {
-			CustomerOrderHead obj = fetched.getEntity(); //
-			CustomerOrderForm window = new CustomerOrderForm(this, customerOrderRepository, "Edit", obj, CRUD_EDIT); //
+			CustomerOrderForm window = new CustomerOrderForm(this, customerOrderRepository, "Edit", selected.getValue(), fetched.getEntity(), CRUD_EDIT); //
 			getUI().addWindow(window);
 		} else {
 			Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
@@ -190,9 +189,10 @@ public class CustomerOrderList extends Composite {
 
 		SingleSelect<CustomerOrderHeadListView> selected = grid.asSingleSelect();
 		Long id = selected.getValue().getId();
+		// ensure order is still there
 		RestResponse<CustomerOrderHead> fetched = customerOrderRepository.getById(id);
 		if (fetched.getStatus().equals(200)) {
-			CustomerOrderForm window = new CustomerOrderForm(this, customerOrderRepository, "Delete", fetched.getEntity(), CRUD_DELETE);
+			CustomerOrderForm window = new CustomerOrderForm(this, customerOrderRepository, "Delete", selected.getValue(), fetched.getEntity(), CRUD_DELETE);
 			getUI().addWindow(window);
 		} else {
 			Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
