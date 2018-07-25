@@ -1,9 +1,9 @@
 package com.fnt.item;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fnt.entity.Customer;
 import com.fnt.entity.Item;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
@@ -23,6 +23,7 @@ import com.vaadin.ui.SingleSelect;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.components.grid.HeaderRow;
+import com.vaadin.ui.renderers.NumberRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
 public class ItemList extends Composite {
@@ -91,7 +92,8 @@ public class ItemList extends Composite {
 		header.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		header.setSpacing(true);
 
-//		grid.setColumns("itemnumber", "description", "orderingpoint", "instock", "price", "purchaseprice");
+		// grid.setColumns("itemnumber", "description", "orderingpoint", "instock",
+		// "price", "purchaseprice");
 		// 'Bean' has two fields: String name and Date date
 		// Grid<Bean> grid = new Grid<>();
 		// grid.setItems(getBeans());
@@ -142,7 +144,7 @@ public class ItemList extends Composite {
 					.withValidator(new BeanValidator(Item.class, "instock"))
 					.bind(Item::getInstock, Item::setInstock));
 
-			grid.addColumn(Item::getPrice)
+			grid.addColumn(Item::getPrice, new NumberRenderer(NumberFormat.getCurrencyInstance()))
 			.setCaption("Price")
 			.setExpandRatio(0)
 			.setId("price")
@@ -152,7 +154,7 @@ public class ItemList extends Composite {
 					.withValidator(new BeanValidator(Item.class, "price"))
 					.bind(Item::getPrice, Item::setPrice));
 			
-			grid.addColumn(Item::getPurchaseprice)
+			grid.addColumn(Item::getPurchaseprice, new NumberRenderer(NumberFormat.getCurrencyInstance()))
 			.setCaption("Purchaseprice")
 			.setExpandRatio(0)
 			.setId("purchaseprice")

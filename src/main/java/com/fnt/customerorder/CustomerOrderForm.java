@@ -97,10 +97,28 @@ public class CustomerOrderForm extends Window {
 			btn_addline.setEnabled(false);
 			break;
 		case CustomerOrderList.CRUD_EDIT:
-			btn_execute_header.setCaption("Update header");
+			btn_execute_header.setVisible(false);
+			orderdate.setEnabled(false);
+			customernumber.setEnabled(false);
+			btn_customernumber.setEnabled(false);
+			name.setEnabled(false);
 			break;
 		case CustomerOrderList.CRUD_DELETE:
 			btn_execute_header.setVisible(false);
+			btn_execute_header.setVisible(false);
+			orderdate.setEnabled(false);
+			customernumber.setEnabled(false);
+			btn_customernumber.setEnabled(false);
+			name.setEnabled(false);
+
+			itemnumber.setVisible(false);
+			btn_itemnumber.setVisible(false);
+			itemdescription.setVisible(false);
+			units.setVisible(false);
+			priceperitem.setVisible(false);
+			btn_clearline.setVisible(false);
+			btn_addline.setVisible(false);
+
 			break;
 
 		}
@@ -134,38 +152,62 @@ public class CustomerOrderForm extends Window {
 		// @formatter:off
 		// grid show whats in the order 
 	       Binder<CustomerOrderLineListView> binder = grid.getEditor().getBinder();
+	       
+		    // 'Bean' has two fields: String name and Date date
+	        //   Grid<Bean> grid = new Grid<>();
+	        //   grid.setItems(getBeans());
+	        //   grid.addColumn(Bean::getName).setCaption("Name");
+	        //   DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+	        //   Grid.Column<Bean, Date> dateColumn = grid.addColumn(Bean::getDate, new DateRenderer(df));
+	        //   dateColumn.setCaption("Date");
+		
+	       NumberRenderer dr = new NumberRenderer("");
 
 	        grid.addColumn(CustomerOrderLineListView::getItemnumber)
-	        .setCaption("Itemnumber")
-	        .setEditorBinding(binder
+	        	.setCaption("Item no")
+	        	.setExpandRatio(0)
+	        	.setId("itemnumber")
+	        	.setEditorBinding(binder
 	                .forField(new TextField())
 	                .withNullRepresentation("")
 	                .withValidator(new BeanValidator(CustomerOrderLineListView.class, "itemnumber"))
 	                .bind(CustomerOrderLineListView::getItemnumber, CustomerOrderLineListView::setItemnumber));
+	        
 	        grid.addColumn(CustomerOrderLineListView::getDescription)
-	        .setCaption("Description")
-	        .setEditorBinding(binder
+	        	.setCaption("Description")
+	        	.setExpandRatio(0)
+	        	.setId("description")
+	        	.setEditorBinding(binder
 	                .forField(new TextField())
 	                .withNullRepresentation("")
 	                .withValidator(new BeanValidator(CustomerOrderLineListView.class, "description"))
 	                .bind(CustomerOrderLineListView::getDescription, CustomerOrderLineListView::setDescription));
+	        
 	        grid.addColumn(CustomerOrderLineListView::getUnits, new NumberRenderer())
-	        .setCaption("Units")
-	        .setEditorBinding(binder
+	        	.setCaption("Units")
+	        	.setExpandRatio(0)
+	        	.setId("units")
+	        	.setEditorBinding(binder
 	                .forField(new TextField())
 	                .withConverter(new StringToLongConverter("Please enter a number"))
 	                .withValidator(new BeanValidator(CustomerOrderLineListView.class, "units"))
 	                .bind(CustomerOrderLineListView::getUnits, CustomerOrderLineListView::setUnits));
-	        grid.addColumn(CustomerOrderLineListView::getPriceperitem)
-	        .setCaption("Price per item")
-	        .setEditorBinding(binder
+	        
+	        grid.addColumn(CustomerOrderLineListView::getPriceperitem, new NumberRenderer(NumberFormat.getCurrencyInstance()))
+	        	.setCaption("Price per item")
+	        	.setExpandRatio(0)
+	        	.setId("priceperitem")
+	        	.setEditorBinding(binder
 	                .forField(new TextField())
 	                .withConverter(new StringToDoubleConverter("Please enter a number"))
 	                .withValidator(new BeanValidator(CustomerOrderLineListView.class, "priceperitem"))
 	                .bind(CustomerOrderLineListView::getPriceperitem, CustomerOrderLineListView::setPriceperitem));
-	        grid.addColumn(CustomerOrderLineListView::getLinetotal)
-	        .setCaption("Line total")
-	        .setEditorBinding(binder
+	        
+	        grid.addColumn(CustomerOrderLineListView::getLinetotal, new NumberRenderer(NumberFormat.getCurrencyInstance()))
+	        	.setCaption("Line total")
+	        	.setExpandRatio(0)
+	        	.setId("linetotal")
+	        	.setEditorBinding(binder
 	                .forField(new TextField())
 	                .withConverter(new StringToDoubleConverter("Please enter a number"))
 	                .withValidator(new BeanValidator(CustomerOrderLineListView.class, "linetotal"))
@@ -230,12 +272,12 @@ public class CustomerOrderForm extends Window {
 
 					switch (crudFunction) {
 					case CustomerOrderList.CRUD_CREATE:
-						
+
 						btn_execute_header.setEnabled(false);
 						orderdate.setEnabled(false);
 						customernumber.setEnabled(false);
 						btn_customernumber.setEnabled(false);
-						name.setEnabled(false);						
+						name.setEnabled(false);
 						btn_addline.setEnabled(true);
 						Notification.show("Info", "Customer orderhead created", Notification.Type.TRAY_NOTIFICATION);
 						break;

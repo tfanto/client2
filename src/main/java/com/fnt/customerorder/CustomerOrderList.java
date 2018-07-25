@@ -6,8 +6,13 @@ import java.util.List;
 
 import com.fnt.dto.CustomerOrderHeadListView;
 import com.fnt.entity.CustomerOrderHead;
+import com.fnt.entity.Item;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
+import com.vaadin.data.Binder;
+import com.vaadin.data.converter.StringToIntegerConverter;
+import com.vaadin.data.converter.StringToLongConverter;
+import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
@@ -21,6 +26,7 @@ import com.vaadin.ui.SingleSelect;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.components.grid.HeaderRow;
+import com.vaadin.ui.renderers.NumberRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
 public class CustomerOrderList extends Composite {
@@ -58,7 +64,7 @@ public class CustomerOrderList extends Composite {
 	private CheckBox sortStatus = new CheckBox();
 	private CheckBox sortChangedBy = new CheckBox();
 
-	private Grid<CustomerOrderHeadListView> grid = new Grid<>(CustomerOrderHeadListView.class);
+	private Grid<CustomerOrderHeadListView> grid = new Grid<>();
 
 	public CustomerOrderList() {
 		initLayout();
@@ -75,13 +81,62 @@ public class CustomerOrderList extends Composite {
 		header.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		header.setSpacing(true);
 
-		grid.setColumns("date", "customernumber", "name",  "changedby", "status");
+
+		// @formatter:off
+	       Binder<CustomerOrderHeadListView> binder = grid.getEditor().getBinder();
+	       
+			grid.addColumn(CustomerOrderHeadListView::getDate)
+				.setCaption("date")
+				.setExpandRatio(0)
+				.setId("date")
+				.setEditorBinding(binder.forField(new DateField())
+						.withValidator(new BeanValidator(CustomerOrderHeadListView.class, "date"))
+						.bind(CustomerOrderHeadListView::getDate, CustomerOrderHeadListView::setDate));
+
+			grid.addColumn(CustomerOrderHeadListView::getCustomernumber)
+			.setCaption("Customernumber")
+			.setExpandRatio(0)
+			.setId("customernumber")
+			.setEditorBinding(binder.forField(new TextField())
+					.withNullRepresentation("")
+					.withValidator(new BeanValidator(Item.class, "customernumber"))
+					.bind(CustomerOrderHeadListView::getCustomernumber, CustomerOrderHeadListView::setCustomernumber));
+
+			grid.addColumn(CustomerOrderHeadListView::getName)
+			.setCaption("Name")
+			.setExpandRatio(0)
+			.setId("name")
+			.setEditorBinding(binder.forField(new TextField())
+					.withNullRepresentation("")
+					.withValidator(new BeanValidator(Item.class, "name"))
+					.bind(CustomerOrderHeadListView::getName, CustomerOrderHeadListView::setName));
+
+			grid.addColumn(CustomerOrderHeadListView::getChangedby)
+			.setCaption("Changedby")
+			.setExpandRatio(0)
+			.setId("changedby")
+			.setEditorBinding(binder.forField(new TextField())
+					.withNullRepresentation("")
+					.withValidator(new BeanValidator(Item.class, "changedby"))
+					.bind(CustomerOrderHeadListView::getChangedby, CustomerOrderHeadListView::setChangedby));
+			
+			grid.addColumn(CustomerOrderHeadListView::getStatus, new NumberRenderer())
+			.setCaption("Status")
+			.setExpandRatio(0)
+			.setId("status")
+			.setEditorBinding(binder.forField(new TextField())
+					.withNullRepresentation("")
+	                .withConverter(new StringToIntegerConverter("Please enter a number"))
+					.withValidator(new BeanValidator(Item.class, "status"))
+					.bind(CustomerOrderHeadListView::getStatus, CustomerOrderHeadListView::setStatus));
+		
+			// @formatter:on
 
 		HeaderRow row1 = grid.getDefaultHeaderRow();
 		HeaderRow row2 = grid.addHeaderRowAt(grid.getHeaderRowCount());
 		HeaderRow row3 = grid.addHeaderRowAt(grid.getHeaderRowCount());
 
-		fnc.createFilterField(row1, row2, row3, "customernumber", "Customernumber", filterCustomerNumber, sortCustomerNumber);
+		fnc.createFilterField(row1, row2, row3, "customernumber", "Customer no", filterCustomerNumber, sortCustomerNumber);
 		fnc.createFilterField(row1, row2, row3, "name", "Name", filterName, sortName);
 		fnc.createFilterField(row1, row2, row3, "date", "Date", filterDate, sortDate);
 		fnc.createFilterField(row1, row2, row3, "status", "Status", filterStatus, sortStatus);
