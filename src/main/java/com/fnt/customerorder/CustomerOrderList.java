@@ -13,6 +13,7 @@ import com.vaadin.data.Binder;
 import com.vaadin.data.converter.StringToIntegerConverter;
 import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.icons.VaadinIcons;
+import com.vaadin.navigator.View;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Composite;
@@ -28,7 +29,7 @@ import com.vaadin.ui.components.grid.HeaderRow;
 import com.vaadin.ui.renderers.NumberRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
-public class CustomerOrderList extends Composite {
+public class CustomerOrderList extends Composite implements View {
 
 	private static final long serialVersionUID = 4797579884478708862L;
 	private Fnc fnc = new Fnc();

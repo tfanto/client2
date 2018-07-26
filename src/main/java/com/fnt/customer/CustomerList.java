@@ -9,6 +9,7 @@ import com.fnt.sys.RestResponse;
 import com.vaadin.data.Binder;
 import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.icons.VaadinIcons;
+import com.vaadin.navigator.View;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Composite;
@@ -22,7 +23,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.components.grid.HeaderRow;
 import com.vaadin.ui.themes.ValoTheme;
 
-public class CustomerList extends Composite {
+public class CustomerList extends Composite implements View {
 
 	private Fnc fnc = new Fnc();
 
