@@ -1,5 +1,6 @@
 package com.fnt.item;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,7 @@ import com.vaadin.ui.SingleSelect;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.components.grid.HeaderRow;
+import com.vaadin.ui.renderers.NumberRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
 public class ItemList extends Composite {
@@ -58,7 +60,7 @@ public class ItemList extends Composite {
 	private CheckBox sortPrice = new CheckBox();
 	private CheckBox sortPurchasePrice = new CheckBox();
 
-	private Grid<Item> grid = new Grid<>(Item.class);
+	private Grid<Item> grid = new Grid<>();
 
 	public ItemList() {
 		initLayout();
@@ -90,58 +92,81 @@ public class ItemList extends Composite {
 		header.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		header.setSpacing(true);
 
-		grid.setColumns("itemnumber", "description", "orderingpoint", "instock", "price", "purchaseprice");
-		
-		/*
+		// grid.setColumns("itemnumber", "description", "orderingpoint", "instock",
+		// "price", "purchaseprice");
+		// 'Bean' has two fields: String name and Date date
+		// Grid<Bean> grid = new Grid<>();
+		// grid.setItems(getBeans());
+		// grid.addColumn(Bean::getName).setCaption("Name");
+		// DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+		// Grid.Column<Bean, Date> dateColumn = grid.addColumn(Bean::getDate, new
+		// DateRenderer(df));
+		// dateColumn.setCaption("Date");
+
 		// @formatter:off
 	       Binder<Item> binder = grid.getEditor().getBinder();
+	       
+			grid.addColumn(Item::getItemnumber)
+				.setCaption("Itemnumber")
+				.setExpandRatio(0)
+				.setId("itemnumber")
+				.setEditorBinding(binder.forField(new TextField())
+						.withNullRepresentation("")
+						.withValidator(new BeanValidator(Item.class, "itemnumber"))
+						.bind(Item::getItemnumber, Item::setItemnumber));
 
-	       grid.getColumn("itemnumber").
-	        setEditorBinding(binder
-	                .forField(new TextField())
-	                .withNullRepresentation("")
-	                .withValidator(new BeanValidator(Item.class, "itemnumber"))
-	                .bind(Item::getItemnumber, Item::setItemnumber));
-	       	       
-	        grid.getColumn("description")
-	        .setEditorBinding(binder
-	                .forField(new TextField())
-	                .withNullRepresentation("")
-	                .withValidator(new BeanValidator(Item.class, "description"))
-	                .bind(Item::getDescription, Item::setDescription));
-	        
-	        grid.getColumn("orderingpoint")
-	        .setEditorBinding(binder
-	                .forField(new TextField())
+			grid.addColumn(Item::getDescription)
+			.setCaption("Description")
+			.setExpandRatio(0)
+			.setId("description")
+			.setEditorBinding(binder.forField(new TextField())
+					.withNullRepresentation("")
+					.withValidator(new BeanValidator(Item.class, "description"))
+					.bind(Item::getDescription, Item::setDescription));
+			
+			grid.addColumn(Item::getOrderingpoint)
+			.setCaption("Orderingpoint")
+			.setExpandRatio(0)
+			.setId("orderingpoint")
+			.setEditorBinding(binder.forField(new TextField())
+					.withNullRepresentation("")
 	                .withConverter(new StringToIntegerConverter("Please enter a number"))
-	                .withValidator(new BeanValidator(Item.class, "orderingpoint"))
-	                .bind(Item::getOrderingpoint, Item::setOrderingpoint));
-	        
-	        grid.getColumn("instock")	        
-	        .setEditorBinding(binder
-	                .forField(new TextField())
+					.withValidator(new BeanValidator(Item.class, "orderingpoint"))
+					.bind(Item::getOrderingpoint, Item::setOrderingpoint));
+			
+			grid.addColumn(Item::getInstock)
+			.setCaption("instock")
+			.setExpandRatio(0)
+			.setId("instock")
+			.setEditorBinding(binder.forField(new TextField())
+					.withNullRepresentation("")
 	                .withConverter(new StringToIntegerConverter("Please enter a number"))
-	                .withValidator(new BeanValidator(Item.class, "instock"))
-	                .bind(Item::getInstock, Item::setInstock));
-	        
-	        grid.getColumn("price")	        
-	        .setEditorBinding(binder
-	                .forField(new TextField())
+					.withValidator(new BeanValidator(Item.class, "instock"))
+					.bind(Item::getInstock, Item::setInstock));
+
+			grid.addColumn(Item::getPrice, new NumberRenderer(NumberFormat.getCurrencyInstance()))
+			.setCaption("Price")
+			.setExpandRatio(0)
+			.setId("price")
+			.setEditorBinding(binder.forField(new TextField())
+					.withNullRepresentation("")
 	                .withConverter(new StringToDoubleConverter("Please enter a number"))
-	                .withValidator(new BeanValidator(Item.class, "priceperitem"))
-	                .bind(Item::getPrice, Item::setPrice));
-	        
-	        grid.getColumn("purchaseprice")	        
-	        .setEditorBinding(binder
-	                .forField(new TextField())
+					.withValidator(new BeanValidator(Item.class, "price"))
+					.bind(Item::getPrice, Item::setPrice));
+			
+			grid.addColumn(Item::getPurchaseprice, new NumberRenderer(NumberFormat.getCurrencyInstance()))
+			.setCaption("Purchaseprice")
+			.setExpandRatio(0)
+			.setId("purchaseprice")
+			.setEditorBinding(binder.forField(new TextField())
+					.withNullRepresentation("")
 	                .withConverter(new StringToDoubleConverter("Please enter a number"))
-	                .withValidator(new BeanValidator(Item.class, "purchaseprice"))
-	                .bind(Item::getPurchaseprice, Item::setPurchaseprice));
+					.withValidator(new BeanValidator(Item.class, "purchaseprice"))
+					.bind(Item::getPurchaseprice, Item::setPurchaseprice));
 		
 	        grid.setSizeFull();
 		
 			// @formatter:on
-		*/
 
 		HeaderRow row1 = grid.getDefaultHeaderRow();
 		HeaderRow row2 = grid.addHeaderRowAt(grid.getHeaderRowCount());

@@ -6,6 +6,8 @@ import java.util.List;
 import com.fnt.entity.Customer;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
+import com.vaadin.data.Binder;
+import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
@@ -46,7 +48,7 @@ public class CustomerList extends Composite {
 	private CheckBox sortCustomerNumber = new CheckBox();
 	private CheckBox sortName = new CheckBox();
 
-	private Grid<Customer> grid = new Grid<>(Customer.class);
+	private Grid<Customer> grid = new Grid<>();
 
 	public CustomerList() {
 		initLayout();
@@ -62,16 +64,48 @@ public class CustomerList extends Composite {
 		header.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		header.setSpacing(true);
 
-		grid.setColumns("customernumber", "name");
+		Binder<Customer> binder = grid.getEditor().getBinder();
+
+		// @formatter:off
 		
+		
+	    // 'Bean' has two fields: String name and Date date
+        //   Grid<Bean> grid = new Grid<>();
+        //   grid.setItems(getBeans());
+        //   grid.addColumn(Bean::getName).setCaption("Name");
+        //   DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+        //   Grid.Column<Bean, Date> dateColumn = grid.addColumn(Bean::getDate, new DateRenderer(df));
+        //   dateColumn.setCaption("Date");
+		
+
+		grid.addColumn(Customer::getCustomernumber)
+				.setCaption("Customernumber")
+				.setExpandRatio(0)
+		        .setId("customernumber")
+				.setEditorBinding(binder.forField(new TextField())
+				.withNullRepresentation("")
+				.withValidator(new BeanValidator(Customer.class, "customernumber"))
+				.bind(Customer::getCustomernumber, Customer::setCustomernumber));
+		
+		grid.addColumn(Customer::getName)
+			.	setCaption("Name")
+				.setExpandRatio(0)
+				.setId("name")
+				.setEditorBinding(binder.forField(new TextField())
+				.withNullRepresentation("")
+				.withValidator(new BeanValidator(Customer.class, "name"))
+				.bind(Customer::getName, Customer::setName));
+		
+		
+		// @formatter:on
+
 		HeaderRow row1 = grid.getDefaultHeaderRow();
 		HeaderRow row2 = grid.addHeaderRowAt(grid.getHeaderRowCount());
 		HeaderRow row3 = grid.addHeaderRowAt(grid.getHeaderRowCount());
 
+		grid.setSizeFull();
 		fnc.createFilterField(row1, row2, row3, "customernumber", "Customernumber", filterCustomerNumber, sortCustomerNumber);
 		fnc.createFilterField(row1, row2, row3, "name", "Name", filterName, sortName);
-
-		grid.setSizeFull();
 
 		for (@SuppressWarnings("rawtypes")
 		Grid.Column column : grid.getColumns()) {

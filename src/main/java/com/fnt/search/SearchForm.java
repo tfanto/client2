@@ -40,6 +40,7 @@ public class SearchForm extends Window {
 	private Button btn_cancel = new Button("Cancel");
 	private Button btn_search = new Button("Search", VaadinIcons.SEARCH);
 	private Button btn_ok = new Button("Ok", VaadinIcons.CHECK);
+	private Button btn_clr = new Button("Clear");
 
 	private static DecimalFormat df2 = new DecimalFormat(".##");
 
@@ -89,7 +90,7 @@ public class SearchForm extends Window {
 		HeaderRow headerRow = grid.getDefaultHeaderRow();
 		headerRow.getCell("id").setComponent(fnc.createFilterField(search1));
 		headerRow.getCell("description").setComponent(fnc.createFilterField(search2));
-		HorizontalLayout buttons = new HorizontalLayout(btn_cancel, btn_search, btn_ok);
+		HorizontalLayout buttons = new HorizontalLayout(btn_cancel, btn_clr, btn_search, btn_ok);
 		buttons.setSpacing(true);
 		VerticalLayout layout = new VerticalLayout();
 		layout.addComponents(grid, buttons);
@@ -108,6 +109,10 @@ public class SearchForm extends Window {
 		});
 		btn_search.addClickListener(e -> search());
 		btn_ok.addClickListener(e -> close());
+		btn_clr.addClickListener(e -> {
+			search1.setValue("");
+			search2.setValue("");			
+		});
 
 	}
 
