@@ -11,7 +11,6 @@ import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
 import com.vaadin.data.Binder;
 import com.vaadin.data.converter.StringToIntegerConverter;
-import com.vaadin.data.converter.StringToLongConverter;
 import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Button;
@@ -65,6 +64,7 @@ public class CustomerOrderList extends Composite {
 	private CheckBox sortChangedBy = new CheckBox();
 
 	private Grid<CustomerOrderHeadListView> grid = new Grid<>();
+	private CustomerOrderHead currentOrderHead = null;
 
 	public CustomerOrderList() {
 		initLayout();
@@ -80,7 +80,6 @@ public class CustomerOrderList extends Composite {
 		HorizontalLayout header = new HorizontalLayout(buttons, filterSortOrder);
 		header.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		header.setSpacing(true);
-
 
 		// @formatter:off
 	       Binder<CustomerOrderHeadListView> binder = grid.getEditor().getBinder();
@@ -221,7 +220,8 @@ public class CustomerOrderList extends Composite {
 	}
 
 	private void showAddWindow() {
-		CustomerOrderForm window = new CustomerOrderForm(this, customerOrderRepository, "Add", new CustomerOrderHeadListView(), null, CRUD_CREATE);
+		currentOrderHead = null;
+		CustomerOrderForm window = new CustomerOrderForm(this, customerOrderRepository, "Add", new CustomerOrderHeadListView(), CRUD_CREATE);
 		getUI().addWindow(window);
 	}
 
@@ -232,9 +232,11 @@ public class CustomerOrderList extends Composite {
 		RestResponse<CustomerOrderHead> fetched = customerOrderRepository.getById(id);
 		// ensure order is still there
 		if (fetched.getStatus().equals(200)) {
-			CustomerOrderForm window = new CustomerOrderForm(this, customerOrderRepository, "Edit", selected.getValue(), fetched.getEntity(), CRUD_EDIT); //
+			currentOrderHead = fetched.getEntity();
+			CustomerOrderForm window = new CustomerOrderForm(this, customerOrderRepository, "Edit", selected.getValue(), CRUD_EDIT); //
 			getUI().addWindow(window);
 		} else {
+			currentOrderHead = null;
 			Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
 		}
 
@@ -247,11 +249,21 @@ public class CustomerOrderList extends Composite {
 		// ensure order is still there
 		RestResponse<CustomerOrderHead> fetched = customerOrderRepository.getById(id);
 		if (fetched.getStatus().equals(200)) {
-			CustomerOrderForm window = new CustomerOrderForm(this, customerOrderRepository, "Delete", selected.getValue(), fetched.getEntity(), CRUD_DELETE);
+			currentOrderHead = fetched.getEntity();
+			CustomerOrderForm window = new CustomerOrderForm(this, customerOrderRepository, "Delete", selected.getValue(), CRUD_DELETE);
 			getUI().addWindow(window);
 		} else {
+			currentOrderHead = null;
 			Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
 		}
+	}
+
+	public void setCurrentOrderHead(CustomerOrderHead currentOrderHead) {
+		this.currentOrderHead = currentOrderHead;
+	}
+
+	public CustomerOrderHead getCurrentOrderHead() {
+		return this.currentOrderHead;
 	}
 
 }

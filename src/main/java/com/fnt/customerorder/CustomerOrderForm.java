@@ -8,6 +8,7 @@ import java.util.List;
 import com.fnt.dto.CustomerOrderHeadListView;
 import com.fnt.dto.CustomerOrderLineListView;
 import com.fnt.entity.CustomerOrderHead;
+import com.fnt.entity.CustomerOrderLine;
 import com.fnt.search.SearchForm;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
@@ -63,13 +64,13 @@ public class CustomerOrderForm extends Window {
 
 	private Button btn_cancel = new Button("Cancel order");
 
-	public CustomerOrderForm(CustomerOrderList owner, CustomerOrderRepository customerOrderRepository, String caption, CustomerOrderHeadListView customerOrderHeadListView, CustomerOrderHead customerOrderHead, int crudFunction) {
+	public CustomerOrderForm(CustomerOrderList owner, CustomerOrderRepository customerOrderRepository, String caption, CustomerOrderHeadListView customerOrderHeadListView, int crudFunction) {
 
 		this.owner = owner;
 		this.customerOrderRepository = customerOrderRepository;
 		this.crudFunction = crudFunction;
 		initLayout(caption);
-		initBehavior(customerOrderHeadListView, customerOrderHead);
+		initBehavior(customerOrderHeadListView);
 	}
 
 	private void initLayout(String caption) {
@@ -227,7 +228,7 @@ public class CustomerOrderForm extends Window {
 		// center();
 	}
 
-	private void initBehavior(CustomerOrderHeadListView customerOrderHeadListView, CustomerOrderHead customerOrderHead) {
+	private void initBehavior(CustomerOrderHeadListView customerOrderHeadListView) {
 
 		BeanValidationBinder<CustomerOrderHeadListView> binder = new BeanValidationBinder<>(CustomerOrderHeadListView.class);
 
@@ -237,6 +238,7 @@ public class CustomerOrderForm extends Window {
 			orderdate.setValue(customerOrderHeadListView.getDate());
 			customernumber.setValue(customerOrderHeadListView.getCustomernumber());
 			name.setValue(customerOrderHeadListView.getName());
+			searchCustomerOrderlines();
 		}
 
 		btn_customernumber.addClickListener(e -> searchCustomer());
@@ -257,7 +259,7 @@ public class CustomerOrderForm extends Window {
 					rs = customerOrderRepository.createHead(orderdate.getValue(), customernumber.getValue());
 					break;
 				case CustomerOrderList.CRUD_EDIT:
-					rs = customerOrderRepository.updateHead(customerOrderHead.getOrdernumber(), orderdate.getValue(), customernumber.getValue());
+					rs = customerOrderRepository.updateHead(owner.getCurrentOrderHead().getOrdernumber(), orderdate.getValue(), customernumber.getValue());
 					break;
 				case CustomerOrderList.CRUD_DELETE:
 					// rs = customerOrderRepository.delete(orderHead);
@@ -279,10 +281,11 @@ public class CustomerOrderForm extends Window {
 						btn_customernumber.setEnabled(false);
 						name.setEnabled(false);
 						btn_addline.setEnabled(true);
+						owner.setCurrentOrderHead(rs.getEntity());
 						Notification.show("Info", "Customer orderhead created", Notification.Type.TRAY_NOTIFICATION);
 						break;
 					case CustomerOrderList.CRUD_EDIT:
-						rs = customerOrderRepository.updateHead(customerOrderHead.getOrdernumber(), orderdate.getValue(), customernumber.getValue());
+						rs = customerOrderRepository.updateHead(owner.getCurrentOrderHead().getOrdernumber(), orderdate.getValue(), customernumber.getValue());
 						break;
 					case CustomerOrderList.CRUD_DELETE:
 						close();
@@ -302,10 +305,42 @@ public class CustomerOrderForm extends Window {
 			}
 		});
 
-		btn_addline.addClickListener(e -> {
-			Notification.show("Info", "Add the line to grid", Notification.Type.TRAY_NOTIFICATION);
+		btn_addline.addClickListener(event -> {
 
+			CustomerOrderHead coh = owner.getCurrentOrderHead();
+			String ol_internalordernumber = coh.getInternalordernumber();
+			String ol_item = itemnumber.getValue();
+			String ol_units = units.getValue();
+			String ol_priceperitem = priceperitem.getValue();
+
+			try {
+				RestResponse<CustomerOrderLine> rs = customerOrderRepository.addCustomerOrderLine(ol_internalordernumber, ol_item, ol_units, ol_priceperitem);
+				if (!rs.getStatus().equals(200)) {
+					Notification.show("ERROR", rs.getMsg(), Notification.Type.ERROR_MESSAGE);
+				} else {
+					Notification.show("Info", "Customer orderline added", Notification.Type.TRAY_NOTIFICATION);
+					itemnumber.setValue("");
+					itemdescription.setValue("");
+					units.setValue("1");
+					priceperitem.setValue("");
+					searchCustomerOrderlines();
+					owner.search();
+				}
+			} catch (RuntimeException e) {
+				Notification.show("ERROR", e.getMessage(), Notification.Type.ERROR_MESSAGE);
+			}
 		});
+	}
+
+	private void searchCustomerOrderlines() {
+
+		String currentInternalCustomerOrdernumber = owner.getCurrentOrderHead().getInternalordernumber();
+		RestResponse<List<CustomerOrderLineListView>> rs = customerOrderRepository.searchOrderlinesFor(currentInternalCustomerOrdernumber);
+		if (rs.getStatus() != 200) {
+			Notification.show("ERROR", rs.getMsg(), Notification.Type.ERROR_MESSAGE);
+		} else {
+			grid.setItems(rs.getEntity());
+		}
 	}
 
 	private Object searchItem() {

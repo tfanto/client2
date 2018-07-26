@@ -19,8 +19,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fnt.customer.CustomerRepository;
 import com.fnt.dto.CustomerOrderHeadListView;
+import com.fnt.dto.CustomerOrderLineListView;
 import com.fnt.dto.SearchData;
 import com.fnt.entity.CustomerOrderHead;
+import com.fnt.entity.CustomerOrderLine;
 import com.fnt.item.ItemRepository;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
@@ -122,7 +124,7 @@ public class CustomerOrderRepository {
 	}
 
 	public RestResponse<CustomerOrderHead> createHead(LocalDate orderDate, String customerNumber) {
-		
+
 		Encoder encoder = Base64.getUrlEncoder();
 		String formattedDateString = "";
 		if (orderDate != null) {
@@ -212,5 +214,76 @@ public class CustomerOrderRepository {
 		return itemRepository.selectList(value, value2);
 	}
 
+	public RestResponse<CustomerOrderLine> addCustomerOrderLine(String internalordernumber, String itemnumber, String units, String priceperitem) {
+
+		Encoder encoder = Base64.getUrlEncoder();
+
+		String theInternalordernumber = encoder.encodeToString(internalordernumber.getBytes());
+		String theItemnumber = encoder.encodeToString(itemnumber.getBytes());
+		Integer.parseInt(units);
+		priceperitem = priceperitem.replaceAll(",", ".");
+		Double.parseDouble(priceperitem);
+		String theUnits = encoder.encodeToString(units.getBytes());
+		String thePriceperitem = encoder.encodeToString(priceperitem.getBytes());
+
+		// @formatter:off
+		Client client = null;
+		try {
+			client = createClient();
+			Response response = client.target(REST_CUSTOMER_ORDER_END_POINT).path("line")
+					.queryParam("internalordernumber", theInternalordernumber)
+					.queryParam("itemnumber", theItemnumber)
+					.queryParam("units", theUnits)
+					.queryParam("priceperitem", thePriceperitem)
+					.request(MediaType.APPLICATION_JSON).post(null,Response.class);
+			// @formatter:on
+			int status = response.getStatus();
+			if (status == 200) {
+				CustomerOrderLine obj = response.readEntity(new GenericType<CustomerOrderLine>() {
+				});
+				return new RestResponse<>(status, obj);
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
+	}
+
+	public RestResponse<List<CustomerOrderLineListView>> searchOrderlinesFor(String currentInternalCustomerOrdernumber) {
+
+		Encoder encoder = Base64.getUrlEncoder();
+
+		String theInternalordernumber = encoder.encodeToString(currentInternalCustomerOrdernumber.getBytes());
+
+		// @formatter:off
+			Client client = null;
+			try {
+				client = createClient();
+				Response response = client.target(REST_CUSTOMER_ORDER_END_POINT)
+						.path(String.valueOf("linesfororder"))
+						.path(String.valueOf(theInternalordernumber))
+						.request(MediaType.APPLICATION_JSON).get(Response.class);
+				// @formatter:on
+			int status = response.getStatus();
+			if (status == 200) {
+				List<CustomerOrderLineListView> obj = response.readEntity(new GenericType<List<CustomerOrderLineListView>>() {
+				});
+				return new RestResponse<>(status, obj);
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
+	}
 
 }
