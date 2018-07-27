@@ -157,7 +157,7 @@ public class ItemList extends Composite implements View {
 			
 			grid.addColumn(Item::getPurchaseprice, new NumberRenderer(NumberFormat.getCurrencyInstance()))
 			.setCaption("Purchaseprice")
-			.setExpandRatio(0)
+			.setExpandRatio(1)
 			.setId("purchaseprice")
 			.setEditorBinding(binder.forField(new TextField())
 					.withNullRepresentation("")

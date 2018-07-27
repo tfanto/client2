@@ -122,7 +122,7 @@ public class CustomerOrderList extends Composite implements View {
 			
 			grid.addColumn(CustomerOrderHeadListView::getStatus, new NumberRenderer())
 			.setCaption("Status")
-			.setExpandRatio(0)
+			.setExpandRatio(1)
 			.setId("status")
 			.setEditorBinding(binder.forField(new TextField())
 					.withNullRepresentation("")
