@@ -206,7 +206,7 @@ public class CustomerOrderForm extends Window {
 	        
 	        grid.addColumn(CustomerOrderLineListView::getLinetotal, new NumberRenderer(NumberFormat.getCurrencyInstance()))
 	        	.setCaption("Line total")
-	        	.setExpandRatio(0)
+	        	.setExpandRatio(1)
 	        	.setId("linetotal")
 	        	.setEditorBinding(binder
 	                .forField(new TextField())

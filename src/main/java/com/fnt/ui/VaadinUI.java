@@ -23,18 +23,10 @@ import com.vaadin.ui.themes.ValoTheme;
 @PushStateNavigation
 public class VaadinUI extends UI {
 
-	private TabSheet tabSheet = new TabSheet();
 
 	@Override
 	protected void init(VaadinRequest request) {
 
-		/*
-		 * 
-		 * tabSheet.setSizeFull(); setContent(tabSheet); addTab(new CustomerList(),
-		 * "Customer"); addTab(new ItemList(), "Item"); addTab(new CustomerOrderList(),
-		 * "Customer Order");
-		 * 
-		 */
 
 		Label title = new Label("Menu");
 		title.addStyleName(ValoTheme.MENU_TITLE);
@@ -69,9 +61,6 @@ public class VaadinUI extends UI {
 
 	}
 
-	private void addTab(Component content, String caption) {
-		tabSheet.addTab(content, caption);
-	}
 
 	@WebServlet(urlPatterns = "/*", name = "VaadinUIServlet", asyncSupported = true)
 	@VaadinServletConfiguration(ui = VaadinUI.class, productionMode = false)

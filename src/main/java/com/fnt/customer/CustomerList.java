@@ -90,7 +90,7 @@ public class CustomerList extends Composite implements View {
 		
 		grid.addColumn(Customer::getName)
 			.	setCaption("Name")
-				.setExpandRatio(0)
+				.setExpandRatio(1)
 				.setId("name")
 				.setEditorBinding(binder.forField(new TextField())
 				.withNullRepresentation("")
