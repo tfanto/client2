@@ -43,9 +43,12 @@ public class ItemRepository {
 		return client;
 	}
 
-	public RestResponse<List<Item>> search(String itemNumberStr, String descriptionStr, String sortorderStr) {
+	public RestResponse<List<Item>> paginatesearch(Integer offset, Integer limit, String itemNumberStr, String descriptionStr, String sortorderStr) {
 
 		Encoder encoder = Base64.getEncoder();
+
+		String offs = encoder.encodeToString(String.valueOf(offset).getBytes());
+		String lim = encoder.encodeToString(String.valueOf(limit).getBytes());
 
 		String itemnumber = encoder.encodeToString(itemNumberStr.getBytes());
 		String description = encoder.encodeToString(descriptionStr.getBytes());
@@ -54,13 +57,56 @@ public class ItemRepository {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_ITEM_END_POINT).path("search").queryParam("itemnumber", itemnumber).queryParam("description", description).queryParam("sortorder", sortorder).request(MediaType.APPLICATION_JSON)
+			// @formatter:off
+			Response response = client.target(REST_ITEM_END_POINT)
+					.path("paginatesearch")
+					.queryParam("offset", offs)
+					.queryParam("limit", lim)
+					.queryParam("itemnumber", itemnumber)
+					.queryParam("description", description)
+					.queryParam("sortorder", sortorder).request(MediaType.APPLICATION_JSON)
 					.get(Response.class);
+			// @formatter:on
 			int status = response.getStatus();
 			if (status == 200) {
 				List<Item> theList = response.readEntity(new GenericType<List<Item>>() {
 				});
 				return new RestResponse<>(status, theList);
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
+	}
+
+	public RestResponse<Long> paginatecount(String itemNumberStr, String descriptionStr) {
+
+		Encoder encoder = Base64.getEncoder();
+
+		String itemnumber = encoder.encodeToString(itemNumberStr.getBytes());
+		String description = encoder.encodeToString(descriptionStr.getBytes());
+
+		Client client = null;
+		try {
+			client = createClient();
+			// @formatter:off
+			Response response = client.target(REST_ITEM_END_POINT)
+					.path("paginatecount")
+					.queryParam("itemnumber", itemnumber)
+					.queryParam("description", description)
+					.request(MediaType.APPLICATION_JSON)
+					.get(Response.class);
+			// @formatter:on
+			int status = response.getStatus();
+			if (status == 200) {
+				Long rs = response.readEntity(new GenericType<Long>() {
+				});
+				return new RestResponse<>(status, rs);
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();

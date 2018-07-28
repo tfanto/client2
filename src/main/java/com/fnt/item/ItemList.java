@@ -2,6 +2,7 @@ package com.fnt.item;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.fnt.entity.Item;
@@ -10,6 +11,7 @@ import com.fnt.sys.RestResponse;
 import com.vaadin.data.Binder;
 import com.vaadin.data.converter.StringToDoubleConverter;
 import com.vaadin.data.converter.StringToIntegerConverter;
+import com.vaadin.data.provider.DataProvider;
 import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
@@ -44,6 +46,7 @@ public class ItemList extends Composite implements View {
 	private Button btn_add = new Button("", VaadinIcons.PLUS);
 	private Button btn_edit = new Button("", VaadinIcons.PENCIL);
 	private Button btn_delete = new Button("", VaadinIcons.TRASH);
+	private Label noOfItems = new Label();
 	// filter
 	private TextField filterItemNumber = new TextField();
 	private TextField filterDescription = new TextField();
@@ -69,27 +72,11 @@ public class ItemList extends Composite implements View {
 		updateHeader();
 	}
 
-	private HorizontalLayout createFilterField(String caption, TextField field, CheckBox chk) {
-		HorizontalLayout hl = new HorizontalLayout();
-		hl.addComponent(new Label(caption));
-		hl.addComponent(field);
-		hl.addComponent(chk);
-		field.setHeight("95%");
-		return hl;
-	}
-
-	private HorizontalLayout createSortField(String caption, CheckBox chk) {
-		HorizontalLayout hl = new HorizontalLayout();
-		hl.addComponent(new Label(caption));
-		hl.addComponent(chk);
-		return hl;
-	}
-
 	private void initLayout() {
 
 		HorizontalLayout buttons = new HorizontalLayout(btn_add, btn_edit, btn_delete, btn_refresh);
 		buttons.setSpacing(false);
-		HorizontalLayout header = new HorizontalLayout(buttons, filterSortOrder);
+		HorizontalLayout header = new HorizontalLayout(buttons,  filterSortOrder, noOfItems);
 		header.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		header.setSpacing(true);
 
@@ -165,7 +152,6 @@ public class ItemList extends Composite implements View {
 					.withValidator(new BeanValidator(Item.class, "purchaseprice"))
 					.bind(Item::getPurchaseprice, Item::setPurchaseprice));
 		
-	        grid.setSizeFull();
 		
 			// @formatter:on
 
@@ -182,6 +168,9 @@ public class ItemList extends Composite implements View {
 
 		grid.setSizeFull();
 
+		DataProvider<Item, Void> dp = DataProvider.fromCallbacks(query -> search(query.getOffset(), query.getLimit()).stream(), query -> count());
+		grid.setDataProvider(dp);
+
 		for (@SuppressWarnings("rawtypes")
 		Grid.Column column : grid.getColumns()) {
 			column.setSortable(false);
@@ -192,9 +181,32 @@ public class ItemList extends Composite implements View {
 		setSizeFull();
 	}
 
+	private int count() {
+		String itemNumberStr = filterItemNumber.getValue() == null ? "" : filterItemNumber.getValue().trim();
+		String descriptionStr = filterDescription.getValue() == null ? "" : filterDescription.getValue().trim();
+
+		RestResponse<Long> fetched = itemRepository.paginatecount(itemNumberStr, descriptionStr);
+		Long numberOfItems = fetched.getEntity();
+		noOfItems.setValue("Records : " + numberOfItems);
+		return numberOfItems.intValue();
+	}
+
+	private Collection<Item> search(int offset, int limit) {
+		String itemNumberStr = filterItemNumber.getValue() == null ? "" : filterItemNumber.getValue().trim();
+		String descriptionStr = filterDescription.getValue() == null ? "" : filterDescription.getValue().trim();
+		String sortOrder = filterSortOrder.getValue();
+		RestResponse<List<Item>> fetched = itemRepository.paginatesearch(offset, limit, itemNumberStr, descriptionStr, sortOrder);
+		updateHeader();
+		return fetched.getEntity();
+	}
+
 	private void initBehavior() {
 		grid.asSingleSelect().addValueChangeListener(e -> updateHeader());
-		btn_refresh.addClickListener(e -> search());
+		btn_refresh.addClickListener(e -> {
+
+			grid.getDataProvider().refreshAll();
+
+		});
 		btn_add.addClickListener(e -> showAddWindow());
 		btn_edit.addClickListener(e -> showEditWindow());
 		btn_delete.addClickListener(e -> showRemoveWindow());
@@ -232,31 +244,31 @@ public class ItemList extends Composite implements View {
 		filterSortOrder.setValue(theSort);
 	}
 
-	public void search() {
-
-		String itemNumberStr = filterItemNumber.getValue() == null ? "" : filterItemNumber.getValue().trim();
-		String descriptionStr = filterDescription.getValue() == null ? "" : filterDescription.getValue().trim();
-
-		// String orderingPointStr = filterOrderingPoint.getValue() == null ? "" :
-		// filterOrderingPoint.getValue().trim();
-		// String inStockStr = filterInStock.getValue() == null ? "" :
-		// filterInStock.getValue().trim();
-
-		// String priceStr = filterPrice.getValue() == null ? "" :
-		// filterPrice.getValue().trim();
-		// String purchasePriceStr = filterPurchasePrice.getValue() == null ? "" :
-		// filterPurchasePrice.getValue().trim();
-
-		String sortOrder = filterSortOrder.getValue();
-
-		RestResponse<List<Item>> fetched = itemRepository.search(itemNumberStr, descriptionStr, sortOrder);
-		if (fetched.getStatus().equals(200)) {
-			grid.setItems(fetched.getEntity());
-			updateHeader();
-		} else {
-			Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
-		}
-	}
+	/*
+	 * public void search() {
+	 * 
+	 * String itemNumberStr = filterItemNumber.getValue() == null ? "" :
+	 * filterItemNumber.getValue().trim(); String descriptionStr =
+	 * filterDescription.getValue() == null ? "" :
+	 * filterDescription.getValue().trim();
+	 * 
+	 * // String orderingPointStr = filterOrderingPoint.getValue() == null ? "" : //
+	 * filterOrderingPoint.getValue().trim(); // String inStockStr =
+	 * filterInStock.getValue() == null ? "" : // filterInStock.getValue().trim();
+	 * 
+	 * // String priceStr = filterPrice.getValue() == null ? "" : //
+	 * filterPrice.getValue().trim(); // String purchasePriceStr =
+	 * filterPurchasePrice.getValue() == null ? "" : //
+	 * filterPurchasePrice.getValue().trim();
+	 * 
+	 * String sortOrder = filterSortOrder.getValue();
+	 * 
+	 * RestResponse<List<Item>> fetched = itemRepository.search(itemNumberStr,
+	 * descriptionStr, sortOrder); if (fetched.getStatus().equals(200)) {
+	 * grid.setItems(fetched.getEntity()); updateHeader(); } else {
+	 * Notification.show("ERROR", fetched.getMsg(),
+	 * Notification.Type.ERROR_MESSAGE); } }
+	 */
 
 	private void updateHeader() {
 		boolean selected = !grid.asSingleSelect().isEmpty();
