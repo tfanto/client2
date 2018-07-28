@@ -199,6 +199,10 @@ public class ItemList extends Composite implements View {
 		updateHeader();
 		return fetched.getEntity();
 	}
+	
+	public void refreshSearch() {
+		grid.getDataProvider().refreshAll();
+	}
 
 	private void initBehavior() {
 		grid.asSingleSelect().addValueChangeListener(e -> updateHeader());
