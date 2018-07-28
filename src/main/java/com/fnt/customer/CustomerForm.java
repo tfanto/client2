@@ -113,7 +113,7 @@ public class CustomerForm extends Window {
 					Notification.show("ERROR", rs.getMsg(), Notification.Type.ERROR_MESSAGE);
 				} else {
 					close();
-					owner.search();
+					owner.refreshSearch();
 				}
 			} catch (ValidationException ex) {
 				List<BindingValidationStatus<?>> errors = ex.getFieldValidationErrors();

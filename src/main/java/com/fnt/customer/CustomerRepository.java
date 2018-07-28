@@ -43,9 +43,12 @@ public class CustomerRepository {
 		return client;
 	}
 
-	public RestResponse<List<Customer>> search(String customernumber, String name, String sortorder) {
+	public RestResponse<List<Customer>> paginatesearch(Integer offset, Integer limit, String customernumber, String name, String sortorder) {
 
 		Encoder encoder = Base64.getEncoder();
+
+		String offs = encoder.encodeToString(String.valueOf(offset).getBytes());
+		String lim = encoder.encodeToString(String.valueOf(limit).getBytes());
 
 		String cn = encoder.encodeToString(customernumber.getBytes());
 		String n = encoder.encodeToString(name.getBytes());
@@ -55,7 +58,17 @@ public class CustomerRepository {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_CUSTOMER_END_POINT).path("search").queryParam("customernumber", cn).queryParam("name", n).queryParam("sortorder", so).request(MediaType.APPLICATION_JSON).get(Response.class);
+			// @formatter:off
+			Response response = client.target(REST_CUSTOMER_END_POINT)
+					.path("paginatesearch")
+					.queryParam("offset", offs)
+					.queryParam("limit", lim)
+					.queryParam("customernumber", cn)
+					.queryParam("name", n)
+					.queryParam("sortorder", so)
+					.request(MediaType.APPLICATION_JSON)
+					.get(Response.class);
+			// @formatter:on
 			int status = response.getStatus();
 			if (status == 200) {
 				List<Customer> theList = response.readEntity(new GenericType<List<Customer>>() {
@@ -63,6 +76,40 @@ public class CustomerRepository {
 				return new RestResponse<>(status, theList);
 			} else {
 				return new RestResponse<>(200, new ArrayList<>());
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
+	}
+
+	public RestResponse<Long> paginatecount(String customerNumberStr, String nameStr) {
+		Encoder encoder = Base64.getEncoder();
+
+		String cn = encoder.encodeToString(customerNumberStr.getBytes());
+		String n = encoder.encodeToString(nameStr.getBytes());
+
+		Client client = null;
+		try {
+			client = createClient();
+			// @formatter:off
+			Response response = client.target(REST_CUSTOMER_END_POINT)
+					.path("paginatecount")
+					.queryParam("customernumber", cn)
+					.queryParam("name", n)
+					.request(MediaType.APPLICATION_JSON)
+					.get(Response.class);
+			// @formatter:on
+			int status = response.getStatus();
+			if (status == 200) {
+				Long theList = response.readEntity(new GenericType<Long>() {
+				});
+				return new RestResponse<>(status, theList);
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
 			}
 		} finally {
 			if (client != null) {

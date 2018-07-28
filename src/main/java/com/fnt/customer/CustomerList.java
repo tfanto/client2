@@ -1,12 +1,14 @@
 package com.fnt.customer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.fnt.entity.Customer;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
 import com.vaadin.data.Binder;
+import com.vaadin.data.provider.DataProvider;
 import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
@@ -40,6 +42,8 @@ public class CustomerList extends Composite implements View {
 	private Button btn_add = new Button("", VaadinIcons.PLUS);
 	private Button btn_edit = new Button("", VaadinIcons.PENCIL);
 	private Button btn_delete = new Button("", VaadinIcons.TRASH);
+	private Label noOfItems = new Label();
+
 	// filter
 	private TextField filterCustomerNumber = new TextField();
 	private TextField filterName = new TextField();
@@ -54,14 +58,14 @@ public class CustomerList extends Composite implements View {
 	public CustomerList() {
 		initLayout();
 		initBehavior();
-		search();
+		updateHeader();
 	}
 
 	private void initLayout() {
 
 		HorizontalLayout buttons = new HorizontalLayout(btn_add, btn_edit, btn_delete, btn_refresh);
 		buttons.setSpacing(false);
-		HorizontalLayout header = new HorizontalLayout(buttons, filterSortOrder);
+		HorizontalLayout header = new HorizontalLayout(buttons, filterSortOrder, noOfItems);
 		header.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		header.setSpacing(true);
 
@@ -108,6 +112,9 @@ public class CustomerList extends Composite implements View {
 		fnc.createFilterField(row1, row2, row3, "customernumber", "Customernumber", filterCustomerNumber, sortCustomerNumber);
 		fnc.createFilterField(row1, row2, row3, "name", "Name", filterName, sortName);
 
+		DataProvider<Customer, Void> dp = DataProvider.fromCallbacks(query -> search(query.getOffset(), query.getLimit()).stream(), query -> count());
+		grid.setDataProvider(dp);
+
 		for (@SuppressWarnings("rawtypes")
 		Grid.Column column : grid.getColumns()) {
 			column.setSortable(false);
@@ -118,9 +125,33 @@ public class CustomerList extends Composite implements View {
 		setSizeFull();
 	}
 
+	private int count() {
+		String customerNumberStr = filterCustomerNumber.getValue() == null ? "" : filterCustomerNumber.getValue().trim();
+		String nameStr = filterName.getValue() == null ? "" : filterName.getValue().trim();
+		RestResponse<Long> fetched = customerRepository.paginatecount(customerNumberStr, nameStr);
+		Long numberOfItems = fetched.getEntity();
+		noOfItems.setValue("Records : " + numberOfItems);
+		return numberOfItems.intValue();
+	}
+
+	private Collection<Customer> search(int offset, int limit) {
+		String customerNumberStr = filterCustomerNumber.getValue() == null ? "" : filterCustomerNumber.getValue().trim();
+		String nameStr = filterName.getValue() == null ? "" : filterName.getValue().trim();
+		String sortOrder = filterSortOrder.getValue();
+		RestResponse<List<Customer>> fetched = customerRepository.paginatesearch(offset, limit, customerNumberStr, nameStr, sortOrder);
+		updateHeader();
+		return fetched.getEntity();
+	}
+
+	public void refreshSearch() {
+		grid.getDataProvider().refreshAll();
+	}
+
 	private void initBehavior() {
 		grid.asSingleSelect().addValueChangeListener(e -> updateHeader());
-		btn_refresh.addClickListener(e -> search());
+		btn_refresh.addClickListener(e -> {
+			grid.getDataProvider().refreshAll();
+		});
 		btn_add.addClickListener(e -> showAddWindow());
 		btn_edit.addClickListener(e -> showEditWindow());
 		btn_delete.addClickListener(e -> showRemoveWindow());
@@ -163,17 +194,6 @@ public class CustomerList extends Composite implements View {
 			theSort = theSort.substring(0, theSort.length() - 1);
 		}
 		filterSortOrder.setValue(theSort);
-	}
-
-	public void search() {
-
-		String customerNumberStr = filterCustomerNumber.getValue() == null ? "" : filterCustomerNumber.getValue().trim();
-		String nameStr = filterName.getValue() == null ? "" : filterName.getValue().trim();
-		String sortOrder = filterSortOrder.getValue();
-
-		RestResponse<List<Customer>> rs = customerRepository.search(customerNumberStr, nameStr, sortOrder);
-		grid.setItems(rs.getEntity());
-		updateHeader();
 	}
 
 	private void updateHeader() {
