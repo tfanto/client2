@@ -207,9 +207,7 @@ public class ItemList extends Composite implements View {
 	private void initBehavior() {
 		grid.asSingleSelect().addValueChangeListener(e -> updateHeader());
 		btn_refresh.addClickListener(e -> {
-
 			grid.getDataProvider().refreshAll();
-
 		});
 		btn_add.addClickListener(e -> showAddWindow());
 		btn_edit.addClickListener(e -> showEditWindow());
