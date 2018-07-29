@@ -2,6 +2,7 @@ package com.fnt.customerorder;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.fnt.dto.CustomerOrderHeadListView;
@@ -11,6 +12,7 @@ import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
 import com.vaadin.data.Binder;
 import com.vaadin.data.converter.StringToIntegerConverter;
+import com.vaadin.data.provider.DataProvider;
 import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
@@ -45,6 +47,8 @@ public class CustomerOrderList extends Composite implements View {
 	private Button btn_add = new Button("", VaadinIcons.PLUS);
 	private Button btn_edit = new Button("", VaadinIcons.PENCIL);
 	private Button btn_delete = new Button("", VaadinIcons.TRASH);
+	private Label noOfItems = new Label();
+
 	// filter
 	private TextField filterOrderNumber = new TextField();
 	private TextField filterCustomerNumber = new TextField();
@@ -78,7 +82,7 @@ public class CustomerOrderList extends Composite implements View {
 
 		HorizontalLayout buttons = new HorizontalLayout(btn_add, btn_edit, btn_delete, btn_refresh);
 		buttons.setSpacing(false);
-		HorizontalLayout header = new HorizontalLayout(buttons, filterSortOrder);
+		HorizontalLayout header = new HorizontalLayout(buttons, filterSortOrder, noOfItems);
 		header.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		header.setSpacing(true);
 
@@ -143,6 +147,9 @@ public class CustomerOrderList extends Composite implements View {
 		fnc.createFilterField(row1, row2, row3, "changedby", "Changedby", filterChangedBy, sortChangedBy);
 
 		grid.setSizeFull();
+		DataProvider<CustomerOrderHeadListView, Void> dp = DataProvider.fromCallbacks(query -> search(query.getOffset(), query.getLimit()).stream(), query -> count());
+		grid.setDataProvider(dp);
+
 
 		for (@SuppressWarnings("rawtypes")
 		Grid.Column column : grid.getColumns()) {
@@ -157,7 +164,9 @@ public class CustomerOrderList extends Composite implements View {
 	private void initBehavior() {
 
 		grid.asSingleSelect().addValueChangeListener(e -> updateHeader());
-		btn_refresh.addClickListener(e -> search());
+		btn_refresh.addClickListener(e -> {
+			grid.getDataProvider().refreshAll();
+		});
 		btn_add.addClickListener(e -> showAddWindow());
 		btn_edit.addClickListener(e -> showEditWindow());
 		btn_delete.addClickListener(e -> showRemoveWindow());
@@ -194,25 +203,38 @@ public class CustomerOrderList extends Composite implements View {
 		}
 		filterSortOrder.setValue(theSort);
 	}
-
-	public void search() {
+	
+	public int count() {
 
 		String filterCustomerNumberStr = filterCustomerNumber.getValue() == null ? "" : filterCustomerNumber.getValue().trim();
 		String filterNameStr = filterName.getValue() == null ? "" : filterName.getValue().trim();
 		LocalDate filterDateStr = filterDate.getValue();
 		String filterStatusStr = filterStatus.getValue() == null ? "" : filterStatus.getValue().trim();
 		String filterChangedByStr = filterChangedBy.getValue() == null ? "" : filterChangedBy.getValue().trim();
-
-		String sortOrder = filterSortOrder.getValue();
-
-		RestResponse<List<CustomerOrderHeadListView>> fetched = customerOrderRepository.search(filterCustomerNumberStr, filterNameStr, filterDateStr, filterStatusStr, filterChangedByStr, sortOrder);
-		if (fetched.getStatus().equals(200)) {
-			grid.setItems(fetched.getEntity());
-			updateHeader();
-		} else {
-			Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
-		}
+		RestResponse<Long> fetched = customerOrderRepository.paginatecount(filterCustomerNumberStr, filterNameStr, filterDateStr, filterStatusStr, filterChangedByStr);
+		Long numberOfItems = fetched.getEntity();
+		noOfItems.setValue("Records : " + numberOfItems);
+		return numberOfItems.intValue();
 	}
+
+
+	public Collection<CustomerOrderHeadListView> search(int offset, int limit) {
+
+		String filterCustomerNumberStr = filterCustomerNumber.getValue() == null ? "" : filterCustomerNumber.getValue().trim();
+		String filterNameStr = filterName.getValue() == null ? "" : filterName.getValue().trim();
+		LocalDate filterDateStr = filterDate.getValue();
+		String filterStatusStr = filterStatus.getValue() == null ? "" : filterStatus.getValue().trim();
+		String filterChangedByStr = filterChangedBy.getValue() == null ? "" : filterChangedBy.getValue().trim();
+		String sortOrder = filterSortOrder.getValue();
+		RestResponse<List<CustomerOrderHeadListView>> fetched = customerOrderRepository.paginatesearch(offset, limit, filterCustomerNumberStr, filterNameStr, filterDateStr, filterStatusStr, filterChangedByStr, sortOrder);
+		updateHeader();
+		return fetched.getEntity();
+	}
+	
+	public void refreshSearch() {
+		grid.getDataProvider().refreshAll();
+	}
+
 
 	private void updateHeader() {
 		boolean selected = !grid.asSingleSelect().isEmpty();

@@ -51,7 +51,7 @@ public class CustomerOrderRepository {
 		return client;
 	}
 
-	public RestResponse<List<CustomerOrderHeadListView>> search(String filterCustomerNumberStr, String filterNameStr, LocalDate filterDate, String filterStatusStr, String filterChangedByStr, String sortOrderStr) {
+	public RestResponse<List<CustomerOrderHeadListView>> paginatesearch(Integer offset, Integer limit, String filterCustomerNumberStr, String filterNameStr, LocalDate filterDate, String filterStatusStr, String filterChangedByStr, String sortOrderStr) {
 		Encoder encoder = Base64.getUrlEncoder();
 
 		String customernumber = encoder.encodeToString(filterCustomerNumberStr.getBytes());
@@ -63,6 +63,8 @@ public class CustomerOrderRepository {
 			formattedDateString = filterDate.format(formatter);
 		}
 
+		String offs = encoder.encodeToString(String.valueOf(offset).getBytes());
+		String lim = encoder.encodeToString(String.valueOf(limit).getBytes());
 		String orderstatus = encoder.encodeToString(filterStatusStr.getBytes());
 		String changedby = encoder.encodeToString(filterChangedByStr.getBytes());
 		String sortorder = encoder.encodeToString(sortOrderStr.getBytes());
@@ -72,7 +74,10 @@ public class CustomerOrderRepository {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_CUSTOMER_ORDER_END_POINT).path("search")
+			Response response = client.target(REST_CUSTOMER_ORDER_END_POINT)
+					.path("paginatesearch")
+					.queryParam("offset", offs)
+					.queryParam("limit", lim)
 					.queryParam("customernumber", customernumber)
 					.queryParam("name", name)
 					.queryParam("date", theDate)
@@ -97,6 +102,55 @@ public class CustomerOrderRepository {
 			}
 		}
 	}
+	
+	public RestResponse<Long> paginatecount(String filterCustomerNumberStr, String filterNameStr, LocalDate filterDate, String filterStatusStr, String filterChangedByStr) {
+		Encoder encoder = Base64.getUrlEncoder();
+
+		String customernumber = encoder.encodeToString(filterCustomerNumberStr.getBytes());
+		String name = encoder.encodeToString(filterNameStr.getBytes());
+
+		String formattedDateString = "";
+		if (filterDate != null) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			formattedDateString = filterDate.format(formatter);
+		}
+
+		String orderstatus = encoder.encodeToString(filterStatusStr.getBytes());
+		String changedby = encoder.encodeToString(filterChangedByStr.getBytes());
+		String theDate = encoder.encodeToString(formattedDateString.getBytes());
+
+		Client client = null;
+		try {
+			client = createClient();
+			// @formatter:off
+			Response response = client.target(REST_CUSTOMER_ORDER_END_POINT)
+					.path("paginatecount")
+					.queryParam("customernumber", customernumber)
+					.queryParam("name", name)
+					.queryParam("date", theDate)
+					.queryParam("orderstatus", orderstatus)
+					.queryParam("changedby", changedby)
+					.request(MediaType.APPLICATION_JSON).get(Response.class);
+			// @formatter:on
+			int status = response.getStatus();
+			if (status == 200) {
+				Long rs = response.readEntity(new GenericType<Long>() {
+				});
+				return new RestResponse<>(status, rs);
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
+	}
+
+	
+	
 
 	public RestResponse<CustomerOrderHead> getById(Long id) {
 		// @formatter:off

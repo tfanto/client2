@@ -289,9 +289,9 @@ public class CustomerOrderForm extends Window {
 						break;
 					case CustomerOrderList.CRUD_DELETE:
 						close();
-						owner.search();
 						break;
 					}
+					owner.refreshSearch();
 				}
 			} catch (ValidationException ex) {
 				List<BindingValidationStatus<?>> errors = ex.getFieldValidationErrors();
@@ -324,7 +324,7 @@ public class CustomerOrderForm extends Window {
 					units.setValue("1");
 					priceperitem.setValue("");
 					searchCustomerOrderlines();
-					owner.search();
+					owner.refreshSearch();
 				}
 			} catch (RuntimeException e) {
 				Notification.show("ERROR", e.getMessage(), Notification.Type.ERROR_MESSAGE);
