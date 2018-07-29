@@ -167,7 +167,6 @@ public class ItemList extends Composite implements View {
 		fnc.createFilterField(row1, row2, row3, "purchaseprice", "Purchaseprice", sortPurchasePrice);
 
 		grid.setSizeFull();
-
 		DataProvider<Item, Void> dp = DataProvider.fromCallbacks(query -> search(query.getOffset(), query.getLimit()).stream(), query -> count());
 		grid.setDataProvider(dp);
 

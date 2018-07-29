@@ -49,7 +49,6 @@ public class ItemRepository {
 
 		String offs = encoder.encodeToString(String.valueOf(offset).getBytes());
 		String lim = encoder.encodeToString(String.valueOf(limit).getBytes());
-
 		String itemnumber = encoder.encodeToString(itemNumberStr.getBytes());
 		String description = encoder.encodeToString(descriptionStr.getBytes());
 		String sortorder = encoder.encodeToString(sortorderStr.getBytes());
