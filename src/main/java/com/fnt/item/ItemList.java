@@ -201,6 +201,8 @@ public class ItemList extends Composite implements View {
 	
 	public void refreshSearch() {
 		grid.getDataProvider().refreshAll();
+		grid.scrollToStart();
+		grid.deselectAll();
 	}
 
 	private void initBehavior() {
