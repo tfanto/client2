@@ -233,6 +233,8 @@ public class CustomerOrderList extends Composite implements View {
 	
 	public void refreshSearch() {
 		grid.getDataProvider().refreshAll();
+		grid.scrollToStart();
+		grid.deselectAll();
 	}
 
 
