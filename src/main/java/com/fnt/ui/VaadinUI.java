@@ -2,6 +2,7 @@ package com.fnt.ui;
 
 import javax.servlet.annotation.WebServlet;
 
+import com.fnt.authentication.AppLoginForm;
 import com.fnt.customer.CustomerList;
 import com.fnt.customerorder.CustomerOrderList;
 import com.fnt.item.ItemList;
@@ -11,11 +12,9 @@ import com.vaadin.navigator.PushStateNavigation;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -23,10 +22,8 @@ import com.vaadin.ui.themes.ValoTheme;
 @PushStateNavigation
 public class VaadinUI extends UI {
 
-
 	@Override
 	protected void init(VaadinRequest request) {
-
 
 		Label title = new Label("Menu");
 		title.addStyleName(ValoTheme.MENU_TITLE);
@@ -40,7 +37,10 @@ public class VaadinUI extends UI {
 		Button view3 = new Button("Order", e -> getNavigator().navigateTo("view3"));
 		view3.addStyleNames(ValoTheme.BUTTON_LINK, ValoTheme.MENU_ITEM);
 
-		CssLayout menu = new CssLayout(title, view1, view2,view3);
+		Button view4 = new Button("Login", e -> getNavigator().navigateTo("view4"));
+		view4.addStyleNames(ValoTheme.BUTTON_LINK, ValoTheme.MENU_ITEM);
+
+		CssLayout menu = new CssLayout(title, view1, view2, view3, view4);
 		menu.addStyleName(ValoTheme.MENU_ROOT);
 
 		CssLayout viewContainer = new CssLayout();
@@ -48,7 +48,6 @@ public class VaadinUI extends UI {
 		HorizontalLayout mainLayout = new HorizontalLayout(menu, viewContainer);
 		mainLayout.setExpandRatio(menu, 0);
 		mainLayout.setExpandRatio(viewContainer, 1);
-
 
 		mainLayout.setSizeFull();
 		setContent(mainLayout);
@@ -58,9 +57,9 @@ public class VaadinUI extends UI {
 		navigator.addView("view1", CustomerList.class);
 		navigator.addView("view2", ItemList.class);
 		navigator.addView("view3", CustomerOrderList.class);
+		navigator.addView("view4", AppLoginForm.class);
 
 	}
-
 
 	@WebServlet(urlPatterns = "/*", name = "VaadinUIServlet", asyncSupported = true)
 	@VaadinServletConfiguration(ui = VaadinUI.class, productionMode = false)
