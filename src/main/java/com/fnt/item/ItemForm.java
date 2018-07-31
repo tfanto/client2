@@ -91,6 +91,7 @@ public class ItemForm extends Window {
 		binder.forField(instock).withConverter(new StringToIntegerConverter("Please enter a number")).bind(Item::getInstock, Item::setInstock);
 		binder.forField(price).withConverter(new StringToDoubleConverter("Please enter a number")).bind(Item::getPrice,Item::setPrice);
 		binder.forField(purchaseprice).withConverter(new StringToDoubleConverter("Please enter a number")).bind(Item::getPurchaseprice, Item::setPurchaseprice);
+		
 		binder.bindInstanceFields(this);
 		binder.readBean(obj);
 
