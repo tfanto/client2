@@ -21,6 +21,7 @@ import com.fnt.dto.SearchData;
 import com.fnt.entity.Customer;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
+import com.vaadin.ui.Notification;
 
 public class CustomerRepository {
 
@@ -75,7 +76,7 @@ public class CustomerRepository {
 				});
 				return new RestResponse<>(status, theList);
 			} else {
-				return new RestResponse<>(200, new ArrayList<>());
+				return new RestResponse<>(status, new ArrayList<>());
 			}
 		} finally {
 			if (client != null) {
@@ -106,10 +107,13 @@ public class CustomerRepository {
 				Long theList = response.readEntity(new GenericType<Long>() {
 				});
 				return new RestResponse<>(status, theList);
+			} else if (status == 403) { // forbidden
+				Notification.show(response.getStatusInfo().toString(), Notification.Type.ERROR_MESSAGE);
+				return new RestResponse<>(status, 0L);
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
-				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
+				return new RestResponse<>(status, fnc.formatAppMsg(appMsg));
 			}
 		} finally {
 			if (client != null) {
