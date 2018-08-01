@@ -2,6 +2,7 @@ package com.fnt.customerorder;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Base64.Encoder;
 import java.util.List;
@@ -26,6 +27,7 @@ import com.fnt.entity.CustomerOrderLine;
 import com.fnt.item.ItemRepository;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
+import com.vaadin.ui.Notification;
 
 public class CustomerOrderRepository {
 
@@ -51,7 +53,8 @@ public class CustomerOrderRepository {
 		return client;
 	}
 
-	public RestResponse<List<CustomerOrderHeadListView>> paginatesearch(Integer offset, Integer limit, String filterCustomerNumberStr, String filterNameStr, LocalDate filterDate, String filterStatusStr, String filterChangedByStr, String sortOrderStr) {
+	public RestResponse<List<CustomerOrderHeadListView>> paginatesearch(Integer offset, Integer limit, String filterCustomerNumberStr, String filterNameStr, LocalDate filterDate, String filterStatusStr, String filterChangedByStr,
+			String sortOrderStr) {
 		Encoder encoder = Base64.getUrlEncoder();
 
 		String customernumber = encoder.encodeToString(filterCustomerNumberStr.getBytes());
@@ -92,9 +95,7 @@ public class CustomerOrderRepository {
 				});
 				return new RestResponse<>(status, theList);
 			} else {
-				JsonNode jsonNode = response.readEntity(JsonNode.class);
-				String appMsg = jsonNode.path("appMsg").textValue();
-				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
+				return new RestResponse<>(status, new ArrayList<>());
 			}
 		} finally {
 			if (client != null) {
@@ -102,7 +103,7 @@ public class CustomerOrderRepository {
 			}
 		}
 	}
-	
+
 	public RestResponse<Long> paginatecount(String filterCustomerNumberStr, String filterNameStr, LocalDate filterDate, String filterStatusStr, String filterChangedByStr) {
 		Encoder encoder = Base64.getUrlEncoder();
 
@@ -137,10 +138,13 @@ public class CustomerOrderRepository {
 				Long rs = response.readEntity(new GenericType<Long>() {
 				});
 				return new RestResponse<>(status, rs);
+			} else if (status == 403) { // forbidden
+				Notification.show(response.getStatusInfo().toString(), Notification.Type.ERROR_MESSAGE);
+				return new RestResponse<>(status, 0L);
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
-				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
+				return new RestResponse<>(status, fnc.formatAppMsg(appMsg));
 			}
 		} finally {
 			if (client != null) {
@@ -148,9 +152,6 @@ public class CustomerOrderRepository {
 			}
 		}
 	}
-
-	
-	
 
 	public RestResponse<CustomerOrderHead> getById(Long id) {
 		// @formatter:off
