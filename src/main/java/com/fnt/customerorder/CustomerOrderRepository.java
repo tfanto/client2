@@ -27,6 +27,7 @@ import com.fnt.entity.CustomerOrderLine;
 import com.fnt.item.ItemRepository;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
 
 public class CustomerOrderRepository {
@@ -73,11 +74,12 @@ public class CustomerOrderRepository {
 		String sortorder = encoder.encodeToString(sortOrderStr.getBytes());
 		String theDate = encoder.encodeToString(formattedDateString.getBytes());
 
-		// @formatter:off
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_CUSTOMER_ORDER_END_POINT)
+			// @formatter:off
+			Response response = client
+					.target(REST_CUSTOMER_ORDER_END_POINT)
 					.path("paginatesearch")
 					.queryParam("offset", offs)
 					.queryParam("limit", lim)
@@ -87,7 +89,9 @@ public class CustomerOrderRepository {
 					.queryParam("orderstatus", orderstatus)
 					.queryParam("changedby", changedby)
 					.queryParam("sortorder", sortorder)
-					.request(MediaType.APPLICATION_JSON).get(Response.class);
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))					
+					.get(Response.class);
 			// @formatter:on
 			int status = response.getStatus();
 			if (status == 200) {
@@ -124,14 +128,17 @@ public class CustomerOrderRepository {
 		try {
 			client = createClient();
 			// @formatter:off
-			Response response = client.target(REST_CUSTOMER_ORDER_END_POINT)
+			Response response = client
+					.target(REST_CUSTOMER_ORDER_END_POINT)
 					.path("paginatecount")
 					.queryParam("customernumber", customernumber)
 					.queryParam("name", name)
 					.queryParam("date", theDate)
 					.queryParam("orderstatus", orderstatus)
 					.queryParam("changedby", changedby)
-					.request(MediaType.APPLICATION_JSON).get(Response.class);
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))					
+					.get(Response.class);
 			// @formatter:on
 			int status = response.getStatus();
 			if (status == 200) {
@@ -154,12 +161,16 @@ public class CustomerOrderRepository {
 	}
 
 	public RestResponse<CustomerOrderHead> getById(Long id) {
-		// @formatter:off
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_CUSTOMER_ORDER_END_POINT).path(String.valueOf(id))
-					.request(MediaType.APPLICATION_JSON).get(Response.class);
+			// @formatter:off
+			Response response = client
+					.target(REST_CUSTOMER_ORDER_END_POINT)
+					.path(String.valueOf(id))
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))					
+					.get(Response.class);
 			// @formatter:on
 			int status = response.getStatus();
 			if (status == 200) {
@@ -190,14 +201,17 @@ public class CustomerOrderRepository {
 		String theCustomerNumber = encoder.encodeToString(customerNumber.getBytes());
 		String theDate = encoder.encodeToString(formattedDateString.getBytes());
 
-		// @formatter:off
 		Client client = null;
 		try {
+			// @formatter:off
 			client = createClient();
-			Response response = client.target(REST_CUSTOMER_ORDER_END_POINT).path("header")
+			Response response = client
+					.target(REST_CUSTOMER_ORDER_END_POINT).path("header")
 					.queryParam("customernumber", theCustomerNumber)
 					.queryParam("date", theDate)
-					.request(MediaType.APPLICATION_JSON).post(null,Response.class);
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))					
+					.post(null,Response.class);
 			// @formatter:on
 			int status = response.getStatus();
 			if (status == 200) {
@@ -229,15 +243,18 @@ public class CustomerOrderRepository {
 		String theCustomerNumber = encoder.encodeToString(customerNumber.getBytes());
 		String theDate = encoder.encodeToString(formattedDateString.getBytes());
 
-		// @formatter:off
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_CUSTOMER_ORDER_END_POINT).path("header")
+			// @formatter:off
+			Response response = client
+					.target(REST_CUSTOMER_ORDER_END_POINT).path("header")
 					.queryParam("ordernumber", String.valueOf(ordernumber))
 					.queryParam("customernumber", theCustomerNumber)
 					.queryParam("date", theDate)
-					.request(MediaType.APPLICATION_JSON).put(null,Response.class);
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))					
+					.put(null,Response.class);
 			// @formatter:on
 			int status = response.getStatus();
 			if (status == 200) {
@@ -281,16 +298,20 @@ public class CustomerOrderRepository {
 		String theUnits = encoder.encodeToString(units.getBytes());
 		String thePriceperitem = encoder.encodeToString(priceperitem.getBytes());
 
-		// @formatter:off
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_CUSTOMER_ORDER_END_POINT).path("line")
+			// @formatter:off
+			Response response = client
+					.target(REST_CUSTOMER_ORDER_END_POINT)
+					.path("line")
 					.queryParam("internalordernumber", theInternalordernumber)
 					.queryParam("itemnumber", theItemnumber)
 					.queryParam("units", theUnits)
 					.queryParam("priceperitem", thePriceperitem)
-					.request(MediaType.APPLICATION_JSON).post(null,Response.class);
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))					
+					.post(null,Response.class);
 			// @formatter:on
 			int status = response.getStatus();
 			if (status == 200) {
@@ -315,14 +336,17 @@ public class CustomerOrderRepository {
 
 		String theInternalordernumber = encoder.encodeToString(currentInternalCustomerOrdernumber.getBytes());
 
-		// @formatter:off
 			Client client = null;
 			try {
 				client = createClient();
-				Response response = client.target(REST_CUSTOMER_ORDER_END_POINT)
+				// @formatter:off
+				Response response = client
+						.target(REST_CUSTOMER_ORDER_END_POINT)
 						.path(String.valueOf("linesfororder"))
 						.path(String.valueOf(theInternalordernumber))
-						.request(MediaType.APPLICATION_JSON).get(Response.class);
+						.request(MediaType.APPLICATION_JSON)
+						.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))					
+						.get(Response.class);
 				// @formatter:on
 			int status = response.getStatus();
 			if (status == 200) {
