@@ -5,6 +5,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Composite;
 import com.vaadin.ui.LoginForm;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -12,8 +13,6 @@ import com.vaadin.ui.VerticalLayout;
 public class AppLoginForm extends Composite implements View {
 
 	private static final long serialVersionUID = 1L;
-
-	private AppLoginRepository appLoginRepository = new AppLoginRepository();
 
 	public interface LoginListener {
 		void logInClicked(AppLoginForm loginForm);
@@ -70,7 +69,13 @@ public class AppLoginForm extends Composite implements View {
 	}
 
 	private void logInClicked(LoginForm.LoginEvent loginEvent) {
-		appLoginRepository.login(username.getValue(), password.getValue());
+		boolean ok = AppLoginRepository.authenticate(username.getValue(), password.getValue());
+		if(!ok) {
+			Notification.show("Bad credentials", Notification.Type.ERROR_MESSAGE);			
+		}
+		else {
+			getUI().getNavigator().navigateTo("");
+		}
 	}
 
 }

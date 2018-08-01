@@ -3,12 +3,14 @@ package com.fnt.ui;
 import javax.servlet.annotation.WebServlet;
 
 import com.fnt.authentication.AppLoginForm;
+import com.fnt.authentication.AppLoginRepository;
 import com.fnt.customer.CustomerList;
 import com.fnt.customerorder.CustomerOrderList;
 import com.fnt.item.ItemList;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.PushStateNavigation;
+import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Button;
@@ -37,10 +39,10 @@ public class VaadinUI extends UI {
 		Button view3 = new Button("Order", e -> getNavigator().navigateTo("view3"));
 		view3.addStyleNames(ValoTheme.BUTTON_LINK, ValoTheme.MENU_ITEM);
 
-		Button view4 = new Button("Login", e -> getNavigator().navigateTo("view4"));
-		view4.addStyleNames(ValoTheme.BUTTON_LINK, ValoTheme.MENU_ITEM);
+		Button btnLogout = new Button("Logout", e -> logout());
+		btnLogout.addStyleNames(ValoTheme.BUTTON_LINK, ValoTheme.MENU_ITEM);
 
-		CssLayout menu = new CssLayout(title, view1, view2, view3, view4);
+		CssLayout menu = new CssLayout(title, view1, view2, view3, btnLogout);
 		menu.addStyleName(ValoTheme.MENU_ROOT);
 
 		CssLayout viewContainer = new CssLayout();
@@ -59,6 +61,33 @@ public class VaadinUI extends UI {
 		navigator.addView("view3", CustomerOrderList.class);
 		navigator.addView("view4", AppLoginForm.class);
 
+		if (!AppLoginRepository.isAuthenticated()) {
+			view1.setVisible(false);
+			view2.setVisible(false);
+			view3.setVisible(false);
+			btnLogout.setVisible(false);
+			navigator.navigateTo("view4");
+		} else {
+			view1.setVisible(true);
+			view2.setVisible(true);
+			view3.setVisible(true);
+			btnLogout.setVisible(true);
+		}
+		navigator.addViewChangeListener(new ViewChangeListener() {
+			@Override
+			public boolean beforeViewChange(ViewChangeEvent event) {
+
+				if (AppLoginRepository.isAuthenticated()) {
+					return true;
+				}
+				return false;
+			}
+		});
+	}
+
+	private Object logout() {
+		AppLoginRepository.logout();
+		return null;
 	}
 
 	@WebServlet(urlPatterns = "/*", name = "VaadinUIServlet", asyncSupported = true)
