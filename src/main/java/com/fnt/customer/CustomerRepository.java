@@ -21,6 +21,7 @@ import com.fnt.dto.SearchData;
 import com.fnt.entity.Customer;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
 
 public class CustomerRepository {
@@ -60,7 +61,8 @@ public class CustomerRepository {
 		try {
 			client = createClient();
 			// @formatter:off
-			Response response = client.target(REST_CUSTOMER_END_POINT)
+			Response response = client
+					.target(REST_CUSTOMER_END_POINT)
 					.path("paginatesearch")
 					.queryParam("offset", offs)
 					.queryParam("limit", lim)
@@ -68,6 +70,7 @@ public class CustomerRepository {
 					.queryParam("name", n)
 					.queryParam("sortorder", so)
 					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))
 					.get(Response.class);
 			// @formatter:on
 			int status = response.getStatus();
@@ -95,11 +98,13 @@ public class CustomerRepository {
 		try {
 			client = createClient();
 			// @formatter:off
-			Response response = client.target(REST_CUSTOMER_END_POINT)
+			Response response = client
+					.target(REST_CUSTOMER_END_POINT)
 					.path("paginatecount")
 					.queryParam("customernumber", cn)
 					.queryParam("name", n)
 					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))
 					.get(Response.class);
 			// @formatter:on
 			int status = response.getStatus();
@@ -129,7 +134,14 @@ public class CustomerRepository {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_CUSTOMER_END_POINT).path(idStr).request(MediaType.APPLICATION_JSON).get(Response.class);
+			// @formatter:off
+			Response response = client
+					.target(REST_CUSTOMER_END_POINT)
+					.path(idStr)
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))
+					.get(Response.class);
+			// @formatter:off
 			int status = response.getStatus();
 			if (status == 200) {
 				Customer data = response.readEntity(new GenericType<Customer>() {
@@ -151,8 +163,14 @@ public class CustomerRepository {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_CUSTOMER_END_POINT).request(MediaType.APPLICATION_JSON).post(Entity.entity(customer, MediaType.APPLICATION_JSON), Response.class);
+			// @formatter:off
+			Response response = client
+					.target(REST_CUSTOMER_END_POINT)
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))					
+					.post(Entity.entity(customer, MediaType.APPLICATION_JSON), Response.class);
 			int status = response.getStatus();
+			// @formatter:off
 			if (status == 200) {
 				Customer data = response.readEntity(new GenericType<Customer>() {
 				});
@@ -173,8 +191,14 @@ public class CustomerRepository {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_CUSTOMER_END_POINT).request(MediaType.APPLICATION_JSON).put(Entity.entity(customer, MediaType.APPLICATION_JSON), Response.class);
+			// @formatter:off
+			Response response = client
+					.target(REST_CUSTOMER_END_POINT)
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))					
+					.put(Entity.entity(customer, MediaType.APPLICATION_JSON), Response.class);
 			int status = response.getStatus();
+			// @formatter:off
 			if (status == 200) {
 				Customer data = response.readEntity(new GenericType<Customer>() {
 				});
@@ -197,7 +221,14 @@ public class CustomerRepository {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_CUSTOMER_END_POINT).path(idStr).request(MediaType.APPLICATION_JSON).delete();
+			// @formatter:off
+			Response response = client
+					.target(REST_CUSTOMER_END_POINT)
+					.path(idStr)
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))					
+					.delete();
+			// @formatter:off
 			int status = response.getStatus();
 			if (status != 200) {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
@@ -222,7 +253,16 @@ public class CustomerRepository {
 		Client client = null;
 		try {
 			client = createClient();
-			Response response = client.target(REST_CUSTOMER_END_POINT).path("prompt").queryParam("customernumber", v1).queryParam("name", v2).request(MediaType.APPLICATION_JSON).get(Response.class);
+			// @formatter:off
+			Response response = client
+					.target(REST_CUSTOMER_END_POINT)
+					.path("prompt")
+					.queryParam("customernumber", v1)
+					.queryParam("name", v2)
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))					
+					.get(Response.class);
+			// @formatter:off
 			int status = response.getStatus();
 			if (status == 200) {
 				List<SearchData> theList = response.readEntity(new GenericType<List<SearchData>>() {

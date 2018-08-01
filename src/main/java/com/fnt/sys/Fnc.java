@@ -1,5 +1,6 @@
 package com.fnt.sys;
 
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
@@ -20,13 +21,12 @@ public class Fnc {
 		hl.addComponent(field);
 		return hl;
 	}
-	
-	public void createFilterField(HeaderRow row1, HeaderRow row2, HeaderRow row3, String columnname, String caption,  CheckBox chk) {
+
+	public void createFilterField(HeaderRow row1, HeaderRow row2, HeaderRow row3, String columnname, String caption, CheckBox chk) {
 		Label lbl = new Label(caption);
 		row1.getCell(columnname).setComponent(lbl);
 		row3.getCell(columnname).setComponent(chk);
 	}
-
 
 	public void createFilterField(HeaderRow row1, HeaderRow row2, HeaderRow row3, String columnname, String caption, TextField field, CheckBox chk) {
 		Label lbl = new Label(caption);
@@ -95,6 +95,18 @@ public class Fnc {
 		captionLayout.addComponent(label);
 		dataLayout.addComponent(component);
 		return vertical;
+	}
+
+	public String getToken(VaadinSession ses) {
+		String jwe = null;
+		if (ses != null) {
+			Object jweObj = ses.getAttribute("jwe");
+			if (jweObj instanceof String) {
+				jwe = String.valueOf(jweObj);
+				return jwe;
+			}
+		}
+		return "";
 	}
 
 }
