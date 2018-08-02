@@ -22,7 +22,6 @@ import com.fnt.entity.Item;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.ui.Notification;
 
 public class ItemRepository {
 
@@ -75,6 +74,8 @@ public class ItemRepository {
 				List<Item> theList = response.readEntity(new GenericType<List<Item>>() {
 				});
 				return new RestResponse<>(status, theList);
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
 			} else {
 				return new RestResponse<>(status, new ArrayList<>());
 			}
@@ -110,9 +111,8 @@ public class ItemRepository {
 				Long rs = response.readEntity(new GenericType<Long>() {
 				});
 				return new RestResponse<>(status, rs);
-			} else if (status == 403) { // forbidden
-				Notification.show(response.getStatusInfo().toString(), Notification.Type.ERROR_MESSAGE);
-				return new RestResponse<>(status, 0L);
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
@@ -145,6 +145,8 @@ public class ItemRepository {
 				Item data = response.readEntity(new GenericType<Item>() {
 				});
 				return new RestResponse<>(status, data);
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
@@ -173,6 +175,8 @@ public class ItemRepository {
 				Item data = response.readEntity(new GenericType<Item>() {
 				});
 				return new RestResponse<>(status, data);
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
@@ -201,6 +205,8 @@ public class ItemRepository {
 				Item data = response.readEntity(new GenericType<Item>() {
 				});
 				return new RestResponse<>(status, data);
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
@@ -232,6 +238,8 @@ public class ItemRepository {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
 				return new RestResponse<>(status, fnc.formatAppMsg(appMsg));
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
 			} else {
 				return new RestResponse<>(status);
 			}
@@ -266,6 +274,8 @@ public class ItemRepository {
 				List<SearchData> theList = response.readEntity(new GenericType<List<SearchData>>() {
 				});
 				return new RestResponse<>(status, theList);
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
 			} else {
 				return new RestResponse<>(200, new ArrayList<>());
 			}

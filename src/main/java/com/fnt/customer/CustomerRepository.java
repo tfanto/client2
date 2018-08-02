@@ -78,6 +78,8 @@ public class CustomerRepository {
 				List<Customer> theList = response.readEntity(new GenericType<List<Customer>>() {
 				});
 				return new RestResponse<>(status, theList);
+			} else if(status == 403){
+				return new RestResponse<>(status, response.getStatusInfo().toString());				
 			} else {
 				return new RestResponse<>(status, new ArrayList<>());
 			}
@@ -147,6 +149,8 @@ public class CustomerRepository {
 				Customer data = response.readEntity(new GenericType<Customer>() {
 				});
 				return new RestResponse<>(status, data);
+			} else if(status == 403){
+				return new RestResponse<>(status, response.getStatusInfo().toString());				
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
@@ -175,6 +179,8 @@ public class CustomerRepository {
 				Customer data = response.readEntity(new GenericType<Customer>() {
 				});
 				return new RestResponse<>(status, data);
+			} else if(status == 403){
+				return new RestResponse<>(status, response.getStatusInfo().toString());				
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
@@ -203,7 +209,9 @@ public class CustomerRepository {
 				Customer data = response.readEntity(new GenericType<Customer>() {
 				});
 				return new RestResponse<>(status, data);
-			} else {
+			} else if(status == 403){
+				return new RestResponse<>(status, response.getStatusInfo().toString());				
+			}else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
 				return new RestResponse<>(status, fnc.formatAppMsg(appMsg));
@@ -234,6 +242,8 @@ public class CustomerRepository {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
 				return new RestResponse<>(status, fnc.formatAppMsg(appMsg));
+			} else if(status == 403){
+				return new RestResponse<>(status, response.getStatusInfo().toString());				
 			} else {
 				return new RestResponse<>(status);
 			}
@@ -268,6 +278,8 @@ public class CustomerRepository {
 				List<SearchData> theList = response.readEntity(new GenericType<List<SearchData>>() {
 				});
 				return new RestResponse<>(status, theList);
+			} else if(status == 403){
+				return new RestResponse<>(status, response.getStatusInfo().toString());				
 			} else {
 				return new RestResponse<>(200, new ArrayList<>());
 			}
