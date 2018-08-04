@@ -60,7 +60,7 @@ public class UserRepository {
 				});
 				return new RestResponse<>(status, theList);
 			} else if (status == 403) {
-				return new RestResponse<>(status, response.getStatusInfo().toString());
+				return new RestResponse<>(status, new ArrayList<>());  // dont tell the the user why he could be evil
 			} else {
 				return new RestResponse<>(status, new ArrayList<>());
 			}
