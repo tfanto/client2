@@ -101,7 +101,6 @@ public class UserList extends Composite implements View {
 		SingleSelect<UserDto> selected = grid.asSingleSelect();
 		String login = selected.getValue().getLogin();
 		RestResponse<UserDto> fetched = userRepository.getLogin(login);
-
 		if (fetched.getStatus().equals(200)) {
 			UserDto dto = fetched.getEntity();
 			UserForm window = new UserForm(this, userRepository, "Edit", dto, CRUD_EDIT);

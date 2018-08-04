@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fnt.dto.UserDto;
@@ -70,8 +71,34 @@ public class UserRepository {
 	}
 
 	public RestResponse<UserDto> getLogin(String login) {
-		// TODO Auto-generated method stub
-		return null;
+		Client client = null;
+		try {
+			client = createClient();
+			// @formatter:off
+			Response response = client
+					.target(REST_USER_END_POINT)
+					.path(login)
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))
+					.get(Response.class);
+			// @formatter:on
+			int status = response.getStatus();
+			if (status == 200) {
+				UserDto theList = response.readEntity(new GenericType<UserDto>() {
+				});
+				return new RestResponse<>(status, theList);
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
 	}
 
 	public RestResponse<UserDto> create(UserDto user) {
