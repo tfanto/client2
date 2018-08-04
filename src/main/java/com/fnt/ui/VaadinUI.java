@@ -7,6 +7,7 @@ import com.fnt.authentication.AppLoginRepository;
 import com.fnt.customer.CustomerList;
 import com.fnt.customerorder.CustomerOrderList;
 import com.fnt.item.ItemList;
+import com.fnt.useradmin.UserList;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.PushStateNavigation;
@@ -39,10 +40,13 @@ public class VaadinUI extends UI {
 		Button view3 = new Button("Order", e -> getNavigator().navigateTo("view3"));
 		view3.addStyleNames(ValoTheme.BUTTON_LINK, ValoTheme.MENU_ITEM);
 
+		Button btnUserAdmin = new Button("User", e -> getNavigator().navigateTo("view5"));
+		btnUserAdmin.addStyleNames(ValoTheme.BUTTON_LINK, ValoTheme.MENU_ITEM);
+
 		Button btnLogout = new Button("Logout", e -> logout());
 		btnLogout.addStyleNames(ValoTheme.BUTTON_LINK, ValoTheme.MENU_ITEM);
 
-		CssLayout menu = new CssLayout(title, view1, view2, view3, btnLogout);
+		CssLayout menu = new CssLayout(title, view1, view2, view3, btnLogout, btnUserAdmin);
 		menu.addStyleName(ValoTheme.MENU_ROOT);
 
 		CssLayout viewContainer = new CssLayout();
@@ -60,6 +64,7 @@ public class VaadinUI extends UI {
 		navigator.addView("view2", ItemList.class);
 		navigator.addView("view3", CustomerOrderList.class);
 		navigator.addView("view4", AppLoginForm.class);
+		navigator.addView("view5", UserList.class);
 
 		if (!AppLoginRepository.isAuthenticated()) {
 			view1.setVisible(false);
