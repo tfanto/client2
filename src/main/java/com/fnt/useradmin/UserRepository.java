@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -102,18 +103,91 @@ public class UserRepository {
 	}
 
 	public RestResponse<UserDto> create(UserDto user) {
-		// TODO Auto-generated method stub
-		return null;
+		Client client = null;
+		try {
+			client = createClient();
+			// @formatter:off
+			Response response = client
+					.target(REST_USER_END_POINT)
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))
+					.post(Entity.json(user), Response.class);
+			// @formatter:on
+			int status = response.getStatus();
+			if (status == 200) {
+				UserDto theList = response.readEntity(new GenericType<UserDto>() {
+				});
+				return new RestResponse<>(status, theList);
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
 	}
 
 	public RestResponse<UserDto> update(UserDto user) {
-		// TODO Auto-generated method stub
-		return null;
+		Client client = null;
+		try {
+			client = createClient();
+			// @formatter:off
+			Response response = client
+					.target(REST_USER_END_POINT)
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))
+					.put(Entity.json(user), Response.class);
+			// @formatter:on
+			int status = response.getStatus();
+			if (status == 200) {
+				UserDto theList = response.readEntity(new GenericType<UserDto>() {
+				});
+				return new RestResponse<>(status, theList);
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
 	}
 
 	public RestResponse<UserDto> delete(UserDto user) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		Client client = null;
+		try {
+			client = createClient();
+			// @formatter:off
+			Response response = client
+					.target(REST_USER_END_POINT)
+					.path(user.getLogin())
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))
+					.delete( Response.class);
+			// @formatter:on
+			int status = response.getStatus();
+			if (status == 200) {
+				return new RestResponse<>(status, user);
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}	}
 
 }
