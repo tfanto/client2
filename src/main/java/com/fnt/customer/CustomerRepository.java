@@ -238,12 +238,13 @@ public class CustomerRepository {
 					.delete();
 			// @formatter:off
 			int status = response.getStatus();
+			if(status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());								
+			}
 			if (status != 200) {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
 				return new RestResponse<>(status, fnc.formatAppMsg(appMsg));
-			} else if(status == 403){
-				return new RestResponse<>(status, response.getStatusInfo().toString());				
 			} else {
 				return new RestResponse<>(status);
 			}

@@ -67,16 +67,19 @@ public class VaadinUI extends UI {
 		navigator.addView("view5", UserList.class);
 
 		if (!AppLoginRepository.isAuthenticated()) {
+			btnUserAdmin.setVisible(false);
 			view1.setVisible(false);
 			view2.setVisible(false);
 			view3.setVisible(false);
 			btnLogout.setVisible(false);
 			navigator.navigateTo("view4");
 		} else {
+			btnUserAdmin.setVisible(true);
 			view1.setVisible(true);
 			view2.setVisible(true);
 			view3.setVisible(true);
 			btnLogout.setVisible(true);
+			
 		}
 		navigator.addViewChangeListener(new ViewChangeListener() {
 			@Override
