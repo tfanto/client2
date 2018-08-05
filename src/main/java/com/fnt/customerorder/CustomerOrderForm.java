@@ -63,6 +63,7 @@ public class CustomerOrderForm extends Window {
 	private TextField priceperitem = new TextField("Price per Item");
 	private Button btn_clearline = new Button("Clear");
 	private Button btn_addline = new Button("Add line");
+	private Button btn_deleteSelectedLine = new Button("Delete selected line");
 
 
 	public CustomerOrderForm(CustomerOrderList owner, CustomerOrderRepository customerOrderRepository, String caption, CustomerOrderHeadListView customerOrderHeadListView, int crudFunction) {
@@ -72,12 +73,14 @@ public class CustomerOrderForm extends Window {
 		this.crudFunction = crudFunction;
 		initLayout(caption);
 		initBehavior(customerOrderHeadListView);
+		updateHeader();
 	}
 
 	private void initLayout(String caption) {
 
 		grid.setHeightMode(HeightMode.UNDEFINED);
 		setCaption(caption);
+		grid.asSingleSelect().addValueChangeListener(e -> updateHeader());
 
 
 		// HEADER - registration / selection
@@ -131,6 +134,7 @@ public class CustomerOrderForm extends Window {
 		priceperitem.addStyleName(ValoTheme.TEXTFIELD_TINY);
 		btn_clearline.addStyleName(ValoTheme.BUTTON_TINY);
 		btn_addline.addStyleName(ValoTheme.BUTTON_TINY);
+		btn_deleteSelectedLine.addStyleName(ValoTheme.BUTTON_TINY);
 
 		units.setValue("1");
 		orderline.addComponent(units);
@@ -138,8 +142,9 @@ public class CustomerOrderForm extends Window {
 
 		HorizontalLayout orderlineButtons = new HorizontalLayout();
 		orderlineButtons.setSpacing(false);
-		orderlineButtons.addComponent(btn_clearline);
+		//orderlineButtons.addComponent(btn_clearline);
 		orderlineButtons.addComponent(btn_addline);
+		orderlineButtons.addComponent(btn_deleteSelectedLine);
 		orderline.addComponent(orderlineButtons);
 		orderline.setComponentAlignment(orderlineButtons, Alignment.BOTTOM_LEFT);
 
@@ -224,6 +229,12 @@ public class CustomerOrderForm extends Window {
 		setSizeFull();
 		// center();
 	}
+	
+	private void updateHeader() {
+		boolean selected = !grid.asSingleSelect().isEmpty();
+		btn_deleteSelectedLine.setVisible(selected);
+	}
+
 
 	private void initBehavior(CustomerOrderHeadListView customerOrderHeadListView) {
 
@@ -325,6 +336,21 @@ public class CustomerOrderForm extends Window {
 				}
 			} catch (RuntimeException e) {
 				Notification.show("ERROR", e.getMessage(), Notification.Type.ERROR_MESSAGE);
+			}
+		});
+		
+		btn_deleteSelectedLine.addClickListener(event -> {
+
+			CustomerOrderLineListView  selectedLine =  grid.asSingleSelect().getValue();
+			String internalordernbr = selectedLine.getInternal_ordernumber();
+			Long linennbr = selectedLine.getLinennumber();
+			String itemnbr = selectedLine.getItemnumber();
+			RestResponse<CustomerOrderLine> rs = customerOrderRepository.deleteCustomerOrderLine(internalordernbr, linennbr, itemnbr);
+			if (rs.getStatus() != 200) {
+				Notification.show("ERROR", rs.getMsg(), Notification.Type.ERROR_MESSAGE);
+			} else {
+				Notification.show("Info", "Order line removed", Notification.Type.TRAY_NOTIFICATION);
+				searchCustomerOrderlines();
 			}
 		});
 	}

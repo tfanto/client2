@@ -407,4 +407,43 @@ public class CustomerOrderRepository {
 		}
 	}
 
+	public RestResponse<CustomerOrderLine> deleteCustomerOrderLine(String internalordernbr, Long linennbr, String itemnbr) {
+		Encoder encoder = Base64.getUrlEncoder();
+		String internalordernbrStr = encoder.encodeToString(internalordernbr.getBytes());
+		String linennbrStr = encoder.encodeToString(String.valueOf(linennbr).getBytes());
+		String itemnbrStr = encoder.encodeToString(itemnbr.getBytes());
+
+		Client client = null;
+		try {
+			client = createClient();
+			// @formatter:off
+				Response response = client
+						.target(REST_CUSTOMER_ORDER_END_POINT)
+						.path(internalordernbrStr)
+						.path(linennbrStr)
+						.path(itemnbrStr)
+						.request(MediaType.APPLICATION_JSON)
+						.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))					
+						.delete(Response.class);
+				// @formatter:on
+			int status = response.getStatus();
+			if (status == 200) {
+				return new RestResponse<>(status, new CustomerOrderLine());
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
+	}
+	
+	
+
+
 }
