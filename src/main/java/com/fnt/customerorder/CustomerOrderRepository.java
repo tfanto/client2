@@ -28,6 +28,7 @@ import com.fnt.item.ItemRepository;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Notification;
 
 public class CustomerOrderRepository {
 
@@ -97,8 +98,9 @@ public class CustomerOrderRepository {
 				List<CustomerOrderHeadListView> theList = response.readEntity(new GenericType<List<CustomerOrderHeadListView>>() {
 				});
 				return new RestResponse<>(status, theList);
-			} else if(status == 403){
-				return new RestResponse<>(status, response.getStatusInfo().toString());				
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString(), new ArrayList<>());
+
 			} else {
 				return new RestResponse<>(status, new ArrayList<>());
 			}
@@ -146,8 +148,9 @@ public class CustomerOrderRepository {
 				Long rs = response.readEntity(new GenericType<Long>() {
 				});
 				return new RestResponse<>(status, rs);
-			} else if(status == 403){
-				return new RestResponse<>(status, response.getStatusInfo().toString());				
+			} else if (status == 403) {
+				Notification.show(response.getStatusInfo().toString(), Notification.Type.ERROR_MESSAGE);
+				return new RestResponse<>(status, 0L);
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
@@ -177,8 +180,8 @@ public class CustomerOrderRepository {
 				CustomerOrderHead obj = response.readEntity(new GenericType<CustomerOrderHead>() {
 				});
 				return new RestResponse<>(status, obj);
-			} else if(status == 403){
-				return new RestResponse<>(status, response.getStatusInfo().toString());				
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
@@ -220,8 +223,8 @@ public class CustomerOrderRepository {
 				CustomerOrderHead obj = response.readEntity(new GenericType<CustomerOrderHead>() {
 				});
 				return new RestResponse<>(status, obj);
-			} else if(status == 403){
-				return new RestResponse<>(status, response.getStatusInfo().toString());				
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
@@ -265,8 +268,8 @@ public class CustomerOrderRepository {
 				CustomerOrderHead obj = response.readEntity(new GenericType<CustomerOrderHead>() {
 				});
 				return new RestResponse<>(status, obj);
-			} else if(status == 403){
-				return new RestResponse<>(status, response.getStatusInfo().toString());				
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
@@ -324,8 +327,8 @@ public class CustomerOrderRepository {
 				CustomerOrderLine obj = response.readEntity(new GenericType<CustomerOrderLine>() {
 				});
 				return new RestResponse<>(status, obj);
-			} else if(status == 403){
-				return new RestResponse<>(status, response.getStatusInfo().toString());				
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
@@ -344,10 +347,10 @@ public class CustomerOrderRepository {
 
 		String theInternalordernumber = encoder.encodeToString(currentInternalCustomerOrdernumber.getBytes());
 
-			Client client = null;
-			try {
-				client = createClient();
-				// @formatter:off
+		Client client = null;
+		try {
+			client = createClient();
+			// @formatter:off
 				Response response = client
 						.target(REST_CUSTOMER_ORDER_END_POINT)
 						.path(String.valueOf("linesfororder"))
@@ -361,8 +364,8 @@ public class CustomerOrderRepository {
 				List<CustomerOrderLineListView> obj = response.readEntity(new GenericType<List<CustomerOrderLineListView>>() {
 				});
 				return new RestResponse<>(status, obj);
-			} else if(status == 403){
-				return new RestResponse<>(status, response.getStatusInfo().toString());				
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();

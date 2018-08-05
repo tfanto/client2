@@ -22,6 +22,7 @@ import com.fnt.entity.Item;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Notification;
 
 public class ItemRepository {
 
@@ -75,7 +76,7 @@ public class ItemRepository {
 				});
 				return new RestResponse<>(status, theList);
 			} else if (status == 403) {
-				return new RestResponse<>(status, response.getStatusInfo().toString());
+				return new RestResponse<>(status, response.getStatusInfo().toString(), new ArrayList<>());				
 			} else {
 				return new RestResponse<>(status, new ArrayList<>());
 			}
@@ -112,7 +113,8 @@ public class ItemRepository {
 				});
 				return new RestResponse<>(status, rs);
 			} else if (status == 403) {
-				return new RestResponse<>(status, response.getStatusInfo().toString());
+				Notification.show(response.getStatusInfo().toString(), Notification.Type.ERROR_MESSAGE);
+				return new RestResponse<>(status, 0L);
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
