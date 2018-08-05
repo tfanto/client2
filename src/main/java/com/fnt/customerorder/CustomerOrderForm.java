@@ -50,8 +50,10 @@ public class CustomerOrderForm extends Window {
 	private TextField customernumber = new TextField("Customer no");
 	private Button btn_customernumber = new Button("...");
 	private TextField name = new TextField("Name");
+	
 
 	private Button btn_execute_header = new Button("Create");
+
 	// lineInfo
 
 	private TextField itemnumber = new TextField("Item no");
@@ -62,7 +64,6 @@ public class CustomerOrderForm extends Window {
 	private Button btn_clearline = new Button("Clear");
 	private Button btn_addline = new Button("Add line");
 
-	private Button btn_cancel = new Button("Cancel order");
 
 	public CustomerOrderForm(CustomerOrderList owner, CustomerOrderRepository customerOrderRepository, String caption, CustomerOrderHeadListView customerOrderHeadListView, int crudFunction) {
 
@@ -78,9 +79,6 @@ public class CustomerOrderForm extends Window {
 		grid.setHeightMode(HeightMode.UNDEFINED);
 		setCaption(caption);
 
-		btn_cancel.addStyleName(ValoTheme.BUTTON_TINY);
-		HorizontalLayout buttons = new HorizontalLayout(btn_cancel);
-		buttons.setSpacing(true);
 
 		// HEADER - registration / selection
 		orderdate.addStyleName(ValoTheme.DATEFIELD_TINY);
@@ -105,8 +103,7 @@ public class CustomerOrderForm extends Window {
 			name.setEnabled(false);
 			break;
 		case CustomerOrderList.CRUD_DELETE:
-			btn_execute_header.setVisible(false);
-			btn_execute_header.setVisible(false);
+			btn_execute_header.setCaption("Confirm delete");
 			orderdate.setEnabled(false);
 			customernumber.setEnabled(false);
 			btn_customernumber.setEnabled(false);
@@ -221,7 +218,7 @@ public class CustomerOrderForm extends Window {
 
 		// VerticalLayout layout = new VerticalLayout(orderform, grid, buttons);
 		VerticalLayout layout = new VerticalLayout();
-		layout.addComponents(orderform, grid, buttons);
+		layout.addComponents(orderform, grid);
 		setContent(layout);
 		setModal(true);
 		setSizeFull();
@@ -244,7 +241,6 @@ public class CustomerOrderForm extends Window {
 		btn_customernumber.addClickListener(e -> searchCustomer());
 		btn_itemnumber.addClickListener(e -> searchItem());
 
-		btn_cancel.addClickListener(e -> close());
 		btn_execute_header.addClickListener(e -> {
 
 			// Notification.show("Info", "Add the header ",
@@ -262,7 +258,7 @@ public class CustomerOrderForm extends Window {
 					rs = customerOrderRepository.updateHead(owner.getCurrentOrderHead().getOrdernumber(), orderdate.getValue(), customernumber.getValue());
 					break;
 				case CustomerOrderList.CRUD_DELETE:
-					// rs = customerOrderRepository.delete(orderHead);
+					rs = customerOrderRepository.delete(owner.getCurrentOrderHead());
 					break;
 				default: {
 					return;
@@ -288,6 +284,7 @@ public class CustomerOrderForm extends Window {
 						rs = customerOrderRepository.updateHead(owner.getCurrentOrderHead().getOrdernumber(), orderdate.getValue(), customernumber.getValue());
 						break;
 					case CustomerOrderList.CRUD_DELETE:
+						Notification.show("Info", "Customer order removed", Notification.Type.TRAY_NOTIFICATION);
 						close();
 						break;
 					}

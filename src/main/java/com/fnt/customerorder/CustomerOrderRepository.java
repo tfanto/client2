@@ -282,11 +282,6 @@ public class CustomerOrderRepository {
 		}
 	}
 
-	public RestResponse<CustomerOrderHead> delete(CustomerOrderHead obj) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public RestResponse<List<SearchData>> selectListCustomers(String value, String value2) {
 		return customerRepository.selectList(value, value2);
 	}
@@ -364,6 +359,40 @@ public class CustomerOrderRepository {
 				List<CustomerOrderLineListView> obj = response.readEntity(new GenericType<List<CustomerOrderLineListView>>() {
 				});
 				return new RestResponse<>(status, obj);
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
+	}
+
+	public RestResponse<CustomerOrderHead> delete(CustomerOrderHead obj) {
+		
+		String currentInternalCustomerOrdernumber = obj.getInternalordernumber();
+		Encoder encoder = Base64.getUrlEncoder();
+		String theInternalordernumber = encoder.encodeToString(currentInternalCustomerOrdernumber.getBytes());
+
+		Client client = null;
+		try {
+			client = createClient();
+			// @formatter:off
+				Response response = client
+						.target(REST_CUSTOMER_ORDER_END_POINT)
+						.path(String.valueOf(theInternalordernumber))
+						.request(MediaType.APPLICATION_JSON)
+						.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))					
+						.delete(Response.class);
+				// @formatter:on
+			int status = response.getStatus();
+			if (status == 200) {
+				return new RestResponse<>(status, new CustomerOrderHead());
 			} else if (status == 403) {
 				return new RestResponse<>(status, response.getStatusInfo().toString());
 			} else {
