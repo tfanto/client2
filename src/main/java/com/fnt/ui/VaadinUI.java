@@ -7,7 +7,6 @@ import com.fnt.authentication.AppLoginRepository;
 import com.fnt.customer.CustomerList;
 import com.fnt.customerorder.CustomerOrderList;
 import com.fnt.item.ItemList;
-import com.fnt.useradmin.UserList;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.PushStateNavigation;
@@ -31,22 +30,19 @@ public class VaadinUI extends UI {
 		Label title = new Label("Menu");
 		title.addStyleName(ValoTheme.MENU_TITLE);
 
-		Button view1 = new Button("Customer", e -> getNavigator().navigateTo("view1"));
+		Button view1 = new Button("Customer", e -> getNavigator().navigateTo("Customer"));
 		view1.addStyleNames(ValoTheme.BUTTON_LINK, ValoTheme.MENU_ITEM);
 
-		Button view2 = new Button("Item", e -> getNavigator().navigateTo("view2"));
+		Button view2 = new Button("Item", e -> getNavigator().navigateTo("Item"));
 		view2.addStyleNames(ValoTheme.BUTTON_LINK, ValoTheme.MENU_ITEM);
 
-		Button view3 = new Button("Order", e -> getNavigator().navigateTo("view3"));
+		Button view3 = new Button("Order", e -> getNavigator().navigateTo("Order"));
 		view3.addStyleNames(ValoTheme.BUTTON_LINK, ValoTheme.MENU_ITEM);
-
-		Button btnUserAdmin = new Button("User", e -> getNavigator().navigateTo("view5"));
-		btnUserAdmin.addStyleNames(ValoTheme.BUTTON_LINK, ValoTheme.MENU_ITEM);
 
 		Button btnLogout = new Button("Logout", e -> logout());
 		btnLogout.addStyleNames(ValoTheme.BUTTON_LINK, ValoTheme.MENU_ITEM);
 
-		CssLayout menu = new CssLayout(title, view1, view2, view3, btnLogout, btnUserAdmin);
+		CssLayout menu = new CssLayout(title, view1, view2, view3, btnLogout);
 		menu.addStyleName(ValoTheme.MENU_ROOT);
 
 		CssLayout viewContainer = new CssLayout();
@@ -60,26 +56,23 @@ public class VaadinUI extends UI {
 
 		Navigator navigator = new Navigator(this, viewContainer);
 		navigator.addView("", DefaultView.class);
-		navigator.addView("view1", CustomerList.class);
-		navigator.addView("view2", ItemList.class);
-		navigator.addView("view3", CustomerOrderList.class);
-		navigator.addView("view4", AppLoginForm.class);
-		navigator.addView("view5", UserList.class);
+		navigator.addView("Customer", CustomerList.class);
+		navigator.addView("Item", ItemList.class);
+		navigator.addView("Order", CustomerOrderList.class);
+		navigator.addView("Login", AppLoginForm.class);
 
 		if (!AppLoginRepository.isAuthenticated()) {
-			btnUserAdmin.setVisible(false);
 			view1.setVisible(false);
 			view2.setVisible(false);
 			view3.setVisible(false);
 			btnLogout.setVisible(false);
-			navigator.navigateTo("view4");
+			navigator.navigateTo("Login");
 		} else {
-			btnUserAdmin.setVisible(true);
 			view1.setVisible(true);
 			view2.setVisible(true);
 			view3.setVisible(true);
 			btnLogout.setVisible(true);
-			
+
 		}
 		navigator.addViewChangeListener(new ViewChangeListener() {
 			@Override
