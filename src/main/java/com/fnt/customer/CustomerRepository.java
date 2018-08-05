@@ -79,7 +79,7 @@ public class CustomerRepository {
 				});
 				return new RestResponse<>(status, theList);
 			} else if(status == 403){
-				return new RestResponse<>(status, response.getStatusInfo().toString());				
+				return new RestResponse<>(status, response.getStatusInfo().toString(), new ArrayList<>());				
 			} else {
 				return new RestResponse<>(status, new ArrayList<>());
 			}

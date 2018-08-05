@@ -27,6 +27,13 @@ public class RestResponse<T> {
 		this.entity = entity;
 		this.msg = "";
 	}
+	
+	public RestResponse(Integer status, String msg, T entity) {
+		this.status = status;
+		this.entity = entity;
+		this.msg = msg;
+	}
+
 
 	public T getEntity() {
 		return entity;
