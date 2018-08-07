@@ -253,11 +253,14 @@ public class ItemRepository {
 		}
 	}
 
-	public RestResponse<List<SearchData>> selectList(String value, String value2) {
+	public RestResponse<List<SearchData>> promptpaginatesearch(Integer offset, Integer limit, String itemNumberStr, String descriptionStr) {
+
 		Encoder encoder = Base64.getEncoder();
 
-		String v1 = encoder.encodeToString(value.getBytes());
-		String v2 = encoder.encodeToString(value2.getBytes());
+		String offs = encoder.encodeToString(String.valueOf(offset).getBytes());
+		String lim = encoder.encodeToString(String.valueOf(limit).getBytes());
+		String itemnumber = encoder.encodeToString(itemNumberStr.getBytes());
+		String description = encoder.encodeToString(descriptionStr.getBytes());
 
 		Client client = null;
 		try {
@@ -265,9 +268,11 @@ public class ItemRepository {
 			// @formatter:off
 			Response response = client
 					.target(REST_ITEM_END_POINT)
-					.path("prompt")
-					.queryParam("itemnumber", v1)
-					.queryParam("description", v2)
+					.path("promptpaginatesearch")
+					.queryParam("offset", offs)
+					.queryParam("limit", lim)
+					.queryParam("itemnumber", itemnumber)
+					.queryParam("description", description)
 					.request(MediaType.APPLICATION_JSON)
 					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))					
 					.get(Response.class);
@@ -278,9 +283,9 @@ public class ItemRepository {
 				});
 				return new RestResponse<>(status, theList);
 			} else if (status == 403) {
-				return new RestResponse<>(status, response.getStatusInfo().toString());
+				return new RestResponse<>(status, response.getStatusInfo().toString(), new ArrayList<>());				
 			} else {
-				return new RestResponse<>(200, new ArrayList<>());
+				return new RestResponse<>(status, new ArrayList<>());
 			}
 		} finally {
 			if (client != null) {
@@ -288,5 +293,48 @@ public class ItemRepository {
 			}
 		}
 	}
+
+	public RestResponse<Long> promptpaginatecount(String itemNumberStr, String descriptionStr) {
+
+		Encoder encoder = Base64.getEncoder();
+
+		String itemnumber = encoder.encodeToString(itemNumberStr.getBytes());
+		String description = encoder.encodeToString(descriptionStr.getBytes());
+
+		Client client = null;
+		try {
+			client = createClient();
+			// @formatter:off
+			Response response = client
+					.target(REST_ITEM_END_POINT)
+					.path("promptpaginatecount")
+					.queryParam("itemnumber", itemnumber)
+					.queryParam("description", description)
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))					
+					.get(Response.class);
+			// @formatter:on
+			int status = response.getStatus();
+			if (status == 200) {
+				Long rs = response.readEntity(new GenericType<Long>() {
+				});
+				return new RestResponse<>(status, rs);
+			} else if (status == 403) {
+				Notification.show(response.getStatusInfo().toString(), Notification.Type.ERROR_MESSAGE);
+				return new RestResponse<>(status, 0L);
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(status, fnc.formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
+	}
+
+	
+	
 
 }

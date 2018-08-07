@@ -1,12 +1,14 @@
 package com.fnt.search;
 
 import java.text.DecimalFormat;
+import java.util.Collection;
 import java.util.List;
 
 import com.fnt.customerorder.CustomerOrderRepository;
 import com.fnt.dto.SearchData;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
+import com.vaadin.data.provider.DataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
@@ -60,16 +62,6 @@ public class SearchForm extends Window {
 		}
 
 		this.searchType = searchType;
-		switch (searchType) {
-		case CUSTOMERS:
-			break;
-		case ITEMS:
-			break;
-
-		default: {
-			searchType = 1;
-		}
-		}
 
 		initLayout();
 		initBehavior();
@@ -77,10 +69,15 @@ public class SearchForm extends Window {
 		btn_ok.setEnabled(false);
 		String s1 = search1.getValue() == null ? "" : search1.getValue().trim();
 		String s2 = search1.getValue() == null ? "" : search2.getValue().trim();
-		if ((s1.length() > 0) || (s2.length() > 0)) {
+		switch (searchType) {
+		case CUSTOMERS:
 			search();
+			break;
+		case ITEMS:
+			DataProvider<SearchData, Void> dp = DataProvider.fromCallbacks(query -> search(query.getOffset(), query.getLimit()).stream(), query -> count());
+			grid.setDataProvider(dp);
+			break;
 		}
-
 	}
 
 	private void initLayout() {
@@ -107,11 +104,22 @@ public class SearchForm extends Window {
 			searchField2.setValue(old_search2);
 			close();
 		});
-		btn_search.addClickListener(e -> search());
+		btn_search.addClickListener(e -> {
+
+			switch (searchType) {
+			case CUSTOMERS:
+				search();
+				break;
+			case ITEMS:
+				grid.getDataProvider().refreshAll();
+				break;
+			}
+		});
+
 		btn_ok.addClickListener(e -> close());
 		btn_clr.addClickListener(e -> {
 			search1.setValue("");
-			search2.setValue("");			
+			search2.setValue("");
 		});
 
 	}
@@ -139,20 +147,20 @@ public class SearchForm extends Window {
 
 	private Object search() {
 
-		switch (searchType) {
-		case CUSTOMERS: {
-			RestResponse<List<SearchData>> resultSet = searchRepository.selectListCustomers(search1.getValue(), search2.getValue());
-			grid.setItems(resultSet.getEntity());
-			break;
-		}
-		case ITEMS: {
-			RestResponse<List<SearchData>> resultSet = searchRepository.selectListItems(search1.getValue(), search2.getValue());
-			grid.setItems(resultSet.getEntity());
-			break;
-		}
-		}
-
+		RestResponse<List<SearchData>> resultSet = searchRepository.selectListCustomers(search1.getValue(), search2.getValue());
+		grid.setItems(resultSet.getEntity());
 		return null;
+	}
+
+	private Collection<SearchData> search(int offset, int limit) {
+		RestResponse<List<SearchData>> resultSet = searchRepository.promptpaginatesearchItem(offset, limit, search1.getValue(), search2.getValue());
+		return resultSet.getEntity();
+	}
+
+	private int count() {
+		RestResponse<Long> fetched = searchRepository.promptpaginatecount(search1.getValue(), search2.getValue());
+		Long numberOfItems = fetched.getEntity();
+		return numberOfItems.intValue();
 	}
 
 }
