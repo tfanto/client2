@@ -24,6 +24,7 @@ import com.fnt.dto.CustomerOrderLineListView;
 import com.fnt.dto.SearchData;
 import com.fnt.entity.CustomerOrderHead;
 import com.fnt.entity.CustomerOrderLine;
+import com.fnt.entity.Item;
 import com.fnt.item.ItemRepository;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
@@ -286,10 +287,6 @@ public class CustomerOrderRepository {
 		return customerRepository.selectList(value, value2);
 	}
 
-	public RestResponse<List<SearchData>> selectListItems(String value, String value2) {
-		return itemRepository.selectList(value, value2);
-	}
-
 	public RestResponse<CustomerOrderLine> addCustomerOrderLine(String internalordernumber, String itemnumber, String units, String priceperitem) {
 
 		Encoder encoder = Base64.getUrlEncoder();
@@ -374,7 +371,7 @@ public class CustomerOrderRepository {
 	}
 
 	public RestResponse<CustomerOrderHead> delete(CustomerOrderHead obj) {
-		
+
 		String currentInternalCustomerOrdernumber = obj.getInternalordernumber();
 		Encoder encoder = Base64.getUrlEncoder();
 		String theInternalordernumber = encoder.encodeToString(currentInternalCustomerOrdernumber.getBytes());
@@ -442,8 +439,13 @@ public class CustomerOrderRepository {
 			}
 		}
 	}
-	
-	
 
+	public RestResponse<List<SearchData>> promptpaginatesearchItem(int offset, int limit, String itemNumberStr, String descriptionStr) {
+		return itemRepository.promptpaginatesearch(offset, limit, itemNumberStr, descriptionStr);
+	}
+
+	public RestResponse<Long> promptpaginatecount(String itemNumberStr, String descriptionStr) {
+		return itemRepository.promptpaginatecount(itemNumberStr, descriptionStr);
+	}
 
 }
