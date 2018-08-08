@@ -106,11 +106,10 @@ public class CustomerList extends Composite implements View {
 
 		HeaderRow row1 = grid.getDefaultHeaderRow();
 		HeaderRow row2 = grid.addHeaderRowAt(grid.getHeaderRowCount());
-		HeaderRow row3 = grid.addHeaderRowAt(grid.getHeaderRowCount());
 
 		grid.setSizeFull();
-		fnc.createFilterField(row1, row2, row3, "customernumber", "Customernumber", filterCustomerNumber, sortCustomerNumber);
-		fnc.createFilterField(row1, row2, row3, "name", "Name", filterName, sortName);
+		fnc.createFilterField(row1, row2,  "customernumber", "Customernumber", filterCustomerNumber, sortCustomerNumber);
+		fnc.createFilterField(row1, row2,  "name", "Name", filterName, sortName);
 
 		DataProvider<Customer, Void> dp = DataProvider.fromCallbacks(query -> search(query.getOffset(), query.getLimit()).stream(), query -> count());
 		grid.setDataProvider(dp);

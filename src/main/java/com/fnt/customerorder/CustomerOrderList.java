@@ -1,6 +1,8 @@
 package com.fnt.customerorder;
 
 import java.time.LocalDate;
+
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,6 +33,9 @@ import com.vaadin.ui.components.grid.HeaderRow;
 import com.vaadin.ui.renderers.NumberRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
+
+// https://github.com/melistik/vaadin-grid-util
+// https://vaadin.com/directory/component/gridutil
 public class CustomerOrderList extends Composite implements View {
 
 	private static final long serialVersionUID = 4797579884478708862L;
@@ -138,13 +143,12 @@ public class CustomerOrderList extends Composite implements View {
 
 		HeaderRow row1 = grid.getDefaultHeaderRow();
 		HeaderRow row2 = grid.addHeaderRowAt(grid.getHeaderRowCount());
-		HeaderRow row3 = grid.addHeaderRowAt(grid.getHeaderRowCount());
 
-		fnc.createFilterField(row1, row2, row3, "customernumber", "Customer no", filterCustomerNumber, sortCustomerNumber);
-		fnc.createFilterField(row1, row2, row3, "name", "Name", filterName, sortName);
-		fnc.createFilterField(row1, row2, row3, "date", "Date", filterDate, sortDate);
-		fnc.createFilterField(row1, row2, row3, "status", "Status", filterStatus, sortStatus);
-		fnc.createFilterField(row1, row2, row3, "changedby", "Changedby", filterChangedBy, sortChangedBy);
+		fnc.createFilterField(row1, row2,  "customernumber", "Customer no", filterCustomerNumber, sortCustomerNumber);
+		fnc.createFilterField(row1, row2,  "name", "Name", filterName, sortName);
+		fnc.createFilterField(row1, row2,  "date", "Date", filterDate, sortDate);
+		fnc.createFilterField(row1, row2,  "status", "Status", filterStatus, sortStatus);
+		fnc.createFilterField(row1, row2,  "changedby", "Changedby", filterChangedBy, sortChangedBy);
 
 		grid.setSizeFull();
 		DataProvider<CustomerOrderHeadListView, Void> dp = DataProvider.fromCallbacks(query -> search(query.getOffset(), query.getLimit()).stream(), query -> count());

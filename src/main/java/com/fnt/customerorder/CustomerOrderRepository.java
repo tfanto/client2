@@ -24,7 +24,6 @@ import com.fnt.dto.CustomerOrderLineListView;
 import com.fnt.dto.SearchData;
 import com.fnt.entity.CustomerOrderHead;
 import com.fnt.entity.CustomerOrderLine;
-import com.fnt.entity.Item;
 import com.fnt.item.ItemRepository;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
