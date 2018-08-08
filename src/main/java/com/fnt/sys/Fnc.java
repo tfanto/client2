@@ -22,25 +22,24 @@ public class Fnc {
 		return hl;
 	}
 
-	public void createFilterField(HeaderRow row1, HeaderRow row2, HeaderRow row3, String columnname, String caption, CheckBox chk) {
+	public void createFilterField(HeaderRow row1, HeaderRow row2, String columnname, String caption, CheckBox chk) {
 		Label lbl = new Label(caption);
 		row1.getCell(columnname).setComponent(lbl);
-		row3.getCell(columnname).setComponent(chk);
+		row2.getCell(columnname).setComponent(chk);
 	}
 
-	public void createFilterField(HeaderRow row1, HeaderRow row2, HeaderRow row3, String columnname, String caption, TextField field, CheckBox chk) {
-		Label lbl = new Label(caption);
+	public void createFilterField(HeaderRow row1, HeaderRow row2, String columnname, String caption, TextField field, CheckBox chk) {
+		field.setPlaceholder(caption);
 		field.addStyleName(ValoTheme.TEXTFIELD_TINY);
-		row1.getCell(columnname).setComponent(lbl);
-		row2.getCell(columnname).setComponent(field);
-		row3.getCell(columnname).setComponent(chk);
+		row1.getCell(columnname).setComponent(field);
+		row2.getCell(columnname).setComponent(chk);
 	}
 
-	public void createFilterField(HeaderRow row1, HeaderRow row2, HeaderRow row3, String columnname, String caption, DateField field, CheckBox chk) {
+	public void createFilterField(HeaderRow row1, HeaderRow row2,  String columnname, String caption, DateField field, CheckBox chk) {
 		field.addStyleName(ValoTheme.DATEFIELD_TINY);
-		row1.getCell(columnname).setComponent(new Label(caption));
-		row2.getCell(columnname).setComponent(field);
-		row3.getCell(columnname).setComponent(chk);
+		field.setPlaceholder(caption);
+		row1.getCell(columnname).setComponent(field);
+		row2.getCell(columnname).setComponent(chk);
 	}
 
 	public HorizontalLayout createPrompt(TextField fld, Button btn) {
