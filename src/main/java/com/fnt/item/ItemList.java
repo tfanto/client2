@@ -157,14 +157,13 @@ public class ItemList extends Composite implements View {
 
 		HeaderRow row1 = grid.getDefaultHeaderRow();
 		HeaderRow row2 = grid.addHeaderRowAt(grid.getHeaderRowCount());
-		HeaderRow row3 = grid.addHeaderRowAt(grid.getHeaderRowCount());
 
-		fnc.createFilterField(row1, row2, row3, "itemnumber", "Itemnumber", filterItemNumber, sortItemNumber);
-		fnc.createFilterField(row1, row2, row3, "description", "Description", filterDescription, sortDescription);
-		fnc.createFilterField(row1, row2, row3, "orderingpoint", "Orderingpoint", sortOrderingPoint);
-		fnc.createFilterField(row1, row2, row3, "instock", "In stock", sortInStock);
-		fnc.createFilterField(row1, row2, row3, "price", "Price", sortPrice);
-		fnc.createFilterField(row1, row2, row3, "purchaseprice", "Purchaseprice", sortPurchasePrice);
+		fnc.createFilterField(row1, row2,  "itemnumber", "Itemnumber", filterItemNumber, sortItemNumber);
+		fnc.createFilterField(row1, row2,  "description", "Description", filterDescription, sortDescription);
+		fnc.createFilterField(row1, row2,  "orderingpoint", "Orderingpoint", sortOrderingPoint);
+		fnc.createFilterField(row1, row2,  "instock", "In stock", sortInStock);
+		fnc.createFilterField(row1, row2,  "price", "Price", sortPrice);
+		fnc.createFilterField(row1, row2,  "purchaseprice", "Purchaseprice", sortPurchasePrice);
 
 		grid.setSizeFull();
 		DataProvider<Item, Void> dp = DataProvider.fromCallbacks(query -> search(query.getOffset(), query.getLimit()).stream(), query -> count());
