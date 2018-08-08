@@ -25,6 +25,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -50,6 +51,7 @@ public class CustomerOrderForm extends Window {
 	private TextField customernumber = new TextField("Customer no");
 	private Button btn_customernumber = new Button("...");
 	private TextField name = new TextField("Name");
+	private Label orderTotal = new Label();
 	
 
 	private Button btn_execute_header = new Button("Create");
@@ -126,6 +128,8 @@ public class CustomerOrderForm extends Window {
 
 		orderheader.addComponent(btn_execute_header);
 		orderheader.setComponentAlignment(btn_execute_header, Alignment.BOTTOM_LEFT);
+		orderheader.addComponent(orderTotal);
+		orderheader.setComponentAlignment(orderTotal, Alignment.BOTTOM_RIGHT);
 
 		HorizontalLayout orderline = new HorizontalLayout();
 		orderline.addComponent(fnc.createPrompt(itemnumber, itemdescription, btn_itemnumber));
@@ -363,6 +367,13 @@ public class CustomerOrderForm extends Window {
 			Notification.show("ERROR", rs.getMsg(), Notification.Type.ERROR_MESSAGE);
 		} else {
 			grid.setItems(rs.getEntity());
+			
+			Double total = 0.0D;
+			List<CustomerOrderLineListView>  lines =  rs.getEntity();
+			for(CustomerOrderLineListView line : lines) {
+				total += line.getLinetotal();
+			}			
+			orderTotal.setValue("Total : " + String.format("%.2f", total) + "  Lines : " + lines.size());
 		}
 	}
 
