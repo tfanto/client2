@@ -148,7 +148,9 @@ public class SearchForm extends Window {
 	private Object search() {
 
 		RestResponse<List<SearchData>> resultSet = searchRepository.selectListCustomers(search1.getValue(), search2.getValue());
-		grid.setItems(resultSet.getEntity());
+		if (resultSet.getEntity() != null) {
+			grid.setItems(resultSet.getEntity());
+		}
 		return null;
 	}
 
