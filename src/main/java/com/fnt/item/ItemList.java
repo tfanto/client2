@@ -8,11 +8,7 @@ import java.util.List;
 import com.fnt.entity.Item;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
-import com.vaadin.data.Binder;
-import com.vaadin.data.converter.StringToDoubleConverter;
-import com.vaadin.data.converter.StringToIntegerConverter;
 import com.vaadin.data.provider.DataProvider;
-import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
 import com.vaadin.ui.Button;
@@ -76,7 +72,7 @@ public class ItemList extends Composite implements View {
 
 		HorizontalLayout buttons = new HorizontalLayout(btn_add, btn_edit, btn_delete, btn_refresh);
 		buttons.setSpacing(false);
-		HorizontalLayout header = new HorizontalLayout(buttons,  filterSortOrder, noOfItems);
+		HorizontalLayout header = new HorizontalLayout(buttons, filterSortOrder, noOfItems);
 		header.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		header.setSpacing(true);
 
@@ -92,78 +88,42 @@ public class ItemList extends Composite implements View {
 		// dateColumn.setCaption("Date");
 
 		// @formatter:off
-	       Binder<Item> binder = grid.getEditor().getBinder();
 	       
 			grid.addColumn(Item::getItemnumber)
-				.setCaption("Itemnumber")
 				.setExpandRatio(0)
-				.setId("itemnumber")
-				.setEditorBinding(binder.forField(new TextField())
-						.withNullRepresentation("")
-						.withValidator(new BeanValidator(Item.class, "itemnumber"))
-						.bind(Item::getItemnumber, Item::setItemnumber));
+				.setId("itemnumber");
 
 			grid.addColumn(Item::getDescription)
-			.setCaption("Description")
 			.setExpandRatio(0)
-			.setId("description")
-			.setEditorBinding(binder.forField(new TextField())
-					.withNullRepresentation("")
-					.withValidator(new BeanValidator(Item.class, "description"))
-					.bind(Item::getDescription, Item::setDescription));
+			.setId("description");
 			
 			grid.addColumn(Item::getOrderingpoint)
-			.setCaption("Orderingpoint")
 			.setExpandRatio(0)
-			.setId("orderingpoint")
-			.setEditorBinding(binder.forField(new TextField())
-					.withNullRepresentation("")
-	                .withConverter(new StringToIntegerConverter("Please enter a number"))
-					.withValidator(new BeanValidator(Item.class, "orderingpoint"))
-					.bind(Item::getOrderingpoint, Item::setOrderingpoint));
+			.setId("orderingpoint");
 			
 			grid.addColumn(Item::getInstock)
-			.setCaption("instock")
 			.setExpandRatio(0)
-			.setId("instock")
-			.setEditorBinding(binder.forField(new TextField())
-					.withNullRepresentation("")
-	                .withConverter(new StringToIntegerConverter("Please enter a number"))
-					.withValidator(new BeanValidator(Item.class, "instock"))
-					.bind(Item::getInstock, Item::setInstock));
+			.setId("instock");
 
 			grid.addColumn(Item::getPrice, new NumberRenderer(NumberFormat.getCurrencyInstance()))
-			.setCaption("Price")
 			.setExpandRatio(0)
-			.setId("price")
-			.setEditorBinding(binder.forField(new TextField())
-					.withNullRepresentation("")
-	                .withConverter(new StringToDoubleConverter("Please enter a number"))
-					.withValidator(new BeanValidator(Item.class, "price"))
-					.bind(Item::getPrice, Item::setPrice));
+			.setId("price");
 			
 			grid.addColumn(Item::getPurchaseprice, new NumberRenderer(NumberFormat.getCurrencyInstance()))
-			.setCaption("Purchaseprice")
 			.setExpandRatio(1)
-			.setId("purchaseprice")
-			.setEditorBinding(binder.forField(new TextField())
-					.withNullRepresentation("")
-	                .withConverter(new StringToDoubleConverter("Please enter a number"))
-					.withValidator(new BeanValidator(Item.class, "purchaseprice"))
-					.bind(Item::getPurchaseprice, Item::setPurchaseprice));
-		
+			.setId("purchaseprice");
 		
 			// @formatter:on
 
 		HeaderRow row1 = grid.getDefaultHeaderRow();
 		HeaderRow row2 = grid.addHeaderRowAt(grid.getHeaderRowCount());
 
-		fnc.createFilterField(row1, row2,  "itemnumber", "Itemnumber", filterItemNumber, sortItemNumber);
-		fnc.createFilterField(row1, row2,  "description", "Description", filterDescription, sortDescription);
-		fnc.createFilterField(row1, row2,  "orderingpoint", "Orderingpoint", sortOrderingPoint);
-		fnc.createFilterField(row1, row2,  "instock", "In stock", sortInStock);
-		fnc.createFilterField(row1, row2,  "price", "Price", sortPrice);
-		fnc.createFilterField(row1, row2,  "purchaseprice", "Purchaseprice", sortPurchasePrice);
+		fnc.createFilterField(row1, row2, "itemnumber", "Itemnumber", filterItemNumber, sortItemNumber);
+		fnc.createFilterField(row1, row2, "description", "Description", filterDescription, sortDescription);
+		fnc.createFilterField(row1, row2, "orderingpoint", "Orderingpoint", sortOrderingPoint);
+		fnc.createFilterField(row1, row2, "instock", "In stock", sortInStock);
+		fnc.createFilterField(row1, row2, "price", "Price", sortPrice);
+		fnc.createFilterField(row1, row2, "purchaseprice", "Purchaseprice", sortPurchasePrice);
 
 		grid.setSizeFull();
 		DataProvider<Item, Void> dp = DataProvider.fromCallbacks(query -> search(query.getOffset(), query.getLimit()).stream(), query -> count());
@@ -197,7 +157,7 @@ public class ItemList extends Composite implements View {
 		updateHeader();
 		return fetched.getEntity();
 	}
-	
+
 	public void refreshSearch() {
 		grid.getDataProvider().refreshAll();
 		grid.scrollToStart();
@@ -245,32 +205,6 @@ public class ItemList extends Composite implements View {
 		}
 		filterSortOrder.setValue(theSort);
 	}
-
-	/*
-	 * public void search() {
-	 * 
-	 * String itemNumberStr = filterItemNumber.getValue() == null ? "" :
-	 * filterItemNumber.getValue().trim(); String descriptionStr =
-	 * filterDescription.getValue() == null ? "" :
-	 * filterDescription.getValue().trim();
-	 * 
-	 * // String orderingPointStr = filterOrderingPoint.getValue() == null ? "" : //
-	 * filterOrderingPoint.getValue().trim(); // String inStockStr =
-	 * filterInStock.getValue() == null ? "" : // filterInStock.getValue().trim();
-	 * 
-	 * // String priceStr = filterPrice.getValue() == null ? "" : //
-	 * filterPrice.getValue().trim(); // String purchasePriceStr =
-	 * filterPurchasePrice.getValue() == null ? "" : //
-	 * filterPurchasePrice.getValue().trim();
-	 * 
-	 * String sortOrder = filterSortOrder.getValue();
-	 * 
-	 * RestResponse<List<Item>> fetched = itemRepository.search(itemNumberStr,
-	 * descriptionStr, sortOrder); if (fetched.getStatus().equals(200)) {
-	 * grid.setItems(fetched.getEntity()); updateHeader(); } else {
-	 * Notification.show("ERROR", fetched.getMsg(),
-	 * Notification.Type.ERROR_MESSAGE); } }
-	 */
 
 	private void updateHeader() {
 		boolean selected = !grid.asSingleSelect().isEmpty();

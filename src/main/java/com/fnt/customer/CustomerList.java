@@ -69,10 +69,7 @@ public class CustomerList extends Composite implements View {
 		header.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		header.setSpacing(true);
 
-		Binder<Customer> binder = grid.getEditor().getBinder();
-
 		// @formatter:off
-		
 		
 	    // 'Bean' has two fields: String name and Date date
         //   Grid<Bean> grid = new Grid<>();
@@ -81,26 +78,14 @@ public class CustomerList extends Composite implements View {
         //   DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm");
         //   Grid.Column<Bean, Date> dateColumn = grid.addColumn(Bean::getDate, new DateRenderer(df));
         //   dateColumn.setCaption("Date");
-		
 
 		grid.addColumn(Customer::getCustomernumber)
-				.setCaption("Customernumber")
 				.setExpandRatio(0)
-		        .setId("customernumber")
-				.setEditorBinding(binder.forField(new TextField())
-				.withNullRepresentation("")
-				.withValidator(new BeanValidator(Customer.class, "customernumber"))
-				.bind(Customer::getCustomernumber, Customer::setCustomernumber));
+		        .setId("customernumber");
 		
 		grid.addColumn(Customer::getName)
-			.	setCaption("Name")
 				.setExpandRatio(1)
-				.setId("name")
-				.setEditorBinding(binder.forField(new TextField())
-				.withNullRepresentation("")
-				.withValidator(new BeanValidator(Customer.class, "name"))
-				.bind(Customer::getName, Customer::setName));
-		
+				.setId("name");
 		
 		// @formatter:on
 

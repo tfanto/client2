@@ -1,21 +1,15 @@
 package com.fnt.customerorder;
 
 import java.time.LocalDate;
-
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import com.fnt.dto.CustomerOrderHeadListView;
 import com.fnt.entity.CustomerOrderHead;
-import com.fnt.entity.Item;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
-import com.vaadin.data.Binder;
-import com.vaadin.data.converter.StringToIntegerConverter;
 import com.vaadin.data.provider.DataProvider;
-import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
 import com.vaadin.ui.Button;
@@ -32,7 +26,6 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.components.grid.HeaderRow;
 import com.vaadin.ui.renderers.NumberRenderer;
 import com.vaadin.ui.themes.ValoTheme;
-
 
 // https://github.com/melistik/vaadin-grid-util
 // https://vaadin.com/directory/component/gridutil
@@ -92,68 +85,41 @@ public class CustomerOrderList extends Composite implements View {
 		header.setSpacing(true);
 
 		// @formatter:off
-	       Binder<CustomerOrderHeadListView> binder = grid.getEditor().getBinder();
 	       
 			grid.addColumn(CustomerOrderHeadListView::getDate)
-				.setCaption("date")
 				.setExpandRatio(0)
-				.setId("date")
-				.setEditorBinding(binder.forField(new DateField())
-						.withValidator(new BeanValidator(CustomerOrderHeadListView.class, "date"))
-						.bind(CustomerOrderHeadListView::getDate, CustomerOrderHeadListView::setDate));
+				.setId("date");
 
 			grid.addColumn(CustomerOrderHeadListView::getCustomernumber)
-			.setCaption("Customernumber")
 			.setExpandRatio(0)
-			.setId("customernumber")
-			.setEditorBinding(binder.forField(new TextField())
-					.withNullRepresentation("")
-					.withValidator(new BeanValidator(Item.class, "customernumber"))
-					.bind(CustomerOrderHeadListView::getCustomernumber, CustomerOrderHeadListView::setCustomernumber));
+			.setId("customernumber");
 
 			grid.addColumn(CustomerOrderHeadListView::getName)
-			.setCaption("Name")
 			.setExpandRatio(0)
-			.setId("name")
-			.setEditorBinding(binder.forField(new TextField())
-					.withNullRepresentation("")
-					.withValidator(new BeanValidator(Item.class, "name"))
-					.bind(CustomerOrderHeadListView::getName, CustomerOrderHeadListView::setName));
+			.setId("name");
 
 			grid.addColumn(CustomerOrderHeadListView::getChangedby)
-			.setCaption("Changedby")
 			.setExpandRatio(0)
-			.setId("changedby")
-			.setEditorBinding(binder.forField(new TextField())
-					.withNullRepresentation("")
-					.withValidator(new BeanValidator(Item.class, "changedby"))
-					.bind(CustomerOrderHeadListView::getChangedby, CustomerOrderHeadListView::setChangedby));
+			.setId("changedby");
 			
 			grid.addColumn(CustomerOrderHeadListView::getStatus, new NumberRenderer())
-			.setCaption("Status")
 			.setExpandRatio(1)
-			.setId("status")
-			.setEditorBinding(binder.forField(new TextField())
-					.withNullRepresentation("")
-	                .withConverter(new StringToIntegerConverter("Please enter a number"))
-					.withValidator(new BeanValidator(Item.class, "status"))
-					.bind(CustomerOrderHeadListView::getStatus, CustomerOrderHeadListView::setStatus));
-		
+			.setId("status");
+			
 			// @formatter:on
 
 		HeaderRow row1 = grid.getDefaultHeaderRow();
 		HeaderRow row2 = grid.addHeaderRowAt(grid.getHeaderRowCount());
 
-		fnc.createFilterField(row1, row2,  "customernumber", "Customer no", filterCustomerNumber, sortCustomerNumber);
-		fnc.createFilterField(row1, row2,  "name", "Name", filterName, sortName);
-		fnc.createFilterField(row1, row2,  "date", "Date", filterDate, sortDate);
-		fnc.createFilterField(row1, row2,  "status", "Status", filterStatus, sortStatus);
-		fnc.createFilterField(row1, row2,  "changedby", "Changedby", filterChangedBy, sortChangedBy);
+		fnc.createFilterField(row1, row2, "customernumber", "Customer no", filterCustomerNumber, sortCustomerNumber);
+		fnc.createFilterField(row1, row2, "name", "Name", filterName, sortName);
+		fnc.createFilterField(row1, row2, "date", "Date", filterDate, sortDate);
+		fnc.createFilterField(row1, row2, "status", "Status", filterStatus, sortStatus);
+		fnc.createFilterField(row1, row2, "changedby", "Changedby", filterChangedBy, sortChangedBy);
 
 		grid.setSizeFull();
 		DataProvider<CustomerOrderHeadListView, Void> dp = DataProvider.fromCallbacks(query -> search(query.getOffset(), query.getLimit()).stream(), query -> count());
 		grid.setDataProvider(dp);
-
 
 		for (@SuppressWarnings("rawtypes")
 		Grid.Column column : grid.getColumns()) {
@@ -207,7 +173,7 @@ public class CustomerOrderList extends Composite implements View {
 		}
 		filterSortOrder.setValue(theSort);
 	}
-	
+
 	public int count() {
 
 		String filterCustomerNumberStr = filterCustomerNumber.getValue() == null ? "" : filterCustomerNumber.getValue().trim();
@@ -221,7 +187,6 @@ public class CustomerOrderList extends Composite implements View {
 		return numberOfItems.intValue();
 	}
 
-
 	public Collection<CustomerOrderHeadListView> search(int offset, int limit) {
 
 		String filterCustomerNumberStr = filterCustomerNumber.getValue() == null ? "" : filterCustomerNumber.getValue().trim();
@@ -234,13 +199,12 @@ public class CustomerOrderList extends Composite implements View {
 		updateHeader();
 		return fetched.getEntity();
 	}
-	
+
 	public void refreshSearch() {
 		grid.getDataProvider().refreshAll();
 		grid.scrollToStart();
 		grid.deselectAll();
 	}
-
 
 	private void updateHeader() {
 		boolean selected = !grid.asSingleSelect().isEmpty();
