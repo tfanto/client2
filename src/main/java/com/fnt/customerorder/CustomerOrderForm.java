@@ -13,12 +13,8 @@ import com.fnt.search.SearchForm;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
 import com.vaadin.data.BeanValidationBinder;
-import com.vaadin.data.Binder;
 import com.vaadin.data.BindingValidationStatus;
 import com.vaadin.data.ValidationException;
-import com.vaadin.data.converter.StringToDoubleConverter;
-import com.vaadin.data.converter.StringToLongConverter;
-import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -52,7 +48,6 @@ public class CustomerOrderForm extends Window {
 	private Button btn_customernumber = new Button("...");
 	private TextField name = new TextField("Name");
 	private Label orderTotal = new Label();
-	
 
 	private Button btn_execute_header = new Button("Create");
 
@@ -66,7 +61,6 @@ public class CustomerOrderForm extends Window {
 	private Button btn_clearline = new Button("Clear");
 	private Button btn_addline = new Button("Add line");
 	private Button btn_deleteSelectedLine = new Button("Delete selected line");
-
 
 	public CustomerOrderForm(CustomerOrderList owner, CustomerOrderRepository customerOrderRepository, String caption, CustomerOrderHeadListView customerOrderHeadListView, int crudFunction) {
 
@@ -83,7 +77,6 @@ public class CustomerOrderForm extends Window {
 		grid.setHeightMode(HeightMode.UNDEFINED);
 		setCaption(caption);
 		grid.asSingleSelect().addValueChangeListener(e -> updateHeader());
-
 
 		// HEADER - registration / selection
 		orderdate.addStyleName(ValoTheme.DATEFIELD_TINY);
@@ -146,7 +139,7 @@ public class CustomerOrderForm extends Window {
 
 		HorizontalLayout orderlineButtons = new HorizontalLayout();
 		orderlineButtons.setSpacing(false);
-		//orderlineButtons.addComponent(btn_clearline);
+		// orderlineButtons.addComponent(btn_clearline);
 		orderlineButtons.addComponent(btn_addline);
 		orderlineButtons.addComponent(btn_deleteSelectedLine);
 		orderline.addComponent(orderlineButtons);
@@ -157,9 +150,7 @@ public class CustomerOrderForm extends Window {
 		orderform.addComponent(orderline);
 
 		// @formatter:off
-		// grid show whats in the order 
-	       Binder<CustomerOrderLineListView> binder = grid.getEditor().getBinder();
-	       
+		// grid show whats in the order 	       
 		    // 'Bean' has two fields: String name and Date date
 	        //   Grid<Bean> grid = new Grid<>();
 	        //   grid.setItems(getBeans());
@@ -167,59 +158,31 @@ public class CustomerOrderForm extends Window {
 	        //   DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm");
 	        //   Grid.Column<Bean, Date> dateColumn = grid.addColumn(Bean::getDate, new DateRenderer(df));
 	        //   dateColumn.setCaption("Date");
-		
-	       NumberRenderer dr = new NumberRenderer("");
 
 	        grid.addColumn(CustomerOrderLineListView::getItemnumber)
 	        	.setCaption("Item no")
 	        	.setExpandRatio(0)
-	        	.setId("itemnumber")
-	        	.setEditorBinding(binder
-	                .forField(new TextField())
-	                .withNullRepresentation("")
-	                .withValidator(new BeanValidator(CustomerOrderLineListView.class, "itemnumber"))
-	                .bind(CustomerOrderLineListView::getItemnumber, CustomerOrderLineListView::setItemnumber));
+	        	.setId("itemnumber");
 	        
 	        grid.addColumn(CustomerOrderLineListView::getDescription)
 	        	.setCaption("Description")
 	        	.setExpandRatio(0)
-	        	.setId("description")
-	        	.setEditorBinding(binder
-	                .forField(new TextField())
-	                .withNullRepresentation("")
-	                .withValidator(new BeanValidator(CustomerOrderLineListView.class, "description"))
-	                .bind(CustomerOrderLineListView::getDescription, CustomerOrderLineListView::setDescription));
-	        
+	        	.setId("description");
+
 	        grid.addColumn(CustomerOrderLineListView::getUnits, new NumberRenderer())
 	        	.setCaption("Units")
 	        	.setExpandRatio(0)
-	        	.setId("units")
-	        	.setEditorBinding(binder
-	                .forField(new TextField())
-	                .withConverter(new StringToLongConverter("Please enter a number"))
-	                .withValidator(new BeanValidator(CustomerOrderLineListView.class, "units"))
-	                .bind(CustomerOrderLineListView::getUnits, CustomerOrderLineListView::setUnits));
+	        	.setId("units");
 	        
 	        grid.addColumn(CustomerOrderLineListView::getPriceperitem, new NumberRenderer(NumberFormat.getCurrencyInstance()))
 	        	.setCaption("Price per item")
 	        	.setExpandRatio(0)
-	        	.setId("priceperitem")
-	        	.setEditorBinding(binder
-	                .forField(new TextField())
-	                .withConverter(new StringToDoubleConverter("Please enter a number"))
-	                .withValidator(new BeanValidator(CustomerOrderLineListView.class, "priceperitem"))
-	                .bind(CustomerOrderLineListView::getPriceperitem, CustomerOrderLineListView::setPriceperitem));
+	        	.setId("priceperitem");
 	        
 	        grid.addColumn(CustomerOrderLineListView::getLinetotal, new NumberRenderer(NumberFormat.getCurrencyInstance()))
 	        	.setCaption("Line total")
 	        	.setExpandRatio(1)
-	        	.setId("linetotal")
-	        	.setEditorBinding(binder
-	                .forField(new TextField())
-	                .withConverter(new StringToDoubleConverter("Please enter a number"))
-	                .withValidator(new BeanValidator(CustomerOrderLineListView.class, "linetotal"))
-	                .bind(CustomerOrderLineListView::getLinetotal, CustomerOrderLineListView::setLinetotal));
-	        
+	        	.setId("linetotal");
 		
 	        grid.setSizeFull();
 		
@@ -233,12 +196,11 @@ public class CustomerOrderForm extends Window {
 		setSizeFull();
 		// center();
 	}
-	
+
 	private void updateHeader() {
 		boolean selected = !grid.asSingleSelect().isEmpty();
 		btn_deleteSelectedLine.setVisible(selected);
 	}
-
 
 	private void initBehavior(CustomerOrderHeadListView customerOrderHeadListView) {
 
@@ -342,10 +304,10 @@ public class CustomerOrderForm extends Window {
 				Notification.show("ERROR", e.getMessage(), Notification.Type.ERROR_MESSAGE);
 			}
 		});
-		
+
 		btn_deleteSelectedLine.addClickListener(event -> {
 
-			CustomerOrderLineListView  selectedLine =  grid.asSingleSelect().getValue();
+			CustomerOrderLineListView selectedLine = grid.asSingleSelect().getValue();
 			String internalordernbr = selectedLine.getInternal_ordernumber();
 			Long linennbr = selectedLine.getLinennumber();
 			String itemnbr = selectedLine.getItemnumber();
@@ -367,12 +329,12 @@ public class CustomerOrderForm extends Window {
 			Notification.show("ERROR", rs.getMsg(), Notification.Type.ERROR_MESSAGE);
 		} else {
 			grid.setItems(rs.getEntity());
-			
+
 			Double total = 0.0D;
-			List<CustomerOrderLineListView>  lines =  rs.getEntity();
-			for(CustomerOrderLineListView line : lines) {
+			List<CustomerOrderLineListView> lines = rs.getEntity();
+			for (CustomerOrderLineListView line : lines) {
 				total += line.getLinetotal();
-			}			
+			}
 			orderTotal.setValue("Total : " + String.format("%.2f", total) + "  Lines : " + lines.size());
 		}
 	}
