@@ -109,22 +109,17 @@ public class CustomerOrderList extends Composite implements View {
 			// @formatter:on
 
 		HeaderRow row1 = grid.getDefaultHeaderRow();
-		HeaderRow row2 = grid.addHeaderRowAt(grid.getHeaderRowCount());
 
-		fnc.createFilterField(row1, row2, "customernumber", "Customer no", filterCustomerNumber, sortCustomerNumber);
-		fnc.createFilterField(row1, row2, "name", "Name", filterName, sortName);
-		fnc.createFilterField(row1, row2, "date", "Date", filterDate, sortDate);
-		fnc.createFilterField(row1, row2, "status", "Status", filterStatus, sortStatus);
-		fnc.createFilterField(row1, row2, "changedby", "Changedby", filterChangedBy, sortChangedBy);
+		fnc.createFilterField(row1,  "customernumber", "Customer no", filterCustomerNumber);
+		fnc.createFilterField(row1,  "name", "Name", filterName);
+		fnc.createFilterField(row1,  "date", "Date", filterDate);
+		fnc.createFilterField(row1,  "status", "Status", filterStatus);
+		fnc.createFilterField(row1,  "changedby", "Changedby", filterChangedBy);
 
 		grid.setSizeFull();
 		DataProvider<CustomerOrderHeadListView, Void> dp = DataProvider.fromCallbacks(query -> search(query.getOffset(), query.getLimit()).stream(), query -> count());
 		grid.setDataProvider(dp);
 
-		for (@SuppressWarnings("rawtypes")
-		Grid.Column column : grid.getColumns()) {
-			column.setSortable(false);
-		}
 		VerticalLayout layout = new VerticalLayout(header, grid);
 		layout.setExpandRatio(grid, 1);
 		setCompositionRoot(layout);

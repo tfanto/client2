@@ -116,23 +116,18 @@ public class ItemList extends Composite implements View {
 			// @formatter:on
 
 		HeaderRow row1 = grid.getDefaultHeaderRow();
-		HeaderRow row2 = grid.addHeaderRowAt(grid.getHeaderRowCount());
 
-		fnc.createFilterField(row1, row2, "itemnumber", "Itemnumber", filterItemNumber, sortItemNumber);
-		fnc.createFilterField(row1, row2, "description", "Description", filterDescription, sortDescription);
-		fnc.createFilterField(row1, row2, "orderingpoint", "Orderingpoint", sortOrderingPoint);
-		fnc.createFilterField(row1, row2, "instock", "In stock", sortInStock);
-		fnc.createFilterField(row1, row2, "price", "Price", sortPrice);
-		fnc.createFilterField(row1, row2, "purchaseprice", "Purchaseprice", sortPurchasePrice);
+		fnc.createFilterField(row1, "itemnumber", "Itemnumber", filterItemNumber);
+		fnc.createFilterField(row1, "description", "Description", filterDescription);
+		fnc.createFilterField(row1, "orderingpoint", "Orderingpoint");
+		fnc.createFilterField(row1, "instock", "In stock");
+		fnc.createFilterField(row1, "price", "Price");
+		fnc.createFilterField(row1, "purchaseprice", "Purchaseprice");
 
 		grid.setSizeFull();
 		DataProvider<Item, Void> dp = DataProvider.fromCallbacks(query -> search(query.getOffset(), query.getLimit()).stream(), query -> count());
 		grid.setDataProvider(dp);
 
-		for (@SuppressWarnings("rawtypes")
-		Grid.Column column : grid.getColumns()) {
-			column.setSortable(false);
-		}
 		VerticalLayout layout = new VerticalLayout(header, grid);
 		layout.setExpandRatio(grid, 1);
 		setCompositionRoot(layout);

@@ -2,16 +2,19 @@ package com.fnt.customer;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.fnt.entity.Customer;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
-import com.vaadin.data.Binder;
 import com.vaadin.data.provider.DataProvider;
-import com.vaadin.data.validator.BeanValidator;
+import com.vaadin.data.provider.Query;
+import com.vaadin.data.provider.QuerySortOrder;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
+import com.vaadin.shared.data.sort.SortDirection;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Composite;
@@ -71,14 +74,6 @@ public class CustomerList extends Composite implements View {
 
 		// @formatter:off
 		
-	    // 'Bean' has two fields: String name and Date date
-        //   Grid<Bean> grid = new Grid<>();
-        //   grid.setItems(getBeans());
-        //   grid.addColumn(Bean::getName).setCaption("Name");
-        //   DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm");
-        //   Grid.Column<Bean, Date> dateColumn = grid.addColumn(Bean::getDate, new DateRenderer(df));
-        //   dateColumn.setCaption("Date");
-
 		grid.addColumn(Customer::getCustomernumber)
 				.setExpandRatio(0)
 		        .setId("customernumber");
@@ -87,22 +82,19 @@ public class CustomerList extends Composite implements View {
 				.setExpandRatio(1)
 				.setId("name");
 		
-		// @formatter:on
-
 		HeaderRow row1 = grid.getDefaultHeaderRow();
-		HeaderRow row2 = grid.addHeaderRowAt(grid.getHeaderRowCount());
 
 		grid.setSizeFull();
-		fnc.createFilterField(row1, row2,  "customernumber", "Customernumber", filterCustomerNumber, sortCustomerNumber);
-		fnc.createFilterField(row1, row2,  "name", "Name", filterName, sortName);
+		fnc.createFilterField(row1, "customernumber", "Customernumber", filterCustomerNumber);
+		fnc.createFilterField(row1, "name", "Name", filterName);
 
-		DataProvider<Customer, Void> dp = DataProvider.fromCallbacks(query -> search(query.getOffset(), query.getLimit()).stream(), query -> count());
+		DataProvider<Customer, Void> dp = DataProvider.
+				fromFilteringCallbacks(
+						query -> search(query.getOffset(), query.getLimit(), sortInterpretation(query)).stream(), 
+						query -> count());
 		grid.setDataProvider(dp);
+		// @formatter:on
 
-		for (@SuppressWarnings("rawtypes")
-		Grid.Column column : grid.getColumns()) {
-			column.setSortable(false);
-		}
 		VerticalLayout layout = new VerticalLayout(header, grid);
 		layout.setExpandRatio(grid, 1);
 		setCompositionRoot(layout);
@@ -118,7 +110,17 @@ public class CustomerList extends Composite implements View {
 		return numberOfItems.intValue();
 	}
 
-	private Collection<Customer> search(int offset, int limit) {
+	private <T, F> Map<String, Boolean> sortInterpretation(Query<T, F> qry) {
+		Map<String, Boolean> ret = new LinkedHashMap<>();
+		for (QuerySortOrder sortOrder : qry.getSortOrders()) {
+			String prop = sortOrder.getSorted();
+			Boolean isAscending = SortDirection.ASCENDING.equals(sortOrder.getDirection());
+			ret.put(prop, isAscending);
+		}
+		return ret;
+	}
+
+	private Collection<Customer> search(int offset, int limit,  Map<String,Boolean> sortingFieldAndDirection) {
 		String customerNumberStr = filterCustomerNumber.getValue() == null ? "" : filterCustomerNumber.getValue().trim();
 		String nameStr = filterName.getValue() == null ? "" : filterName.getValue().trim();
 		String sortOrder = filterSortOrder.getValue();

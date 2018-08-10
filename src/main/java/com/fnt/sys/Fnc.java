@@ -3,7 +3,6 @@ package com.fnt.sys;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.HorizontalLayout;
@@ -22,24 +21,25 @@ public class Fnc {
 		return hl;
 	}
 
-	public void createFilterField(HeaderRow row1, HeaderRow row2, String columnname, String caption, CheckBox chk) {
+	/**/
+	public void createFilterField(HeaderRow row1, String columnname, String caption) {
+		HorizontalLayout lo = new HorizontalLayout();
 		Label lbl = new Label(caption);
-		row1.getCell(columnname).setComponent(lbl);
-		row2.getCell(columnname).setComponent(chk);
+		lo.addComponent(lbl);
+		row1.getCell(columnname).setComponent(lo);
 	}
 
-	public void createFilterField(HeaderRow row1, HeaderRow row2, String columnname, String caption, TextField field, CheckBox chk) {
+	/**/
+	public void createFilterField(HeaderRow row1, String columnname, String caption, TextField field) {
 		field.setPlaceholder(caption);
 		field.addStyleName(ValoTheme.TEXTFIELD_TINY);
 		row1.getCell(columnname).setComponent(field);
-		row2.getCell(columnname).setComponent(chk);
 	}
 
-	public void createFilterField(HeaderRow row1, HeaderRow row2,  String columnname, String caption, DateField field, CheckBox chk) {
+	public void createFilterField(HeaderRow row1, String columnname, String caption, DateField field) {
 		field.addStyleName(ValoTheme.DATEFIELD_TINY);
 		field.setPlaceholder(caption);
 		row1.getCell(columnname).setComponent(field);
-		row2.getCell(columnname).setComponent(chk);
 	}
 
 	public HorizontalLayout createPrompt(TextField fld, Button btn) {
