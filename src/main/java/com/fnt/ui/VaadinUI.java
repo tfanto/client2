@@ -84,6 +84,7 @@ public class VaadinUI extends UI {
 				return false;
 			}
 		});
+
 	}
 
 	private Object logout() {

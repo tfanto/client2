@@ -1,9 +1,9 @@
 package com.fnt.item;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import com.fnt.entity.Item;
 import com.fnt.sys.Fnc;
@@ -12,7 +12,6 @@ import com.vaadin.data.provider.DataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Composite;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
@@ -50,15 +49,6 @@ public class ItemList extends Composite implements View {
 	private TextField filterInStock = new TextField();
 	private TextField filterPrice = new TextField();
 	private TextField filterPurchasePrice = new TextField();
-	// sorting
-	private Label filterSortOrder = new Label();
-	private List<String> selectedSort = new ArrayList<>();
-	private CheckBox sortItemNumber = new CheckBox();
-	private CheckBox sortDescription = new CheckBox();
-	private CheckBox sortOrderingPoint = new CheckBox();
-	private CheckBox sortInStock = new CheckBox();
-	private CheckBox sortPrice = new CheckBox();
-	private CheckBox sortPurchasePrice = new CheckBox();
 
 	private Grid<Item> grid = new Grid<>();
 
@@ -72,21 +62,9 @@ public class ItemList extends Composite implements View {
 
 		HorizontalLayout buttons = new HorizontalLayout(btn_add, btn_edit, btn_delete, btn_refresh);
 		buttons.setSpacing(false);
-		HorizontalLayout header = new HorizontalLayout(buttons, filterSortOrder, noOfItems);
+		HorizontalLayout header = new HorizontalLayout(buttons, noOfItems);
 		header.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		header.setSpacing(true);
-
-		// grid.setColumns("itemnumber", "description", "orderingpoint", "instock",
-		// "price", "purchaseprice");
-		// 'Bean' has two fields: String name and Date date
-		// Grid<Bean> grid = new Grid<>();
-		// grid.setItems(getBeans());
-		// grid.addColumn(Bean::getName).setCaption("Name");
-		// DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm");
-		// Grid.Column<Bean, Date> dateColumn = grid.addColumn(Bean::getDate, new
-		// DateRenderer(df));
-		// dateColumn.setCaption("Date");
-
 		// @formatter:off
 	       
 			grid.addColumn(Item::getItemnumber)
@@ -113,26 +91,25 @@ public class ItemList extends Composite implements View {
 			.setExpandRatio(1)
 			.setId("purchaseprice");
 		
-			// @formatter:on
 
 		HeaderRow row1 = grid.getDefaultHeaderRow();
-		HeaderRow row2 = grid.addHeaderRowAt(grid.getHeaderRowCount());
 
-		fnc.createFilterField(row1, row2, "itemnumber", "Itemnumber", filterItemNumber, sortItemNumber);
-		fnc.createFilterField(row1, row2, "description", "Description", filterDescription, sortDescription);
-		fnc.createFilterField(row1, row2, "orderingpoint", "Orderingpoint", sortOrderingPoint);
-		fnc.createFilterField(row1, row2, "instock", "In stock", sortInStock);
-		fnc.createFilterField(row1, row2, "price", "Price", sortPrice);
-		fnc.createFilterField(row1, row2, "purchaseprice", "Purchaseprice", sortPurchasePrice);
+		fnc.createFilterField(row1, "itemnumber", "Itemnumber", filterItemNumber);
+		fnc.createFilterField(row1, "description", "Descr", filterDescription);
+		fnc.createFilterField(row1, "orderingpoint", "Order point");
+		fnc.createFilterField(row1, "instock", "In stock");
+		fnc.createFilterField(row1, "price", "Price");
+		fnc.createFilterField(row1, "purchaseprice", "Purchase price");
 
 		grid.setSizeFull();
-		DataProvider<Item, Void> dp = DataProvider.fromCallbacks(query -> search(query.getOffset(), query.getLimit()).stream(), query -> count());
+		DataProvider<Item, Void> dp = DataProvider.
+				fromFilteringCallbacks(
+						query -> search(query.getOffset(), query.getLimit(), fnc.sortInterpretation(query)).stream(), 
+						query -> count());
 		grid.setDataProvider(dp);
+		
+		// @formatter:on
 
-		for (@SuppressWarnings("rawtypes")
-		Grid.Column column : grid.getColumns()) {
-			column.setSortable(false);
-		}
 		VerticalLayout layout = new VerticalLayout(header, grid);
 		layout.setExpandRatio(grid, 1);
 		setCompositionRoot(layout);
@@ -142,18 +119,16 @@ public class ItemList extends Composite implements View {
 	private int count() {
 		String itemNumberStr = filterItemNumber.getValue() == null ? "" : filterItemNumber.getValue().trim();
 		String descriptionStr = filterDescription.getValue() == null ? "" : filterDescription.getValue().trim();
-
 		RestResponse<Long> fetched = itemRepository.paginatecount(itemNumberStr, descriptionStr);
 		Long numberOfItems = fetched.getEntity();
 		noOfItems.setValue("Records : " + numberOfItems);
 		return numberOfItems.intValue();
 	}
 
-	private Collection<Item> search(int offset, int limit) {
+	private Collection<Item> search(int offset, int limit, Map<String, Boolean> sortingFieldAndDirection) {
 		String itemNumberStr = filterItemNumber.getValue() == null ? "" : filterItemNumber.getValue().trim();
 		String descriptionStr = filterDescription.getValue() == null ? "" : filterDescription.getValue().trim();
-		String sortOrder = filterSortOrder.getValue();
-		RestResponse<List<Item>> fetched = itemRepository.paginatesearch(offset, limit, itemNumberStr, descriptionStr, sortOrder);
+		RestResponse<List<Item>> fetched = itemRepository.paginatesearch(offset, limit, itemNumberStr, descriptionStr, fnc.map2Str(sortingFieldAndDirection));
 		updateHeader();
 		return fetched.getEntity();
 	}
@@ -172,38 +147,6 @@ public class ItemList extends Composite implements View {
 		btn_add.addClickListener(e -> showAddWindow());
 		btn_edit.addClickListener(e -> showEditWindow());
 		btn_delete.addClickListener(e -> showRemoveWindow());
-
-		sortItemNumber.addValueChangeListener(e -> evaluateSort(sortItemNumber, "ItemNumber"));
-		sortDescription.addValueChangeListener(e -> evaluateSort(sortDescription, "Description"));
-		sortOrderingPoint.addValueChangeListener(e -> evaluateSort(sortOrderingPoint, "OrderingPoint"));
-		sortInStock.addValueChangeListener(e -> evaluateSort(sortInStock, "InStock"));
-		sortPrice.addValueChangeListener(e -> evaluateSort(sortPrice, "Price"));
-		sortPurchasePrice.addValueChangeListener(e -> evaluateSort(sortPurchasePrice, "PurchasePrice"));
-		showSort();
-	}
-
-	private Object evaluateSort(CheckBox checkBox, String fieldName) {
-		Boolean val = checkBox.getValue();
-		if (val) {
-			selectedSort.add(fieldName);
-		} else {
-			selectedSort.remove(fieldName);
-		}
-		showSort();
-		return null;
-	}
-
-	private void showSort() {
-
-		String theSort = "";
-		for (String dta : selectedSort) {
-			theSort += dta;
-			theSort += ",";
-		}
-		if (theSort.endsWith(",")) {
-			theSort = theSort.substring(0, theSort.length() - 1);
-		}
-		filterSortOrder.setValue(theSort);
 	}
 
 	private void updateHeader() {
