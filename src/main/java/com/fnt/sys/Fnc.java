@@ -1,6 +1,12 @@
 package com.fnt.sys;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import com.vaadin.data.provider.Query;
+import com.vaadin.data.provider.QuerySortOrder;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.shared.data.sort.SortDirection;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -23,10 +29,7 @@ public class Fnc {
 
 	/**/
 	public void createFilterField(HeaderRow row1, String columnname, String caption) {
-		HorizontalLayout lo = new HorizontalLayout();
-		Label lbl = new Label(caption);
-		lo.addComponent(lbl);
-		row1.getCell(columnname).setComponent(lo);
+		row1.getCell(columnname).setText(caption);
 	}
 
 	/**/
@@ -106,6 +109,33 @@ public class Fnc {
 			}
 		}
 		return "";
+	}
+
+	public <T, F> Map<String, Boolean> sortInterpretation(Query<T, F> qry) {
+		Map<String, Boolean> ret = new LinkedHashMap<>();
+		for (QuerySortOrder sortOrder : qry.getSortOrders()) {
+			String prop = sortOrder.getSorted();
+			Boolean isAscending = SortDirection.ASCENDING.equals(sortOrder.getDirection());
+			ret.put(prop, isAscending);
+		}
+		return ret;
+	}
+
+	public String map2Str(Map<String, Boolean> sortingFieldAndDirection) {
+		String ret = "";
+		for (Map.Entry<String, Boolean> entry : sortingFieldAndDirection.entrySet()) {
+			ret += " " + entry.getKey();
+			if (entry.getValue()) {
+				ret += " ASC ";
+			} else {
+				ret += " DESC ";
+			}
+			ret += ",";
+		}
+		if (ret.length() > 0) {
+			ret = ret.substring(0, ret.length() - 1);
+		}
+		return ret;
 	}
 
 }
