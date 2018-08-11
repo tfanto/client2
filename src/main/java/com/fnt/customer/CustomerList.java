@@ -7,6 +7,7 @@ import java.util.Map;
 import com.fnt.entity.Customer;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
+import com.vaadin.contextmenu.GridContextMenu;
 import com.vaadin.data.provider.DataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
@@ -46,6 +47,7 @@ public class CustomerList extends Composite implements View {
 	private TextField filterName = new TextField();
 
 	private Grid<Customer> grid = new Grid<>();
+	private GridContextMenu<Customer> contextMenu;
 
 	public CustomerList() {
 		initLayout();
@@ -83,6 +85,7 @@ public class CustomerList extends Composite implements View {
 						query -> count());
 		grid.setDataProvider(dp);
 		// @formatter:on
+		contextMenu = new GridContextMenu<>(grid);
 
 		VerticalLayout layout = new VerticalLayout(header, grid);
 		layout.setExpandRatio(grid, 1);
@@ -121,6 +124,31 @@ public class CustomerList extends Composite implements View {
 		btn_add.addClickListener(e -> showAddWindow());
 		btn_edit.addClickListener(e -> showEditWindow());
 		btn_delete.addClickListener(e -> showRemoveWindow());
+
+		contextMenu.addGridHeaderContextMenuListener(event -> {
+			contextMenu.removeItems();
+			contextMenu.addItem("Add", VaadinIcons.LIST_OL, selectedMenuItem -> {
+				showAddWindow();
+			});
+		});
+
+		contextMenu.addGridBodyContextMenuListener(event -> {
+			contextMenu.removeItems();
+			contextMenu.addItem("Add", VaadinIcons.LIST_OL, selectedMenuItem -> {
+				showAddWindow();
+			});
+			contextMenu.addItem("Edit", VaadinIcons.LIST_OL, selectedMenuItem -> {
+				if (event.getItem() != null) {
+					showEditWindow();
+				}
+			});
+			contextMenu.addItem("Delete", VaadinIcons.LIST_OL, selectedMenuItem -> {
+				if (event.getItem() != null) {
+					showRemoveWindow();
+				}
+			});
+		});
+
 	}
 
 	private void updateHeader() {
@@ -135,22 +163,28 @@ public class CustomerList extends Composite implements View {
 	}
 
 	private void showEditWindow() {
-		// get from the server, it could have been removed
 		SingleSelect<Customer> selected = grid.asSingleSelect();
-		Long id = selected.getValue().getId();
-		RestResponse<Customer> fetched = customerRepository.getById(id);
-
-		if (fetched.getStatus().equals(200)) {
-			Customer obj = fetched.getEntity();
-			CustomerForm window = new CustomerForm(this, customerRepository, "Edit", obj, CRUD_EDIT);
-			getUI().addWindow(window);
-		} else {
-			Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
+		Customer selectedCustomerInGrid = selected.getValue();
+		if (selectedCustomerInGrid != null) {
+			Long id = selectedCustomerInGrid.getId();
+			// get from the server, it could have been removed
+			RestResponse<Customer> fetched = customerRepository.getById(id);
+			if (fetched.getStatus().equals(200)) {
+				Customer obj = fetched.getEntity();
+				CustomerForm window = new CustomerForm(this, customerRepository, "Edit", obj, CRUD_EDIT);
+				getUI().addWindow(window);
+			} else {
+				Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
+			}
 		}
 	}
 
 	private void showRemoveWindow() {
-		CustomerForm window = new CustomerForm(this, customerRepository, "Delete", grid.asSingleSelect().getValue(), CRUD_DELETE);
-		getUI().addWindow(window);
+		SingleSelect<Customer> selected = grid.asSingleSelect();
+		Customer selectedCustomerInGrid = selected.getValue();
+		if (selectedCustomerInGrid != null) {
+			CustomerForm window = new CustomerForm(this, customerRepository, "Delete", grid.asSingleSelect().getValue(), CRUD_DELETE);
+			getUI().addWindow(window);
+		}
 	}
 }
