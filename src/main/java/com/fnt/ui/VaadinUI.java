@@ -44,6 +44,7 @@ public class VaadinUI extends UI {
 
 		CssLayout menu = new CssLayout(title, view1, view2, view3, btnLogout);
 		menu.addStyleName(ValoTheme.MENU_ROOT);
+		menu.setWidth("200px");
 
 		CssLayout viewContainer = new CssLayout();
 		viewContainer.setSizeFull();

@@ -45,6 +45,7 @@ public class Fnc {
 		row1.getCell(columnname).setComponent(field);
 	}
 
+	/*
 	public HorizontalLayout createPrompt(TextField fld, Button btn) {
 		HorizontalLayout layout = new HorizontalLayout();
 		fld.addStyleName(ValoTheme.TEXTFIELD_TINY);
@@ -55,6 +56,7 @@ public class Fnc {
 		layout.setComponentAlignment(btn, Alignment.BOTTOM_LEFT);
 		return layout;
 	}
+	*/
 
 	public HorizontalLayout createPrompt(TextField fld1, TextField fld2, Button btn) {
 		HorizontalLayout layout = new HorizontalLayout();
