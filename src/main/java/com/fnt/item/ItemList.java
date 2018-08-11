@@ -5,9 +5,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.fnt.entity.Customer;
 import com.fnt.entity.Item;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
+import com.vaadin.contextmenu.GridContextMenu;
 import com.vaadin.data.provider.DataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
@@ -51,6 +53,7 @@ public class ItemList extends Composite implements View {
 	private TextField filterPurchasePrice = new TextField();
 
 	private Grid<Item> grid = new Grid<>();
+	private GridContextMenu<Item> contextMenu;
 
 	public ItemList() {
 		initLayout();
@@ -91,7 +94,6 @@ public class ItemList extends Composite implements View {
 			.setExpandRatio(1)
 			.setId("purchaseprice");
 		
-
 		HeaderRow row1 = grid.getDefaultHeaderRow();
 
 		fnc.createFilterField(row1, "itemnumber", "Itemnumber", filterItemNumber);
@@ -107,7 +109,7 @@ public class ItemList extends Composite implements View {
 						query -> search(query.getOffset(), query.getLimit(), fnc.sortInterpretation(query)).stream(), 
 						query -> count());
 		grid.setDataProvider(dp);
-		
+		contextMenu = new GridContextMenu<>(grid);
 		// @formatter:on
 
 		VerticalLayout layout = new VerticalLayout(header, grid);
@@ -147,6 +149,28 @@ public class ItemList extends Composite implements View {
 		btn_add.addClickListener(e -> showAddWindow());
 		btn_edit.addClickListener(e -> showEditWindow());
 		btn_delete.addClickListener(e -> showRemoveWindow());
+		contextMenu.addGridHeaderContextMenuListener(event -> {
+			contextMenu.removeItems();
+			contextMenu.addItem("Add", VaadinIcons.LIST_OL, selectedMenuItem -> {
+				showAddWindow();
+			});
+		});
+		contextMenu.addGridBodyContextMenuListener(event -> {
+			contextMenu.removeItems();
+			contextMenu.addItem("Add", VaadinIcons.LIST_OL, selectedMenuItem -> {
+				showAddWindow();
+			});
+			contextMenu.addItem("Edit", VaadinIcons.LIST_OL, selectedMenuItem -> {
+				if (event.getItem() != null) {
+					showEditWindow();
+				}
+			});
+			contextMenu.addItem("Delete", VaadinIcons.LIST_OL, selectedMenuItem -> {
+				if (event.getItem() != null) {
+					showRemoveWindow();
+				}
+			});
+		});
 	}
 
 	private void updateHeader() {
@@ -163,21 +187,27 @@ public class ItemList extends Composite implements View {
 	private void showEditWindow() {
 		// get from the server, it could have been removed
 		SingleSelect<Item> selected = grid.asSingleSelect();
-		Long id = selected.getValue().getId();
-		RestResponse<Item> fetched = itemRepository.getById(id);
-
-		if (fetched.getStatus().equals(200)) {
-			Item obj = fetched.getEntity();
-			ItemForm window = new ItemForm(this, itemRepository, "Edit", obj, CRUD_EDIT);
-			getUI().addWindow(window);
-		} else {
-			Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
+		Item selectedInGrid = selected.getValue();
+		if (selectedInGrid != null) {
+			Long id = selected.getValue().getId();
+			RestResponse<Item> fetched = itemRepository.getById(id);
+			if (fetched.getStatus().equals(200)) {
+				Item obj = fetched.getEntity();
+				ItemForm window = new ItemForm(this, itemRepository, "Edit", obj, CRUD_EDIT);
+				getUI().addWindow(window);
+			} else {
+				Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
+			}
 		}
 	}
 
 	private void showRemoveWindow() {
-		ItemForm window = new ItemForm(this, itemRepository, "Delete", grid.asSingleSelect().getValue(), CRUD_DELETE);
-		getUI().addWindow(window);
+		SingleSelect<Item> selected = grid.asSingleSelect();
+		Item selectedInGrid = selected.getValue();
+		if (selectedInGrid != null) {
+			ItemForm window = new ItemForm(this, itemRepository, "Delete", grid.asSingleSelect().getValue(), CRUD_DELETE);
+			getUI().addWindow(window);
+		}
 	}
 
 }
