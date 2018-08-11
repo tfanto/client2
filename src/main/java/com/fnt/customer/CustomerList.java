@@ -124,14 +124,12 @@ public class CustomerList extends Composite implements View {
 		btn_add.addClickListener(e -> showAddWindow());
 		btn_edit.addClickListener(e -> showEditWindow());
 		btn_delete.addClickListener(e -> showRemoveWindow());
-
 		contextMenu.addGridHeaderContextMenuListener(event -> {
 			contextMenu.removeItems();
 			contextMenu.addItem("Add", VaadinIcons.LIST_OL, selectedMenuItem -> {
 				showAddWindow();
 			});
 		});
-
 		contextMenu.addGridBodyContextMenuListener(event -> {
 			contextMenu.removeItems();
 			contextMenu.addItem("Add", VaadinIcons.LIST_OL, selectedMenuItem -> {
@@ -148,7 +146,6 @@ public class CustomerList extends Composite implements View {
 				}
 			});
 		});
-
 	}
 
 	private void updateHeader() {
@@ -164,9 +161,9 @@ public class CustomerList extends Composite implements View {
 
 	private void showEditWindow() {
 		SingleSelect<Customer> selected = grid.asSingleSelect();
-		Customer selectedCustomerInGrid = selected.getValue();
-		if (selectedCustomerInGrid != null) {
-			Long id = selectedCustomerInGrid.getId();
+		Customer selectedInGrid = selected.getValue();
+		if (selectedInGrid != null) {
+			Long id = selectedInGrid.getId();
 			// get from the server, it could have been removed
 			RestResponse<Customer> fetched = customerRepository.getById(id);
 			if (fetched.getStatus().equals(200)) {
@@ -181,8 +178,8 @@ public class CustomerList extends Composite implements View {
 
 	private void showRemoveWindow() {
 		SingleSelect<Customer> selected = grid.asSingleSelect();
-		Customer selectedCustomerInGrid = selected.getValue();
-		if (selectedCustomerInGrid != null) {
+		Customer selectedInGrid = selected.getValue();
+		if (selectedInGrid != null) {
 			CustomerForm window = new CustomerForm(this, customerRepository, "Delete", grid.asSingleSelect().getValue(), CRUD_DELETE);
 			getUI().addWindow(window);
 		}

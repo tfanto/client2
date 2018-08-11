@@ -7,8 +7,10 @@ import java.util.Map;
 
 import com.fnt.dto.CustomerOrderHeadListView;
 import com.fnt.entity.CustomerOrderHead;
+import com.fnt.entity.Item;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
+import com.vaadin.contextmenu.GridContextMenu;
 import com.vaadin.data.provider.DataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
@@ -55,6 +57,8 @@ public class CustomerOrderList extends Composite implements View {
 	private TextField filterChangedBy = new TextField();
 
 	private Grid<CustomerOrderHeadListView> grid = new Grid<>();
+	private GridContextMenu<CustomerOrderHeadListView> contextMenu;
+
 	private CustomerOrderHead currentOrderHead = null;
 
 	public CustomerOrderList() {
@@ -109,7 +113,7 @@ public class CustomerOrderList extends Composite implements View {
 						query -> search(query.getOffset(), query.getLimit(), fnc.sortInterpretation(query)).stream(), 
 						query -> count());
 		grid.setDataProvider(dp);
-
+		contextMenu = new GridContextMenu<>(grid);		
 		// @formatter:on
 
 		VerticalLayout layout = new VerticalLayout(header, grid);
@@ -127,6 +131,28 @@ public class CustomerOrderList extends Composite implements View {
 		btn_add.addClickListener(e -> showAddWindow());
 		btn_edit.addClickListener(e -> showEditWindow());
 		btn_delete.addClickListener(e -> showRemoveWindow());
+		contextMenu.addGridHeaderContextMenuListener(event -> {
+			contextMenu.removeItems();
+			contextMenu.addItem("Add", VaadinIcons.LIST_OL, selectedMenuItem -> {
+				showAddWindow();
+			});
+		});
+		contextMenu.addGridBodyContextMenuListener(event -> {
+			contextMenu.removeItems();
+			contextMenu.addItem("Add", VaadinIcons.LIST_OL, selectedMenuItem -> {
+				showAddWindow();
+			});
+			contextMenu.addItem("Edit", VaadinIcons.LIST_OL, selectedMenuItem -> {
+				if (event.getItem() != null) {
+					showEditWindow();
+				}
+			});
+			contextMenu.addItem("Delete", VaadinIcons.LIST_OL, selectedMenuItem -> {
+				if (event.getItem() != null) {
+					showRemoveWindow();
+				}
+			});
+		});
 	}
 
 	public int count() {
@@ -176,16 +202,19 @@ public class CustomerOrderList extends Composite implements View {
 	private void showEditWindow() {
 
 		SingleSelect<CustomerOrderHeadListView> selected = grid.asSingleSelect();
-		Long id = selected.getValue().getId();
-		RestResponse<CustomerOrderHead> fetched = customerOrderRepository.getById(id);
-		// ensure order is still there
-		if (fetched.getStatus().equals(200)) {
-			currentOrderHead = fetched.getEntity();
-			CustomerOrderForm window = new CustomerOrderForm(this, customerOrderRepository, "Edit", selected.getValue(), CRUD_EDIT); //
-			getUI().addWindow(window);
-		} else {
-			currentOrderHead = null;
-			Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
+		CustomerOrderHeadListView selectedInGrid = selected.getValue();
+		if (selectedInGrid != null) {
+			Long id = selected.getValue().getId();
+			RestResponse<CustomerOrderHead> fetched = customerOrderRepository.getById(id);
+			// ensure order is still there
+			if (fetched.getStatus().equals(200)) {
+				currentOrderHead = fetched.getEntity();
+				CustomerOrderForm window = new CustomerOrderForm(this, customerOrderRepository, "Edit", selected.getValue(), CRUD_EDIT); //
+				getUI().addWindow(window);
+			} else {
+				currentOrderHead = null;
+				Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
+			}
 		}
 
 	}
@@ -193,16 +222,19 @@ public class CustomerOrderList extends Composite implements View {
 	private void showRemoveWindow() {
 
 		SingleSelect<CustomerOrderHeadListView> selected = grid.asSingleSelect();
-		Long id = selected.getValue().getId();
-		// ensure order is still there
-		RestResponse<CustomerOrderHead> fetched = customerOrderRepository.getById(id);
-		if (fetched.getStatus().equals(200)) {
-			currentOrderHead = fetched.getEntity();
-			CustomerOrderForm window = new CustomerOrderForm(this, customerOrderRepository, "Delete", selected.getValue(), CRUD_DELETE);
-			getUI().addWindow(window);
-		} else {
-			currentOrderHead = null;
-			Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
+		CustomerOrderHeadListView selectedInGrid = selected.getValue();
+		if (selectedInGrid != null) {
+			Long id = selected.getValue().getId();
+			// ensure order is still there
+			RestResponse<CustomerOrderHead> fetched = customerOrderRepository.getById(id);
+			if (fetched.getStatus().equals(200)) {
+				currentOrderHead = fetched.getEntity();
+				CustomerOrderForm window = new CustomerOrderForm(this, customerOrderRepository, "Delete", selected.getValue(), CRUD_DELETE);
+				getUI().addWindow(window);
+			} else {
+				currentOrderHead = null;
+				Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
+			}
 		}
 	}
 
