@@ -72,8 +72,11 @@ public class VaadinUI extends UI {
 					return true;
 				}
 				else {
-					Notification.show("Forbidden", "User not authenticated", Notification.Type.TRAY_NOTIFICATION);
-				}
+					if(event.getNewView().getClass().equals(AppLoginForm.class)){
+						return true;
+					}
+				}				
+				Notification.show("User not authenticated", Notification.Type.WARNING_MESSAGE);
 				return false;
 			}
 		});

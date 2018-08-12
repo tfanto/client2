@@ -135,16 +135,21 @@ public class CustomerList extends Composite implements View {
 			contextMenu.addItem("Add", VaadinIcons.LIST_OL, selectedMenuItem -> {
 				showAddWindow();
 			});
-			contextMenu.addItem("Edit", VaadinIcons.LIST_OL, selectedMenuItem -> {
-				if (event.getItem() != null) {
-					showEditWindow();
-				}
-			});
-			contextMenu.addItem("Delete", VaadinIcons.LIST_OL, selectedMenuItem -> {
-				if (event.getItem() != null) {
-					showRemoveWindow();
-				}
-			});
+
+			SingleSelect<Customer> selected = grid.asSingleSelect();
+			Customer selectedInGrid = selected.getValue();
+			if (selectedInGrid != null) {
+				contextMenu.addItem("Edit", VaadinIcons.LIST_OL, selectedMenuItem -> {
+					if (event.getItem() != null) {
+						showEditWindow();
+					}
+				});
+				contextMenu.addItem("Delete", VaadinIcons.LIST_OL, selectedMenuItem -> {
+					if (event.getItem() != null) {
+						showRemoveWindow();
+					}
+				});
+			}
 		});
 	}
 

@@ -7,7 +7,6 @@ import java.util.Map;
 
 import com.fnt.dto.CustomerOrderHeadListView;
 import com.fnt.entity.CustomerOrderHead;
-import com.fnt.entity.Item;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
 import com.vaadin.contextmenu.GridContextMenu;
@@ -142,16 +141,21 @@ public class CustomerOrderList extends Composite implements View {
 			contextMenu.addItem("Add", VaadinIcons.LIST_OL, selectedMenuItem -> {
 				showAddWindow();
 			});
-			contextMenu.addItem("Edit", VaadinIcons.LIST_OL, selectedMenuItem -> {
-				if (event.getItem() != null) {
-					showEditWindow();
-				}
-			});
-			contextMenu.addItem("Delete", VaadinIcons.LIST_OL, selectedMenuItem -> {
-				if (event.getItem() != null) {
-					showRemoveWindow();
-				}
-			});
+
+			SingleSelect<CustomerOrderHeadListView> selected = grid.asSingleSelect();
+			CustomerOrderHeadListView selectedInGrid = selected.getValue();
+			if (selectedInGrid != null) {
+				contextMenu.addItem("Edit", VaadinIcons.LIST_OL, selectedMenuItem -> {
+					if (event.getItem() != null) {
+						showEditWindow();
+					}
+				});
+				contextMenu.addItem("Delete", VaadinIcons.LIST_OL, selectedMenuItem -> {
+					if (event.getItem() != null) {
+						showRemoveWindow();
+					}
+				});
+			}
 		});
 	}
 
