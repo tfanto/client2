@@ -160,16 +160,22 @@ public class ItemList extends Composite implements View {
 			contextMenu.addItem("Add", VaadinIcons.LIST_OL, selectedMenuItem -> {
 				showAddWindow();
 			});
-			contextMenu.addItem("Edit", VaadinIcons.LIST_OL, selectedMenuItem -> {
-				if (event.getItem() != null) {
-					showEditWindow();
-				}
-			});
-			contextMenu.addItem("Delete", VaadinIcons.LIST_OL, selectedMenuItem -> {
-				if (event.getItem() != null) {
-					showRemoveWindow();
-				}
-			});
+
+			SingleSelect<Item> selected = grid.asSingleSelect();
+			Item selectedInGrid = selected.getValue();
+			if (selectedInGrid != null) {
+
+				contextMenu.addItem("Edit", VaadinIcons.LIST_OL, selectedMenuItem -> {
+					if (event.getItem() != null) {
+						showEditWindow();
+					}
+				});
+				contextMenu.addItem("Delete", VaadinIcons.LIST_OL, selectedMenuItem -> {
+					if (event.getItem() != null) {
+						showRemoveWindow();
+					}
+				});
+			}
 		});
 	}
 
