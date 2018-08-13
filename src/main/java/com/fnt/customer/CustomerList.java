@@ -126,25 +126,25 @@ public class CustomerList extends Composite implements View {
 		btn_delete.addClickListener(e -> showRemoveWindow());
 		contextMenu.addGridHeaderContextMenuListener(event -> {
 			contextMenu.removeItems();
-			contextMenu.addItem("Add", VaadinIcons.LIST_OL, selectedMenuItem -> {
+			contextMenu.addItem("Add", VaadinIcons.PLUS, selectedMenuItem -> {
 				showAddWindow();
 			});
 		});
 		contextMenu.addGridBodyContextMenuListener(event -> {
 			contextMenu.removeItems();
-			contextMenu.addItem("Add", VaadinIcons.LIST_OL, selectedMenuItem -> {
+			contextMenu.addItem("Add", VaadinIcons.PLUS, selectedMenuItem -> {
 				showAddWindow();
 			});
 
 			SingleSelect<Customer> selected = grid.asSingleSelect();
 			Customer selectedInGrid = selected.getValue();
 			if (selectedInGrid != null) {
-				contextMenu.addItem("Edit", VaadinIcons.LIST_OL, selectedMenuItem -> {
+				contextMenu.addItem("Edit", VaadinIcons.PENCIL, selectedMenuItem -> {
 					if (event.getItem() != null) {
 						showEditWindow();
 					}
 				});
-				contextMenu.addItem("Delete", VaadinIcons.LIST_OL, selectedMenuItem -> {
+				contextMenu.addItem("Delete", VaadinIcons.TRASH, selectedMenuItem -> {
 					if (event.getItem() != null) {
 						showRemoveWindow();
 					}
