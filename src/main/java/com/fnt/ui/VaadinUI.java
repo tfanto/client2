@@ -90,16 +90,30 @@ public class VaadinUI extends UI {
 			if (userObj instanceof String) {
 				user = String.valueOf(userObj);
 			}
-			setUser(user, VaadinIcons.HANDSHAKE);
+			setUser(user);
 		}
 
 	}
+	
+	private FileResource getUserIcon(String user) {
+		
+		FileResource resource = null;
+		String userResource = basepath + "/WEB-INF/images/"+ user + ".jpg";
+		File f = new File(userResource);
+		if(f.exists()) {
+			resource = new FileResource(f);
+		}
+		else {
+			resource = new FileResource(new File(basepath + "/WEB-INF/images/profilDummy.jpg"));			
+		}
+		return resource;
+	}
 
-	private void setUser(String name, Resource icon) {
+	private void setUser(String user) {
 		
-		FileResource resource = new FileResource(new File(basepath + "/WEB-INF/images/profilDummy.jpg"));
+		FileResource resource = getUserIcon(user);
 		
-		sideMenu.setUserName(name);
+		sideMenu.setUserName(user);
 		sideMenu.setUserIcon(resource);
 		sideMenu.clearUserMenu();
 		sideMenu.addUserMenuItem("Sign out", () -> {
