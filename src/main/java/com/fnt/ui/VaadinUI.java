@@ -7,6 +7,7 @@ import javax.servlet.annotation.WebServlet;
 import org.vaadin.teemusa.sidemenu.SideMenu;
 
 import com.fnt.authentication.AppLoginForm;
+import com.fnt.authentication.AppLoginPasswordUpdate;
 import com.fnt.authentication.AppLoginRepository;
 import com.fnt.customer.CustomerList;
 import com.fnt.customerorder.CustomerOrderList;
@@ -116,6 +117,10 @@ public class VaadinUI extends UI {
 		sideMenu.setUserName(user);
 		sideMenu.setUserIcon(resource);
 		sideMenu.clearUserMenu();
+		sideMenu.addUserMenuItem("Update password", () -> {
+			AppLoginPasswordUpdate window = new AppLoginPasswordUpdate();
+			getUI().addWindow(window);
+		});
 		sideMenu.addUserMenuItem("Sign out", () -> {
 			logout();
 		});
