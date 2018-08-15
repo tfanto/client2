@@ -21,8 +21,7 @@ public class AppLoginPasswordUpdate extends Window {
 	private PasswordField oldPwd = new PasswordField();
 	private PasswordField newPwd = new PasswordField();
 	private PasswordField confirmNewPwd = new PasswordField();
-	private Label showIfNewPwdMatches = new Label();
-
+	private Label info = new Label();
 
 	public AppLoginPasswordUpdate() {
 		initLayout();
@@ -39,7 +38,7 @@ public class AppLoginPasswordUpdate extends Window {
 		HorizontalLayout buttons = new HorizontalLayout(btn_cancel, btn_save);
 		buttons.setSpacing(true);
 
-		GridLayout formLayout = new GridLayout(1, 6, login, oldPwd, newPwd, confirmNewPwd, showIfNewPwdMatches, buttons);
+		GridLayout formLayout = new GridLayout(1, 6, login, oldPwd, newPwd, confirmNewPwd, info, buttons);
 		formLayout.setMargin(true);
 		formLayout.setSpacing(true);
 
@@ -52,10 +51,84 @@ public class AppLoginPasswordUpdate extends Window {
 
 	private void initBehavior() {
 		this.setResizable(false);
-		
-		btn_cancel.addClickListener(e ->{
+		btn_save.setEnabled(false);
+
+		btn_cancel.addClickListener(e -> {
 			close();
 		});
+		
+		oldPwd.addValueChangeListener(e -> {
+			checkData();
+			
+		});
+
+		newPwd.addValueChangeListener( e -> {
+			String confirmedPwd = confirmNewPwd.getValue();
+			String newPwd = e.getValue();
+			if(pwdMatches(newPwd, confirmedPwd)) {
+				checkData();
+			}
+		});
+
+		confirmNewPwd.addValueChangeListener( e -> {
+			String oldPwd = newPwd.getValue();
+			String newPwd = e.getValue();
+			if(pwdMatches(oldPwd, newPwd)){
+				checkData();
+			}
+		});
+		
+		btn_save.addClickListener(e -> {
+			updatePassword();
+		});
+		
+		
+	}
+
+	private void updatePassword() {
+		
+		if(!checkData()) {
+			return;
+		}
+		
+		
+		// todo call it . . .
+		
+		
+		close();
+	}
+
+	private Boolean  checkData() {
+		
+		String oldPassword = oldPwd.getValue().trim();
+		if(oldPassword.length() < 1) {
+			info.setValue("Old password is empty");
+			btn_save.setEnabled(false);
+			return false;
+		}
+		
+		String newPassword = newPwd.getValue().trim();
+		if(newPassword.length() > 3) {  // a stupid policy but still
+			info.setValue("");
+			btn_save.setEnabled(true);
+			return true;
+		}
+		btn_save.setEnabled(false);
+		info.setValue("Password error");
+		return false;		
+	}
+
+	private Boolean pwdMatches(String oldPwd, String newPwd) {
+		
+		if(newPwd.equals(oldPwd)) {
+			info.setValue("");
+			return true;
+		}
+		else {
+			btn_save.setEnabled(false);
+			info.setValue("Passwords does not match");
+			return false;
+		}
 	}
 
 }
