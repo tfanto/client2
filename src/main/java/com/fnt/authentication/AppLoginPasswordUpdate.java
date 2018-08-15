@@ -1,5 +1,6 @@
 package com.fnt.authentication;
 
+import com.fnt.sys.RestResponse;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -56,75 +57,79 @@ public class AppLoginPasswordUpdate extends Window {
 		btn_cancel.addClickListener(e -> {
 			close();
 		});
-		
+
 		oldPwd.addValueChangeListener(e -> {
 			checkData();
-			
+
 		});
 
-		newPwd.addValueChangeListener( e -> {
+		newPwd.addValueChangeListener(e -> {
 			String confirmedPwd = confirmNewPwd.getValue();
 			String newPwd = e.getValue();
-			if(pwdMatches(newPwd, confirmedPwd)) {
+			if (pwdMatches(newPwd, confirmedPwd)) {
 				checkData();
 			}
 		});
 
-		confirmNewPwd.addValueChangeListener( e -> {
+		confirmNewPwd.addValueChangeListener(e -> {
 			String oldPwd = newPwd.getValue();
 			String newPwd = e.getValue();
-			if(pwdMatches(oldPwd, newPwd)){
+			if (pwdMatches(oldPwd, newPwd)) {
 				checkData();
 			}
 		});
-		
+
 		btn_save.addClickListener(e -> {
 			updatePassword();
 		});
-		
-		
+
 	}
 
 	private void updatePassword() {
-		
-		if(!checkData()) {
+
+		if (!checkData()) {
 			return;
 		}
-		
-		
-		// todo call it . . .
-		
-		
-		close();
+		String oldPassword = oldPwd.getValue();
+		String newPassword = newPwd.getValue();
+
+		RestResponse<Boolean> response = AppUserRepository.updatePassword(oldPassword, newPassword);
+		int ok = response.getStatus();
+		if (ok == 200) {
+			info.setValue("");
+			close();
+			return;
+		} else {
+			info.setValue(response.getMsg());
+		}
 	}
 
-	private Boolean  checkData() {
-		
+	private Boolean checkData() {
+
 		String oldPassword = oldPwd.getValue().trim();
-		if(oldPassword.length() < 1) {
+		if (oldPassword.length() < 1) {
 			info.setValue("Old password is empty");
 			btn_save.setEnabled(false);
 			return false;
 		}
-		
+
 		String newPassword = newPwd.getValue().trim();
-		if(newPassword.length() > 3) {  // a stupid policy but still
+		if (newPassword.length() > 3) { // a stupid policy but still
 			info.setValue("");
 			btn_save.setEnabled(true);
 			return true;
 		}
 		btn_save.setEnabled(false);
 		info.setValue("Password error");
-		return false;		
+		return false;
 	}
 
 	private Boolean pwdMatches(String oldPwd, String newPwd) {
-		
-		if(newPwd.equals(oldPwd)) {
+
+		if (newPwd.equals(oldPwd)) {
 			info.setValue("");
 			return true;
-		}
-		else {
+		} else {
 			btn_save.setEnabled(false);
 			info.setValue("Passwords does not match");
 			return false;

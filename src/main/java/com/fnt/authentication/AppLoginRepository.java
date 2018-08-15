@@ -16,6 +16,7 @@ import com.vaadin.server.VaadinSession;
 public class AppLoginRepository {
 
 	private static final String REST_LOGIN_END_POINT = "http://localhost:8080/auth/rest/login";
+
 	private static final String LOGIN = "login";
 	private static final String JWE = "jwe";
 
@@ -67,5 +68,6 @@ public class AppLoginRepository {
 		VaadinService.getCurrentRequest().getWrappedSession().invalidate();
 		Page.getCurrent().setLocation("");
 	}
+
 
 }
