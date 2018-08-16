@@ -84,4 +84,9 @@ public class AppUserRepository {
 
 	}
 
+	public static RestResponse<Boolean> updateAppUser() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
