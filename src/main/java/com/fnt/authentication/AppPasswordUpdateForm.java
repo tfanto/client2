@@ -12,7 +12,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-public class AppLoginPasswordUpdate extends Window {
+public class AppPasswordUpdateForm extends Window {
 
 	private static final long serialVersionUID = 6781933231327329883L;
 	private Button btn_cancel = new Button("Cancel");
@@ -24,7 +24,7 @@ public class AppLoginPasswordUpdate extends Window {
 	private PasswordField confirmNewPwd = new PasswordField();
 	private Label info = new Label();
 
-	public AppLoginPasswordUpdate() {
+	public AppPasswordUpdateForm() {
 		initLayout();
 		initBehavior();
 	}
