@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fnt.entity.AppUser;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
 import com.vaadin.server.VaadinSession;
@@ -24,6 +25,7 @@ public class AppUserRepository {
 	private static final String JWE = "jwe";
 
 	private static final String USER_REGISTRATION_END_POINT = "http://localhost:8080/auth/rest/user";
+	private static final String APPUSER_END_POINT = "http://localhost:8080/server2/rest/appuser";
 
 	private static Client createClient() {
 
@@ -40,6 +42,12 @@ public class AppUserRepository {
 		return client;
 	}
 
+	/** warning this goes to the security server
+	 * 
+	 * @param oldPassword
+	 * @param newPassword
+	 * @return
+	 */
 	public static RestResponse<Boolean> updatePassword(String oldPassword, String newPassword) {
 
 		Fnc fnc = new Fnc();
@@ -84,9 +92,78 @@ public class AppUserRepository {
 
 	}
 
-	public static RestResponse<Boolean> updateAppUser() {
-		// TODO Auto-generated method stub
-		return null;
+	public static RestResponse<Boolean> updateAppUser(AppUser user) {
+		Fnc fnc = new Fnc();
+
+		Object obj = VaadinSession.getCurrent().getAttribute(LOGIN);
+		if (!(obj instanceof String)) {
+			return new RestResponse<>(400, "Invalid or not authenticated login.");
+		}
+		String login = String.valueOf(obj);
+
+		user.setLogin(login);
+		Client client = null;
+		try {
+			client = createClient();
+			// @formatter:off
+			Response response = client
+					.target(APPUSER_END_POINT)
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))					
+					.post(Entity.json(user), Response.class);
+			int status = response.getStatus();
+			// @formatter:on
+			if (status == 200) {
+				return new RestResponse<>(status, true);
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(status, fnc.formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
+	}
+
+	public static RestResponse<AppUser> get(String login) {
+		Fnc fnc = new Fnc();
+
+		Object obj = VaadinSession.getCurrent().getAttribute(LOGIN);
+		if (!(obj instanceof String)) {
+			return new RestResponse<>(400, "Invalid or not authenticated login.");
+		}
+
+		Client client = null;
+		try {
+			client = createClient();
+			// @formatter:off
+			Response response = client
+					.target(APPUSER_END_POINT)
+					.path(login)
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", fnc.getToken(VaadinSession.getCurrent()))					
+					.get( Response.class);
+			int status = response.getStatus();
+			// @formatter:on
+			if (status == 200) {
+				AppUser fetched = response.readEntity(AppUser.class);
+				return new RestResponse<>(status, fetched);
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString());
+			} else {
+				JsonNode jsonNode = response.readEntity(JsonNode.class);
+				String appMsg = jsonNode.path("appMsg").textValue();
+				return new RestResponse<>(status, fnc.formatAppMsg(appMsg));
+			}
+		} finally {
+			if (client != null) {
+				client.close();
+			}
+		}
 	}
 
 }
