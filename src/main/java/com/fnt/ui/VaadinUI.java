@@ -7,23 +7,21 @@ import javax.servlet.annotation.WebServlet;
 import org.vaadin.teemusa.sidemenu.SideMenu;
 
 import com.fnt.authentication.AppLoginForm;
-import com.fnt.authentication.AppPasswordUpdateForm;
 import com.fnt.authentication.AppLoginRepository;
+import com.fnt.authentication.AppPasswordUpdateForm;
+import com.fnt.authentication.AppUserDataUpdateForm;
 import com.fnt.customer.CustomerList;
 import com.fnt.customerorder.CustomerOrderList;
 import com.fnt.item.ItemList;
 import com.vaadin.annotations.VaadinServletConfiguration;
-import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.PushStateNavigation;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FileResource;
-import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.ui.Image;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 
@@ -95,29 +93,32 @@ public class VaadinUI extends UI {
 		}
 
 	}
-	
+
 	private FileResource getUserIcon(String user) {
-		
+
 		FileResource resource = null;
-		String userResource = basepath + "/WEB-INF/images/"+ user + ".jpg";
+		String userResource = basepath + "/WEB-INF/images/" + user + ".jpg";
 		File f = new File(userResource);
-		if(f.exists()) {
+		if (f.exists()) {
 			resource = new FileResource(f);
-		}
-		else {
-			resource = new FileResource(new File(basepath + "/WEB-INF/images/profilDummy.jpg"));			
+		} else {
+			resource = new FileResource(new File(basepath + "/WEB-INF/images/profilDummy.jpg"));
 		}
 		return resource;
 	}
 
 	private void setUser(String user) {
-		
+
 		FileResource resource = getUserIcon(user);
-		
+
 		sideMenu.setUserName(user);
 		sideMenu.setUserIcon(resource);
 		sideMenu.clearUserMenu();
-		sideMenu.addUserMenuItem("Update password", () -> {
+		sideMenu.addUserMenuItem("Userinfo", () -> {						
+			AppUserDataUpdateForm window = new AppUserDataUpdateForm(2);
+			getUI().addWindow(window);
+		});
+		sideMenu.addUserMenuItem("Password", () -> {
 			AppPasswordUpdateForm window = new AppPasswordUpdateForm();
 			getUI().addWindow(window);
 		});

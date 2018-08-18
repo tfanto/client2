@@ -2,7 +2,6 @@ package com.fnt.item;
 
 import java.util.List;
 
-import com.fnt.customer.CustomerList;
 import com.fnt.entity.Item;
 import com.fnt.sys.RestResponse;
 import com.vaadin.data.BeanValidationBinder;
@@ -26,6 +25,10 @@ public class ItemForm extends Window {
 	private static final long serialVersionUID = 5876434378047312308L;
 
 	int crudFunction = 1;
+	public static final int CRUD_CREATE = 1;
+	public static final int CRUD_EDIT = 2;
+	public static final int CRUD_DELETE = 4;
+
 	ItemRepository itemRepository;
 	ItemList owner;
 
@@ -48,7 +51,7 @@ public class ItemForm extends Window {
 		this.crudFunction = crudFunction;
 
 		switch (crudFunction) {
-		case CustomerList.CRUD_DELETE:
+		case CRUD_DELETE:
 			btn_save.setCaption("Confirm delete");
 			break;
 		}
@@ -80,7 +83,7 @@ public class ItemForm extends Window {
 	private void initBehavior(Item obj) {
 		BeanValidationBinder<Item> binder = new BeanValidationBinder<>(Item.class);
 
-		if (crudFunction == CustomerList.CRUD_CREATE) {
+		if (crudFunction == CRUD_CREATE) {
 			obj.setOrderingpoint(0);
 			obj.setInstock(0);
 			obj.setPrice(0.0);
@@ -106,13 +109,13 @@ public class ItemForm extends Window {
 				binder.writeBean(obj);
 				RestResponse<Item> rs = null;
 				switch (crudFunction) {
-				case CustomerList.CRUD_CREATE:
+				case CRUD_CREATE:
 					rs = itemRepository.create(obj);
 					break;
-				case CustomerList.CRUD_EDIT:
+				case CRUD_EDIT:
 					rs = itemRepository.update(obj);
 					break;
-				case CustomerList.CRUD_DELETE:
+				case CRUD_DELETE:
 					rs = itemRepository.delete(obj);
 					break;
 				default: {
