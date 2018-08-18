@@ -1,5 +1,6 @@
 package com.fnt.authentication;
 
+import com.fnt.entity.AppUser;
 import com.fnt.sys.RestResponse;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.VaadinSession;
@@ -14,14 +15,12 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 public class AppUserDataUpdateForm extends Window {
-	
+
 	private static final String LOGIN = "login";
 	private int crudFunction = 1;
 	public static final int CRUD_CREATE = 1;
 	public static final int CRUD_EDIT = 2;
 	public static final int CRUD_DELETE = 4;
-
-
 
 	private static final long serialVersionUID = 6781933231327329883L;
 	private Button btn_cancel = new Button("Cancel");
@@ -45,15 +44,15 @@ public class AppUserDataUpdateForm extends Window {
 	}
 
 	private void initLayout() {
-		
+
 		Object obj = VaadinSession.getCurrent().getAttribute(LOGIN);
 		if (!(obj instanceof String)) {
 			close();
 		}
 		String uid = String.valueOf(obj);
 		login.setValue(uid);
-		
-		if(crudFunction == CRUD_DELETE) {
+
+		if (crudFunction == CRUD_DELETE) {
 			btn_save.setCaption("Delete");
 			firstName.setEnabled(false);
 			lastName.setEnabled(false);
@@ -104,7 +103,28 @@ public class AppUserDataUpdateForm extends Window {
 
 	private void initBehavior() {
 		this.setResizable(false);
-		btn_save.setEnabled(false);
+
+		Object obj = VaadinSession.getCurrent().getAttribute(LOGIN);
+		if (!(obj instanceof String)) {
+			close();
+		}
+		String uid = String.valueOf(obj);
+
+		RestResponse<AppUser> response = AppUserRepository.get(uid);
+		if (response.getStatus() != 200) {
+			close();
+		}
+
+		AppUser fetched = response.getEntity();
+
+		login.setValue(uid);
+		firstName.setValue(fetched.getFirstname() == null ? "" : fetched.getFirstname());
+		lastName.setValue(fetched.getLastname() == null ? "" : fetched.getLastname());
+		street.setValue(fetched.getStreet() == null ? "" : fetched.getStreet());
+		ponr.setValue(fetched.getPonr() == null ? "" : fetched.getPonr());
+		padr.setValue(fetched.getPadr() == null ? "" : fetched.getPadr());
+		country.setValue(fetched.getCountry() == null ? "" : fetched.getCountry());
+		phone.setValue(fetched.getPhone() == null ? "" : fetched.getPhone());
 
 		btn_cancel.addClickListener(e -> {
 			close();
@@ -118,11 +138,17 @@ public class AppUserDataUpdateForm extends Window {
 
 	private void update() {
 
-		if (!checkData()) {
-			return;
-		}
+		AppUser user = new AppUser();
+		user.setLogin(login.getValue());
+		user.setFirstname(firstName.getValue());
+		user.setLastname(lastName.getValue());
+		user.setStreet(street.getValue());
+		user.setPonr(ponr.getValue());
+		user.setPadr(padr.getValue());
+		user.setPhone(phone.getValue());
+		user.setCountry(country.getValue());
 
-		RestResponse<Boolean> response = AppUserRepository.updateAppUser();
+		RestResponse<Boolean> response = AppUserRepository.updateAppUser(user);
 		int ok = response.getStatus();
 		if (ok == 200) {
 			info.setValue("");
@@ -132,10 +158,4 @@ public class AppUserDataUpdateForm extends Window {
 			info.setValue(response.getMsg());
 		}
 	}
-
-	private Boolean checkData() {
-
-		return false;
-	}
-
 }

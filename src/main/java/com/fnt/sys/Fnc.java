@@ -1,7 +1,15 @@
 package com.fnt.sys;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 import com.vaadin.data.provider.Query;
 import com.vaadin.data.provider.QuerySortOrder;
@@ -46,17 +54,13 @@ public class Fnc {
 	}
 
 	/*
-	public HorizontalLayout createPrompt(TextField fld, Button btn) {
-		HorizontalLayout layout = new HorizontalLayout();
-		fld.addStyleName(ValoTheme.TEXTFIELD_TINY);
-		btn.addStyleName(ValoTheme.BUTTON_TINY);
-		layout.setSpacing(false);
-		layout.addComponent(fld);
-		layout.addComponent(btn);
-		layout.setComponentAlignment(btn, Alignment.BOTTOM_LEFT);
-		return layout;
-	}
-	*/
+	 * public HorizontalLayout createPrompt(TextField fld, Button btn) {
+	 * HorizontalLayout layout = new HorizontalLayout();
+	 * fld.addStyleName(ValoTheme.TEXTFIELD_TINY);
+	 * btn.addStyleName(ValoTheme.BUTTON_TINY); layout.setSpacing(false);
+	 * layout.addComponent(fld); layout.addComponent(btn);
+	 * layout.setComponentAlignment(btn, Alignment.BOTTOM_LEFT); return layout; }
+	 */
 
 	public HorizontalLayout createPrompt(TextField fld1, TextField fld2, Button btn) {
 		HorizontalLayout layout = new HorizontalLayout();
@@ -136,6 +140,20 @@ public class Fnc {
 		}
 		if (ret.length() > 0) {
 			ret = ret.substring(0, ret.length() - 1);
+		}
+		return ret;
+	}
+
+	public <T> List<String> validate(T e) {
+
+		List<String> ret = new ArrayList<>();
+
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		Validator validator = factory.getValidator();
+		Set<ConstraintViolation<T>> errors = validator.validate(e);
+		for (ConstraintViolation<T> error : errors) {
+			String msg = error.getMessage();
+			ret.add(msg);
 		}
 		return ret;
 	}
