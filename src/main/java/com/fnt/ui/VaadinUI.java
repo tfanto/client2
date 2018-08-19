@@ -50,7 +50,7 @@ public class VaadinUI extends UI {
 		// NOTE: Navigation and custom code menus should not be mixed.
 		// See issue #8
 
-		navigator.addView("", DefaultView.class);
+		navigator.addView("", ClientDefaultView.class);
 		navigator.addView("Customer", CustomerList.class);
 		navigator.addView("Item", ItemList.class);
 		navigator.addView("Order", CustomerOrderList.class);
