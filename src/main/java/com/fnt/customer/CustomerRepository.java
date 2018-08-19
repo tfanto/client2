@@ -21,6 +21,7 @@ import com.fnt.dto.SearchData;
 import com.fnt.entity.Customer;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
+import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
 
@@ -28,7 +29,7 @@ public class CustomerRepository {
 
 	private Fnc fnc = new Fnc();
 
-	private static final String REST_CUSTOMER_END_POINT = "http://localhost:8080/server2/rest/customer";
+	private static final String REST_CUSTOMER_END_POINT = String.valueOf(VaadinServlet.getCurrent().getServletContext().getAttribute("REST_CUSTOMER_END_POINT"));
 
 	public Client createClient() {
 
@@ -78,8 +79,8 @@ public class CustomerRepository {
 				List<Customer> theList = response.readEntity(new GenericType<List<Customer>>() {
 				});
 				return new RestResponse<>(status, theList);
-			} else if(status == 403){
-				return new RestResponse<>(status, response.getStatusInfo().toString(), new ArrayList<>());				
+			} else if (status == 403) {
+				return new RestResponse<>(status, response.getStatusInfo().toString(), new ArrayList<>());
 			} else {
 				return new RestResponse<>(status, new ArrayList<>());
 			}

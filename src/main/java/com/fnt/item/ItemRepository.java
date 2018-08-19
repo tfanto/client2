@@ -21,6 +21,7 @@ import com.fnt.dto.SearchData;
 import com.fnt.entity.Item;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
+import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
 
@@ -28,7 +29,8 @@ public class ItemRepository {
 
 	private Fnc fnc = new Fnc();
 
-	private static final String REST_ITEM_END_POINT = "http://localhost:8080/server2/rest/item";
+	private static final String REST_ITEM_END_POINT = String.valueOf(VaadinServlet.getCurrent().getServletContext().getAttribute("REST_ITEM_END_POINT"));
+
 
 	public Client createClient() {
 
