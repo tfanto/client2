@@ -11,11 +11,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
 
 public class AppLoginRepository {
 
-	private static final String REST_LOGIN_END_POINT = "http://localhost:8080/auth/rest/login";
+	private static final String REST_LOGIN_END_POINT = String.valueOf(VaadinServlet.getCurrent().getServletContext().getAttribute("REST_LOGIN_END_POINT"));
 
 	private static final String LOGIN = "login";
 	private static final String JWE = "jwe";
@@ -68,6 +69,5 @@ public class AppLoginRepository {
 		VaadinService.getCurrentRequest().getWrappedSession().invalidate();
 		Page.getCurrent().setLocation("");
 	}
-
 
 }

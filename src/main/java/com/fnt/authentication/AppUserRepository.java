@@ -17,15 +17,15 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fnt.entity.AppUser;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
+import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
 
 public class AppUserRepository {
 
 	private static final String LOGIN = "login";
-	private static final String JWE = "jwe";
 
-	private static final String USER_REGISTRATION_END_POINT = "http://localhost:8080/auth/rest/user";
-	private static final String APPUSER_END_POINT = "http://localhost:8080/server2/rest/appuser";
+	private static final String USER_REGISTRATION_END_POINT = String.valueOf(VaadinServlet.getCurrent().getServletContext().getAttribute("USER_REGISTRATION_END_POINT"));
+	private static final String APPUSER_END_POINT = String.valueOf(VaadinServlet.getCurrent().getServletContext().getAttribute("APPUSER_END_POINT"));
 
 	private static Client createClient() {
 
@@ -42,7 +42,8 @@ public class AppUserRepository {
 		return client;
 	}
 
-	/** warning this goes to the security server
+	/**
+	 * warning this goes to the security server
 	 * 
 	 * @param oldPassword
 	 * @param newPassword

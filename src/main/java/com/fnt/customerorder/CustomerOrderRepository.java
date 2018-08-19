@@ -27,6 +27,7 @@ import com.fnt.entity.CustomerOrderLine;
 import com.fnt.item.ItemRepository;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
+import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
 
@@ -34,7 +35,7 @@ public class CustomerOrderRepository {
 
 	private Fnc fnc = new Fnc();
 
-	private String REST_CUSTOMER_ORDER_END_POINT = "http://localhost:8080/server2/rest/customerorder";
+	private static final String REST_CUSTOMER_ORDER_END_POINT = String.valueOf(VaadinServlet.getCurrent().getServletContext().getAttribute("REST_CUSTOMER_ORDER_END_POINT"));
 
 	private CustomerRepository customerRepository = new CustomerRepository();
 	private ItemRepository itemRepository = new ItemRepository();
