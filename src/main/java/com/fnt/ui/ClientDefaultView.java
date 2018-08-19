@@ -22,14 +22,20 @@ public class ClientDefaultView extends Composite implements View {
 
 		VerticalLayout layout = new VerticalLayout();
 		Label lblCopyright = new Label("Fanto Software Engineering (c) 2018");
-		Label lblContact = new Label("For more info call +46 70 980 5011");
+		Label lblContact = new Label("For more info:");
+		Label lblContact1 = new Label("phone: +46 70 980 5011");
+		Label lblContact2 = new Label("mail : tomasfanto@gmail.com ");
 
 		layout.addComponent(lblCopyright);
 		layout.addComponent(image);
 		layout.addComponent(lblContact);
+		layout.addComponent(lblContact1);
+		layout.addComponent(lblContact2);
 		layout.setComponentAlignment(lblCopyright, Alignment.MIDDLE_CENTER);
 		layout.setComponentAlignment(image, Alignment.MIDDLE_CENTER);
 		layout.setComponentAlignment(lblContact, Alignment.MIDDLE_CENTER);
+		layout.setComponentAlignment(lblContact1, Alignment.MIDDLE_CENTER);
+		layout.setComponentAlignment(lblContact2, Alignment.MIDDLE_CENTER);
 
 		setCompositionRoot(layout);
 	}

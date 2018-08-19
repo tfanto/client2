@@ -133,7 +133,7 @@ public class VaadinUI extends UI {
 	}
 
 	@WebServlet(urlPatterns = "/*", name = "VaadinUIServlet", asyncSupported = true)
-	@VaadinServletConfiguration(ui = VaadinUI.class, productionMode = false)
+	@VaadinServletConfiguration(ui = VaadinUI.class, productionMode = true)
 	public static class VaadinUIServlet extends VaadinServlet {
 	}
 
