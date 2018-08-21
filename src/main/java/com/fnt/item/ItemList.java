@@ -203,6 +203,10 @@ public class ItemList extends Composite implements View {
 				getUI().addWindow(window);
 			} else {
 				Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
+				if (fetched.getStatus().equals(404)) {
+					grid.getDataProvider().refreshAll();
+					grid.deselectAll();					
+				}
 			}
 		}
 	}
@@ -219,6 +223,10 @@ public class ItemList extends Composite implements View {
 				getUI().addWindow(window);
 			} else {
 				Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
+				if (fetched.getStatus().equals(404)) {
+					grid.getDataProvider().refreshAll();
+					grid.deselectAll();					
+				}				
 			}
 		}
 	}
