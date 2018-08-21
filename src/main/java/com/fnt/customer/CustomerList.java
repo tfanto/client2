@@ -185,8 +185,15 @@ public class CustomerList extends Composite implements View {
 		SingleSelect<Customer> selected = grid.asSingleSelect();
 		Customer selectedInGrid = selected.getValue();
 		if (selectedInGrid != null) {
-			CustomerForm window = new CustomerForm(this, customerRepository, "Delete", grid.asSingleSelect().getValue(), CRUD_DELETE);
-			getUI().addWindow(window);
+			Long id = selectedInGrid.getId();
+			RestResponse<Customer> fetched = customerRepository.getById(id);
+			if (fetched.getStatus().equals(200)) {
+				Customer obj = fetched.getEntity();
+				CustomerForm window = new CustomerForm(this, customerRepository, "Delete", obj, CRUD_DELETE);
+				getUI().addWindow(window);
+			}else {
+				Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);				
+			}
 		}
 	}
 }

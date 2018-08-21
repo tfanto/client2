@@ -211,8 +211,15 @@ public class ItemList extends Composite implements View {
 		SingleSelect<Item> selected = grid.asSingleSelect();
 		Item selectedInGrid = selected.getValue();
 		if (selectedInGrid != null) {
-			ItemForm window = new ItemForm(this, itemRepository, "Delete", grid.asSingleSelect().getValue(), CRUD_DELETE);
-			getUI().addWindow(window);
+			Long id = selected.getValue().getId();
+			RestResponse<Item> fetched = itemRepository.getById(id);
+			if (fetched.getStatus().equals(200)) {
+				Item obj = fetched.getEntity();
+				ItemForm window = new ItemForm(this, itemRepository, "Edit", obj, CRUD_DELETE);
+				getUI().addWindow(window);
+			} else {
+				Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
+			}
 		}
 	}
 
