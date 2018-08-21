@@ -149,12 +149,12 @@ public class ItemRepository {
 				Item data = response.readEntity(new GenericType<Item>() {
 				});
 				return new RestResponse<>(status, data);
-			} else if (status == 403) {
+			} else if((status == 403)|| (status == 404)){
 				return new RestResponse<>(status, response.getStatusInfo().toString());
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
 				String appMsg = jsonNode.path("appMsg").textValue();
-				return new RestResponse<>(404, fnc.formatAppMsg(appMsg));
+				return new RestResponse<>(400, fnc.formatAppMsg(appMsg));
 			}
 		} finally {
 			if (client != null) {

@@ -218,6 +218,10 @@ public class CustomerOrderList extends Composite implements View {
 			} else {
 				currentOrderHead = null;
 				Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
+				if (fetched.getStatus().equals(404)) {
+					grid.getDataProvider().refreshAll();
+					grid.deselectAll();					
+				}
 			}
 		}
 
@@ -238,6 +242,10 @@ public class CustomerOrderList extends Composite implements View {
 			} else {
 				currentOrderHead = null;
 				Notification.show("ERROR", fetched.getMsg(), Notification.Type.ERROR_MESSAGE);
+				if (fetched.getStatus().equals(404)) {
+					grid.getDataProvider().refreshAll();
+					grid.deselectAll();					
+				}
 			}
 		}
 	}
