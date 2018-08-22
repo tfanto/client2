@@ -14,6 +14,7 @@ import com.fnt.customer.CustomerList;
 import com.fnt.customerorder.CustomerOrderList;
 import com.fnt.item.ItemList;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.PushStateNavigation;
 import com.vaadin.navigator.ViewChangeListener;
@@ -58,6 +59,7 @@ public class VaadinUI extends UI {
 
 		sideMenu.setMenuCaption(menuCaption, logo);
 
+		//sideMenu.addNavigation("Home", VaadinIcons.HOME_O, "");
 		sideMenu.addNavigation("Customer", cuno, "Customer");
 		sideMenu.addNavigation("Item", itno, "Item");
 		sideMenu.addNavigation("Customer order", cunoorder, "Order");
