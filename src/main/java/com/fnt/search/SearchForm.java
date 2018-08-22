@@ -8,6 +8,7 @@ import com.fnt.customerorder.CustomerOrderRepository;
 import com.fnt.dto.SearchData;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
+import com.vaadin.contextmenu.GridContextMenu;
 import com.vaadin.data.provider.DataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Button;
@@ -47,6 +48,7 @@ public class SearchForm extends Window {
 	private static DecimalFormat df2 = new DecimalFormat(".##");
 
 	private Grid<SearchData> grid = new Grid<>(SearchData.class);
+	private GridContextMenu<SearchData> contextMenu;
 
 	public SearchForm(int searchType, TextField searchField1, TextField searchField2, TextField searchField3, CustomerOrderRepository searchRepository) {
 		this.searchRepository = searchRepository;
@@ -90,6 +92,7 @@ public class SearchForm extends Window {
 		HorizontalLayout buttons = new HorizontalLayout(btn_cancel, btn_clr, btn_search, btn_ok);
 		buttons.setSpacing(true);
 		VerticalLayout layout = new VerticalLayout();
+		contextMenu = new GridContextMenu<>(grid);
 		layout.addComponents(grid, buttons);
 		setContent(layout);
 		setModal(true);
@@ -120,6 +123,37 @@ public class SearchForm extends Window {
 		btn_clr.addClickListener(e -> {
 			search1.setValue("");
 			search2.setValue("");
+		});
+
+		contextMenu.addGridHeaderContextMenuListener(event -> {
+			contextMenu.removeItems();
+			contextMenu.addItem("Search", VaadinIcons.SELECT, selectedMenuItem -> {
+				switch (searchType) {
+				case CUSTOMERS:
+					search();
+					break;
+				case ITEMS:
+					grid.getDataProvider().refreshAll();
+					break;
+				}
+			});
+			contextMenu.addItem("Clear", VaadinIcons.SELECT, selectedMenuItem -> {
+				search1.setValue("");
+				search2.setValue("");
+			});
+		});
+
+		contextMenu.addGridBodyContextMenuListener(event -> {
+			contextMenu.removeItems();
+			SingleSelect<SearchData> selected = grid.asSingleSelect();
+			SearchData selectedInGrid = selected.getValue();
+			if (selectedInGrid != null) {
+				contextMenu.addItem("Select", VaadinIcons.SELECT, selectedMenuItem -> {
+					if (event.getItem() != null) {
+						close();
+					}
+				});
+			}
 		});
 
 	}

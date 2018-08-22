@@ -11,6 +11,7 @@ import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 
+@SuppressWarnings("serial")
 public class ClientDefaultView extends Composite implements View {
 
 	private String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
