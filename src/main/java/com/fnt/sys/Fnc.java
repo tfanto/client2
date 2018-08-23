@@ -1,6 +1,7 @@
 package com.fnt.sys;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import com.fnt.AppException;
 import com.vaadin.data.provider.Query;
 import com.vaadin.data.provider.QuerySortOrder;
 import com.vaadin.server.VaadinSession;
@@ -144,7 +146,7 @@ public class Fnc {
 		return ret;
 	}
 
-	public <T> List<String> validate(T e) {
+	public <T> List<String> validate2(T e) {
 
 		List<String> ret = new ArrayList<>();
 
@@ -156,6 +158,19 @@ public class Fnc {
 			ret.add(msg);
 		}
 		return ret;
+	}
+
+	public <T> void validate(T obj) {
+
+		Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+		Set<ConstraintViolation<T>> constraintViolations = validator.validate(obj);
+		if (constraintViolations.size() > 0) {
+			Set<String> violationMessages = new HashSet<>();
+			for (ConstraintViolation<T> constraintViolation : constraintViolations) {
+				violationMessages.add(constraintViolation.getPropertyPath() + ": " + constraintViolation.getMessage());
+			}
+			throw new AppException(412, violationMessages);
+		}
 	}
 
 }
