@@ -8,16 +8,11 @@ import java.util.Base64.Encoder;
 import java.util.List;
 
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ContextResolver;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fnt.customer.CustomerRepository;
 import com.fnt.dto.CustomerOrderHeadListView;
 import com.fnt.dto.CustomerOrderLineListView;
@@ -40,20 +35,6 @@ public class CustomerOrderRepository {
 	private CustomerRepository customerRepository = new CustomerRepository();
 	private ItemRepository itemRepository = new ItemRepository();
 
-	public Client createClient() {
-
-		Client client = ClientBuilder.newClient();
-		client.register(new ContextResolver<ObjectMapper>() {
-			@Override
-			public ObjectMapper getContext(Class<?> type) {
-				ObjectMapper mapper = new ObjectMapper();
-				mapper.registerModule(new JavaTimeModule());
-				mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-				return mapper;
-			}
-		});
-		return client;
-	}
 
 	public RestResponse<List<CustomerOrderHeadListView>> paginatesearch(Integer offset, Integer limit, String filterCustomerNumberStr, String filterNameStr, LocalDate filterDate, String filterStatusStr, String filterChangedByStr,
 			String sortOrderStr) {
@@ -77,7 +58,7 @@ public class CustomerOrderRepository {
 
 		Client client = null;
 		try {
-			client = createClient();
+			client = Fnc.createClient();
 			// @formatter:off
 			Response response = client
 					.target(REST_CUSTOMER_ORDER_END_POINT)
@@ -130,7 +111,7 @@ public class CustomerOrderRepository {
 
 		Client client = null;
 		try {
-			client = createClient();
+			client = Fnc.createClient();
 			// @formatter:off
 			Response response = client
 					.target(REST_CUSTOMER_ORDER_END_POINT)
@@ -167,7 +148,7 @@ public class CustomerOrderRepository {
 	public RestResponse<CustomerOrderHead> getById(Long id) {
 		Client client = null;
 		try {
-			client = createClient();
+			client = Fnc.createClient();
 			// @formatter:off
 			Response response = client
 					.target(REST_CUSTOMER_ORDER_END_POINT)
@@ -181,7 +162,7 @@ public class CustomerOrderRepository {
 				CustomerOrderHead obj = response.readEntity(new GenericType<CustomerOrderHead>() {
 				});
 				return new RestResponse<>(status, obj);
-			} else if((status == 403)|| (status == 404)){
+			} else if ((status == 403) || (status == 404)) {
 				return new RestResponse<>(status, response.getStatusInfo().toString());
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
@@ -210,7 +191,7 @@ public class CustomerOrderRepository {
 		Client client = null;
 		try {
 			// @formatter:off
-			client = createClient();
+			client = Fnc.createClient();
 			Response response = client
 					.target(REST_CUSTOMER_ORDER_END_POINT).path("header")
 					.queryParam("customernumber", theCustomerNumber)
@@ -253,7 +234,7 @@ public class CustomerOrderRepository {
 
 		Client client = null;
 		try {
-			client = createClient();
+			client = Fnc.createClient();
 			// @formatter:off
 			Response response = client
 					.target(REST_CUSTOMER_ORDER_END_POINT).path("header")
@@ -301,7 +282,7 @@ public class CustomerOrderRepository {
 
 		Client client = null;
 		try {
-			client = createClient();
+			client = Fnc.createClient();
 			// @formatter:off
 			Response response = client
 					.target(REST_CUSTOMER_ORDER_END_POINT)
@@ -341,7 +322,7 @@ public class CustomerOrderRepository {
 
 		Client client = null;
 		try {
-			client = createClient();
+			client = Fnc.createClient();
 			// @formatter:off
 				Response response = client
 						.target(REST_CUSTOMER_ORDER_END_POINT)
@@ -378,7 +359,7 @@ public class CustomerOrderRepository {
 
 		Client client = null;
 		try {
-			client = createClient();
+			client = Fnc.createClient();
 			// @formatter:off
 				Response response = client
 						.target(REST_CUSTOMER_ORDER_END_POINT)
@@ -412,7 +393,7 @@ public class CustomerOrderRepository {
 
 		Client client = null;
 		try {
-			client = createClient();
+			client = Fnc.createClient();
 			// @formatter:off
 				Response response = client
 						.target(REST_CUSTOMER_ORDER_END_POINT)
