@@ -6,17 +6,12 @@ import java.util.Base64.Encoder;
 import java.util.List;
 
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ContextResolver;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fnt.dto.SearchData;
 import com.fnt.entity.Item;
 import com.fnt.sys.Fnc;
@@ -31,22 +26,6 @@ public class ItemRepository {
 
 	private static final String REST_ITEM_END_POINT = String.valueOf(VaadinServlet.getCurrent().getServletContext().getAttribute("REST_ITEM_END_POINT"));
 
-
-	public Client createClient() {
-
-		Client client = ClientBuilder.newClient();
-		client.register(new ContextResolver<ObjectMapper>() {
-			@Override
-			public ObjectMapper getContext(Class<?> type) {
-				ObjectMapper mapper = new ObjectMapper();
-				mapper.registerModule(new JavaTimeModule());
-				mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-				return mapper;
-			}
-		});
-		return client;
-	}
-
 	public RestResponse<List<Item>> paginatesearch(Integer offset, Integer limit, String itemNumberStr, String descriptionStr, String sortorderStr) {
 
 		Encoder encoder = Base64.getEncoder();
@@ -59,7 +38,7 @@ public class ItemRepository {
 
 		Client client = null;
 		try {
-			client = createClient();
+			client = Fnc.createClient();
 			// @formatter:off
 			Response response = client
 					.target(REST_ITEM_END_POINT)
@@ -78,7 +57,7 @@ public class ItemRepository {
 				});
 				return new RestResponse<>(status, theList);
 			} else if (status == 403) {
-				return new RestResponse<>(status, response.getStatusInfo().toString(), new ArrayList<>());				
+				return new RestResponse<>(status, response.getStatusInfo().toString(), new ArrayList<>());
 			} else {
 				return new RestResponse<>(status, new ArrayList<>());
 			}
@@ -98,7 +77,7 @@ public class ItemRepository {
 
 		Client client = null;
 		try {
-			client = createClient();
+			client = Fnc.createClient();
 			// @formatter:off
 			Response response = client
 					.target(REST_ITEM_END_POINT)
@@ -135,7 +114,7 @@ public class ItemRepository {
 
 		Client client = null;
 		try {
-			client = createClient();
+			client = Fnc.createClient();
 			// @formatter:off
 			Response response = client
 					.target(REST_ITEM_END_POINT)
@@ -149,7 +128,7 @@ public class ItemRepository {
 				Item data = response.readEntity(new GenericType<Item>() {
 				});
 				return new RestResponse<>(status, data);
-			} else if((status == 403)|| (status == 404)){
+			} else if ((status == 403) || (status == 404)) {
 				return new RestResponse<>(status, response.getStatusInfo().toString());
 			} else {
 				JsonNode jsonNode = response.readEntity(JsonNode.class);
@@ -166,7 +145,7 @@ public class ItemRepository {
 	public RestResponse<Item> create(Item obj) {
 		Client client = null;
 		try {
-			client = createClient();
+			client = Fnc.createClient();
 			// @formatter:off
 			Response response = client
 					.target(REST_ITEM_END_POINT)
@@ -196,7 +175,7 @@ public class ItemRepository {
 	public RestResponse<Item> update(Item obj) {
 		Client client = null;
 		try {
-			client = createClient();
+			client = Fnc.createClient();
 			// @formatter:off
 			Response response = client
 					.target(REST_ITEM_END_POINT)
@@ -228,7 +207,7 @@ public class ItemRepository {
 
 		Client client = null;
 		try {
-			client = createClient();
+			client = Fnc.createClient();
 			// @formatter:off
 			Response response = client
 					.target(REST_ITEM_END_POINT)
@@ -266,7 +245,7 @@ public class ItemRepository {
 
 		Client client = null;
 		try {
-			client = createClient();
+			client = Fnc.createClient();
 			// @formatter:off
 			Response response = client
 					.target(REST_ITEM_END_POINT)
@@ -285,7 +264,7 @@ public class ItemRepository {
 				});
 				return new RestResponse<>(status, theList);
 			} else if (status == 403) {
-				return new RestResponse<>(status, response.getStatusInfo().toString(), new ArrayList<>());				
+				return new RestResponse<>(status, response.getStatusInfo().toString(), new ArrayList<>());
 			} else {
 				return new RestResponse<>(status, new ArrayList<>());
 			}
@@ -305,7 +284,7 @@ public class ItemRepository {
 
 		Client client = null;
 		try {
-			client = createClient();
+			client = Fnc.createClient();
 			// @formatter:off
 			Response response = client
 					.target(REST_ITEM_END_POINT)
@@ -335,8 +314,5 @@ public class ItemRepository {
 			}
 		}
 	}
-
-	
-	
 
 }

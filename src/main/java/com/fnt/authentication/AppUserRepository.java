@@ -4,16 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ContextResolver;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fnt.entity.AppUser;
 import com.fnt.sys.Fnc;
 import com.fnt.sys.RestResponse;
@@ -26,21 +21,6 @@ public class AppUserRepository {
 
 	private static final String USER_REGISTRATION_END_POINT = String.valueOf(VaadinServlet.getCurrent().getServletContext().getAttribute("USER_REGISTRATION_END_POINT"));
 	private static final String APPUSER_END_POINT = String.valueOf(VaadinServlet.getCurrent().getServletContext().getAttribute("APPUSER_END_POINT"));
-
-	private static Client createClient() {
-
-		Client client = ClientBuilder.newClient();
-		client.register(new ContextResolver<ObjectMapper>() {
-			@Override
-			public ObjectMapper getContext(Class<?> type) {
-				ObjectMapper mapper = new ObjectMapper();
-				mapper.registerModule(new JavaTimeModule());
-				mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-				return mapper;
-			}
-		});
-		return client;
-	}
 
 	/**
 	 * warning this goes to the security server
@@ -66,7 +46,7 @@ public class AppUserRepository {
 
 		Client client = null;
 		try {
-			client = createClient();
+			client = Fnc.createClient();
 			// @formatter:off
 			Response response = client
 					.target(USER_REGISTRATION_END_POINT)
@@ -105,7 +85,7 @@ public class AppUserRepository {
 		user.setLogin(login);
 		Client client = null;
 		try {
-			client = createClient();
+			client = Fnc.createClient();
 			// @formatter:off
 			Response response = client
 					.target(APPUSER_END_POINT)
@@ -140,7 +120,7 @@ public class AppUserRepository {
 
 		Client client = null;
 		try {
-			client = createClient();
+			client = Fnc.createClient();
 			// @formatter:off
 			Response response = client
 					.target(APPUSER_END_POINT)

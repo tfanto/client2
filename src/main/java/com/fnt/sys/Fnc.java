@@ -11,7 +11,14 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.ext.ContextResolver;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fnt.AppException;
 import com.vaadin.data.provider.Query;
 import com.vaadin.data.provider.QuerySortOrder;
@@ -29,6 +36,23 @@ import com.vaadin.ui.components.grid.HeaderRow;
 import com.vaadin.ui.themes.ValoTheme;
 
 public class Fnc {
+
+	public static Client createClient() {
+
+		Client client = ClientBuilder.newClient();
+		client.register(new ContextResolver<ObjectMapper>() {
+			@Override
+			public ObjectMapper getContext(Class<?> type) {
+				ObjectMapper mapper = new ObjectMapper();
+				mapper.registerModule(new JavaTimeModule());
+				mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+				mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+				mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+				return mapper;
+			}
+		});
+		return client;
+	}
 
 	public HorizontalLayout createFilterField(TextField field) {
 		HorizontalLayout hl = new HorizontalLayout();
