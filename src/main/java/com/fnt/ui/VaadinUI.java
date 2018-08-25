@@ -41,6 +41,7 @@ public class VaadinUI extends UI {
 	private FileResource cuno = new FileResource(new File(basepath + "/WEB-INF/images/customer.jpg"));
 	private FileResource itno = new FileResource(new File(basepath + "/WEB-INF/images/item.jpg"));
 	private FileResource cunoorder = new FileResource(new File(basepath + "/WEB-INF/images/customerorder.jpg"));
+	private FileResource home = new FileResource(new File(basepath + "/WEB-INF/images/home.jpg"));
 
 	@Override
 	protected void init(VaadinRequest request) {
@@ -59,7 +60,7 @@ public class VaadinUI extends UI {
 
 		sideMenu.setMenuCaption(menuCaption, logo);
 
-		//sideMenu.addNavigation("Home", VaadinIcons.HOME_O, "");
+		sideMenu.addNavigation("Home", home, "");
 		sideMenu.addNavigation("Customer", cuno, "Customer");
 		sideMenu.addNavigation("Item", itno, "Item");
 		sideMenu.addNavigation("Customer order", cunoorder, "Order");
@@ -71,7 +72,6 @@ public class VaadinUI extends UI {
 		navigator.addViewChangeListener(new ViewChangeListener() {
 			@Override
 			public boolean beforeViewChange(ViewChangeEvent event) {
-
 				if (AppLoginRepository.isAuthenticated()) {
 					return true;
 				} else {
