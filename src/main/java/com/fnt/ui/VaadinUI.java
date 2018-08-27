@@ -13,8 +13,8 @@ import com.fnt.authentication.AppUserDataUpdateForm;
 import com.fnt.customer.CustomerList;
 import com.fnt.customerorder.CustomerOrderList;
 import com.fnt.item.ItemList;
+import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.VaadinServletConfiguration;
-import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.PushStateNavigation;
 import com.vaadin.navigator.ViewChangeListener;
@@ -28,11 +28,13 @@ import com.vaadin.ui.UI;
 
 @SuppressWarnings("serial")
 @PushStateNavigation
+@PreserveOnRefresh
 public class VaadinUI extends UI {
 
 	private SideMenu sideMenu = new SideMenu();
 	private boolean logoVisible = true;
 	private String menuCaption = "T C O";
+	private static ClientDefaultView clientDefaultView;
 
 	private String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 
@@ -52,7 +54,11 @@ public class VaadinUI extends UI {
 		// NOTE: Navigation and custom code menus should not be mixed.
 		// See issue #8
 
-		navigator.addView("", ClientDefaultView.class);
+		if (clientDefaultView == null) {
+			clientDefaultView = new ClientDefaultView();
+		}
+
+		navigator.addView("", clientDefaultView);
 		navigator.addView("Customer", CustomerList.class);
 		navigator.addView("Item", ItemList.class);
 		navigator.addView("Order", CustomerOrderList.class);
@@ -94,6 +100,13 @@ public class VaadinUI extends UI {
 			setUser(user);
 		}
 
+
+	}
+
+	@Override
+	public void detach() {
+
+		super.detach();
 	}
 
 	private FileResource getUserIcon(String user) {
@@ -116,7 +129,7 @@ public class VaadinUI extends UI {
 		sideMenu.setUserName(user);
 		sideMenu.setUserIcon(resource);
 		sideMenu.clearUserMenu();
-		sideMenu.addUserMenuItem("Userinfo", () -> {						
+		sideMenu.addUserMenuItem("Userinfo", () -> {
 			AppUserDataUpdateForm window = new AppUserDataUpdateForm(2);
 			getUI().addWindow(window);
 		});
@@ -138,6 +151,7 @@ public class VaadinUI extends UI {
 	@VaadinServletConfiguration(ui = VaadinUI.class, productionMode = true)
 	public static class VaadinUIServlet extends VaadinServlet {
 	}
+
 
 	// @formatter:on
 

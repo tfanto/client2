@@ -1,6 +1,6 @@
-package com.fnt.push;
+package com.fnt.broadcasting;
 
-public class PushData {
+public class BroadcastingData {
 	
 	private String data;
 
