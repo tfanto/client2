@@ -10,12 +10,10 @@ import com.fnt.authentication.AppLoginForm;
 import com.fnt.authentication.AppLoginRepository;
 import com.fnt.authentication.AppPasswordUpdateForm;
 import com.fnt.authentication.AppUserDataUpdateForm;
-import com.fnt.broadcasting.Broadcaster;
-import com.fnt.broadcasting.Broadcaster.BroadcastListener;
 import com.fnt.customer.CustomerList;
 import com.fnt.customerorder.CustomerOrderList;
 import com.fnt.item.ItemList;
-import com.vaadin.annotations.Push;
+import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.PushStateNavigation;
@@ -30,8 +28,8 @@ import com.vaadin.ui.UI;
 
 @SuppressWarnings("serial")
 @PushStateNavigation
-@Push
-public class VaadinUI extends UI implements BroadcastListener {
+@PreserveOnRefresh
+public class VaadinUI extends UI {
 
 	private SideMenu sideMenu = new SideMenu();
 	private boolean logoVisible = true;
@@ -55,9 +53,9 @@ public class VaadinUI extends UI implements BroadcastListener {
 
 		// NOTE: Navigation and custom code menus should not be mixed.
 		// See issue #8
-		
-		if(clientDefaultView == null) {
-			clientDefaultView = new ClientDefaultView();			
+
+		if (clientDefaultView == null) {
+			clientDefaultView = new ClientDefaultView();
 		}
 
 		navigator.addView("", clientDefaultView);
@@ -102,15 +100,12 @@ public class VaadinUI extends UI implements BroadcastListener {
 			setUser(user);
 		}
 
-		// Vaadin broadcast
-		Broadcaster.register(this);
 
 	}
 
 	@Override
 	public void detach() {
 
-		Broadcaster.unregister(this);
 		super.detach();
 	}
 
@@ -152,22 +147,11 @@ public class VaadinUI extends UI implements BroadcastListener {
 		return null;
 	}
 
-
 	@WebServlet(urlPatterns = "/*", name = "VaadinUIServlet", asyncSupported = true)
 	@VaadinServletConfiguration(ui = VaadinUI.class, productionMode = true)
 	public static class VaadinUIServlet extends VaadinServlet {
 	}
 
-	@Override
-	public void receiveBroadcast(String message) {
-		access(new Runnable() {
-			@Override
-			public void run() {
-				System.out.println(message);
-			}
-		});
-		
-	}
 
 	// @formatter:on
 

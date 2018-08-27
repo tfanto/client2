@@ -79,20 +79,21 @@ public class ClientDefaultView extends Composite implements View {
 		webTarget = client.target(REST_EVENT_END_POINT);
 		try {
 			eventSource = SseEventSource.target(webTarget).build();
-			// eventSource.register((e) -> {
-			// System.out.println(e.readData());
-			// });
 			eventSource.register(this::onMessage);
 			eventSource.open();
 		} catch (Throwable t) {
 			System.out.println(t.toString());
 		} finally {
 		}
+		
+		System.out.println("--------------------------------------------------------------------------------------------------------------- CTOR");
 
 		setCompositionRoot(layout);
 	}
 
 	void onMessage(InboundSseEvent event) {
+		System.out.println("--------------------------------------------------------------------------------------------------------------- ON_MSG");
+
 		String id = event.getId();
 		String name = event.getName();
 		String payload = event.readData();
@@ -106,7 +107,9 @@ public class ClientDefaultView extends Composite implements View {
 
 	@Override
 	public void finalize() {
-		//eventSource.close();
+		System.out.println("--------------------------------------------------------------------------------------------------------------- DTOR");
+
+		eventSource.close();
 
 	}
 
