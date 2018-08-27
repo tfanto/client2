@@ -78,14 +78,14 @@ public class ClientDefaultView extends Composite implements View {
 
 		webTarget = client.target(REST_EVENT_END_POINT);
 		try {
-			eventSource = SseEventSource.target(webTarget).build();
-			eventSource.register(this::onMessage);
+			eventSource = SseEventSource.target(webTarget).reconnectingEvery(1, TimeUnit.SECONDS).build();
+			eventSource.register(this::onMessage, this::onError);
 			eventSource.open();
 		} catch (Throwable t) {
 			System.out.println(t.toString());
 		} finally {
 		}
-		
+
 		System.out.println("--------------------------------------------------------------------------------------------------------------- CTOR");
 
 		setCompositionRoot(layout);
@@ -102,6 +102,13 @@ public class ClientDefaultView extends Composite implements View {
 		BroadcastingData data = new BroadcastingData();
 		data.setData(payload);
 		notifications.add(data);
+
+	}
+
+	void onError(Throwable t) {
+		System.out.println("--------------------------------------------------------------------------------------------------------------- ON_ERROR");
+
+		t.printStackTrace();
 
 	}
 
