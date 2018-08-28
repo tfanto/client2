@@ -57,6 +57,9 @@ public class SSEClient {
 	public void addSubscriber(Object object) {
 		guava.register(object);		
 	}
+	public void removeSubscriber(Object object) {
+		guava.unregister(object);		
+	}
 
 	public void onMessage(InboundSseEvent event) {
 		String id = event.getId();
