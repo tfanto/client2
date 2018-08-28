@@ -10,12 +10,17 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
 import com.fnt.ui.SSEClient;
+import com.google.common.eventbus.EventBus;
 import com.vaadin.server.VaadinServlet;
 
 @WebListener
 public class AppClientServletContextListener implements ServletContextListener {
 	
 	private static SSEClient sseClient;
+	public static SSEClient getSSE() {
+		return sseClient;
+	}
+
 
 
 	@Override
@@ -49,6 +54,9 @@ public class AppClientServletContextListener implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent servletContextEvent) {
+		
+		
+		sseClient.close();
 	}
 
 }

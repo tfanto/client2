@@ -2,13 +2,14 @@ package com.fnt.ui;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.sse.InboundSseEvent;
 import javax.ws.rs.sse.SseEventSource;
 
 import com.fnt.broadcasting.BroadcastingData;
+import com.fnt.sys.AppClientServletContextListener;
+import com.google.common.eventbus.EventBus;
 
 public class SSEClient {
 
@@ -47,9 +48,14 @@ public class SSEClient {
 
 	}
 
+	public  EventBus guava = new EventBus();
+
 	public void addNotification(BroadcastingData data) {
-		
-		System.out.println(data.getData());
+		guava.post(data.getData());
+	}
+	
+	public void addSubscriber(Object object) {
+		guava.register(object);		
 	}
 
 	public void onMessage(InboundSseEvent event) {

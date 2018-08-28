@@ -29,11 +29,13 @@ import com.vaadin.ui.UI;
 
 @SuppressWarnings("serial")
 @PushStateNavigation
+@PreserveOnRefresh
 public class VaadinUI extends UI {
 
 	private SideMenu sideMenu = new SideMenu();
 	private boolean logoVisible = true;
 	private String menuCaption = "T C O";
+	private ClientDefaultView clientDefaultView = new ClientDefaultView();
 
 	private String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 
@@ -54,7 +56,7 @@ public class VaadinUI extends UI {
 		// See issue #8
 
 
-		navigator.addView("", ClientDefaultView.class);
+		navigator.addView("", clientDefaultView);
 		navigator.addView("Customer", CustomerList.class);
 		navigator.addView("Item", ItemList.class);
 		navigator.addView("Order", CustomerOrderList.class);
