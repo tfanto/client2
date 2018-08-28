@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.fnt.broadcasting.BroadcastingData;
 import com.fnt.sys.AppClientServletContextListener;
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.provider.DataProvider;
 import com.vaadin.data.provider.ListDataProvider;
@@ -35,7 +34,6 @@ public class ClientDefaultView extends Composite implements View {
 	
 	@Subscribe
 	public void stringEvent(String event) {
-		System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   " + event);
 		BroadcastingData d = new BroadcastingData();
 		d.setData(event);
 		notifications.add(d);
@@ -83,6 +81,7 @@ public class ClientDefaultView extends Composite implements View {
 
 	@Override
 	public void finalize() {
+		AppClientServletContextListener.getSSE().removeSubscriber(this);
 	}
 
 }
