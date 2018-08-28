@@ -4,9 +4,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.sse.InboundSseEvent;
-
 import com.fnt.broadcasting.BroadcastingData;
+import com.fnt.sys.AppClientServletContextListener;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.provider.DataProvider;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.navigator.View;
@@ -26,15 +27,24 @@ public class ClientDefaultView extends Composite implements View {
 	private String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 	private FileResource picture = new FileResource(new File(basepath + "/WEB-INF/images/tf03.jpg"));
 
+
 	public Grid<BroadcastingData> grid = new Grid<>();
 	private List<BroadcastingData> notifications = new ArrayList<>();
+	ListDataProvider<BroadcastingData> dataProvider;
 
-	public void addNotification(BroadcastingData data) {
-		notifications.add(data);
-		grid.getDataProvider().refreshAll();
+	
+	@Subscribe
+	public void stringEvent(String event) {
+		System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   " + event);
+		BroadcastingData d = new BroadcastingData();
+		d.setData(event);
+		notifications.add(d);
+		dataProvider.refreshAll();
 	}
 
 	public ClientDefaultView() {
+		
+		AppClientServletContextListener.getSSE().addSubscriber(this);
 
 		grid.removeAllColumns();
 
@@ -65,13 +75,11 @@ public class ClientDefaultView extends Composite implements View {
 		layout.addComponent(grid);
 		layout.setComponentAlignment(grid, Alignment.BOTTOM_CENTER);
 
-		ListDataProvider<BroadcastingData> dataProvider = DataProvider.ofCollection(notifications);
+		dataProvider = DataProvider.ofCollection(notifications);
 		grid.setDataProvider(dataProvider);
 
 		setCompositionRoot(layout);
 	}
-
-
 
 	@Override
 	public void finalize() {
