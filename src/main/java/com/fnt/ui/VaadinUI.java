@@ -2,6 +2,7 @@ package com.fnt.ui;
 
 import java.io.File;
 
+import javax.annotation.Resource;
 import javax.servlet.annotation.WebServlet;
 
 import org.vaadin.teemusa.sidemenu.SideMenu;
@@ -28,13 +29,11 @@ import com.vaadin.ui.UI;
 
 @SuppressWarnings("serial")
 @PushStateNavigation
-@PreserveOnRefresh
 public class VaadinUI extends UI {
 
 	private SideMenu sideMenu = new SideMenu();
 	private boolean logoVisible = true;
 	private String menuCaption = "T C O";
-	private static ClientDefaultView clientDefaultView;
 
 	private String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 
@@ -54,11 +53,8 @@ public class VaadinUI extends UI {
 		// NOTE: Navigation and custom code menus should not be mixed.
 		// See issue #8
 
-		if (clientDefaultView == null) {
-			clientDefaultView = new ClientDefaultView();
-		}
 
-		navigator.addView("", clientDefaultView);
+		navigator.addView("", ClientDefaultView.class);
 		navigator.addView("Customer", CustomerList.class);
 		navigator.addView("Item", ItemList.class);
 		navigator.addView("Order", CustomerOrderList.class);
@@ -99,7 +95,6 @@ public class VaadinUI extends UI {
 			}
 			setUser(user);
 		}
-
 
 	}
 
@@ -151,7 +146,6 @@ public class VaadinUI extends UI {
 	@VaadinServletConfiguration(ui = VaadinUI.class, productionMode = true)
 	public static class VaadinUIServlet extends VaadinServlet {
 	}
-
 
 	// @formatter:on
 
