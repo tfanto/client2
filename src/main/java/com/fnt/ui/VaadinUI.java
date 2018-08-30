@@ -29,7 +29,6 @@ import com.vaadin.ui.UI;
 
 @SuppressWarnings("serial")
 @PushStateNavigation
-@PreserveOnRefresh
 public class VaadinUI extends UI {
 
 	private SideMenu sideMenu = new SideMenu();

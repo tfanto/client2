@@ -10,8 +10,6 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
 import com.fnt.ui.SSEClient;
-import com.google.common.eventbus.EventBus;
-import com.vaadin.server.VaadinServlet;
 
 @WebListener
 public class AppClientServletContextListener implements ServletContextListener {

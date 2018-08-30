@@ -7,9 +7,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.sse.InboundSseEvent;
 import javax.ws.rs.sse.SseEventSource;
 
-import com.fnt.broadcasting.BroadcastingData;
-import com.fnt.sys.AppClientServletContextListener;
-import com.google.common.eventbus.EventBus;
+import com.fanto.sys.AppEventBus;
 
 public class SSEClient {
 
@@ -48,28 +46,13 @@ public class SSEClient {
 
 	}
 
-	public  EventBus guava = new EventBus();
-
-	public void addNotification(BroadcastingData data) {
-		guava.post(data.getData());
-	}
-	
-	public void addSubscriber(Object object) {
-		guava.register(object);		
-	}
-	public void removeSubscriber(Object object) {
-		guava.unregister(object);		
-	}
-
 	public void onMessage(InboundSseEvent event) {
 		String id = event.getId();
 		String name = event.getName();
-		String payload = event.readData();
+		String data = event.readData();
 		String comment = event.getComment();
 		// processing...
-		BroadcastingData data = new BroadcastingData();
-		data.setData(payload);
-		addNotification(data);
+		AppEventBus.getInstance().addNotification(data);
 
 	}
 
