@@ -14,10 +14,10 @@ import com.vaadin.server.FileResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Composite;
-import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.VerticalLayout;
 
 @SuppressWarnings("serial")
@@ -26,7 +26,7 @@ public class ClientDefaultView extends Composite implements View {
 	private String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 	private FileResource picture = new FileResource(new File(basepath + "/WEB-INF/images/tf03.jpg"));
 
-	public Grid<BroadcastingData> grid = new Grid<>();
+	public ListSelect<BroadcastingData> grid = new ListSelect<>();
 	private List<BroadcastingData> notifications = new ArrayList<>();
 	ListDataProvider<BroadcastingData> dataProvider;
 
@@ -42,7 +42,7 @@ public class ClientDefaultView extends Composite implements View {
 
 		AppEventBus.getInstance().addSubscriber(this);
 
-		//grid.removeAllColumns();
+		// grid.removeAllColumns();
 
 		Image image = new Image("", picture);
 
@@ -63,16 +63,17 @@ public class ClientDefaultView extends Composite implements View {
 		layout.setComponentAlignment(lblContact1, Alignment.MIDDLE_CENTER);
 		layout.setComponentAlignment(lblContact2, Alignment.MIDDLE_CENTER);
 
-		grid.addColumn(BroadcastingData::getData).setExpandRatio(1).setId("data").setCaption("Notifications");
-		for (Column<BroadcastingData, ?> col : grid.getColumns()) {
-			col.setSortable(false);
-		}
+		//grid.addColumn(BroadcastingData::getData).setExpandRatio(1).setId("data").setCaption("Notifications");
+		//for (Column<BroadcastingData, ?> col : grid.getColumns()) {
+		//	col.setSortable(false);
+		//}
 
 		layout.addComponent(grid);
 		layout.setComponentAlignment(grid, Alignment.BOTTOM_CENTER);
 
 		dataProvider = DataProvider.ofCollection(notifications);
 		grid.setDataProvider(dataProvider);
+		grid.setWidth("600px");
 
 		setCompositionRoot(layout);
 	}

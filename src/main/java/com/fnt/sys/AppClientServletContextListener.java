@@ -9,17 +9,15 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-import com.fnt.ui.SSEClient;
-
 @WebListener
 public class AppClientServletContextListener implements ServletContextListener {
+
+	// private static SSEClient sseClient;
+	// public static SSEClient getSSE() {
+	// return sseClient;
+	// }
 	
-	private static SSEClient sseClient;
-	public static SSEClient getSSE() {
-		return sseClient;
-	}
-
-
+	AsyncClient asyncClient;
 
 	@Override
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
@@ -36,25 +34,24 @@ public class AppClientServletContextListener implements ServletContextListener {
 				String valStr = String.valueOf(value);
 				ctx.setAttribute(keyStr, valStr);
 			});
-			
+
 			REST_EVENT_END_POINT = props.getProperty("REST_EVENT_END_POINT");
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		sseClient = new SSEClient(REST_EVENT_END_POINT);
-		sseClient.open();
+		// sseClient = new SSEClient(REST_EVENT_END_POINT);
+		// sseClient.open();
+		asyncClient = new AsyncClient();
+		asyncClient.connect();
 
-		
-		
 	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent servletContextEvent) {
-		
-		
-		sseClient.close();
+
+		asyncClient.close();
 	}
 
 }
